@@ -12,9 +12,9 @@
 //    The optimization for connectivity matrix must be done in the first
 //    place (highest priority). The sequences of sources and weights which
 //    specified in arrays Srcs & Weights should be the most similar and
-//    mom-fragmented for sequential targets. Another possible optimization could
+//    nom-fragmented for sequential targets. Another possible optimization could
 //    be the calculating of the partial weighted sum for each target on single
-//    multiprocessor.
+//    multiprocessor unit of the device.
 
 #ifndef __CONNECT_SKETCH_H
 #define __CONNECT_SKETCH_H
