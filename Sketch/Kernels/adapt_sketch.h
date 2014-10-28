@@ -7,7 +7,15 @@
 #define __ADAPT_SKETCH_H
 //////////////////////////////////////////////////////////////////////////
 // global variables
-//--- global parameters (READ-ONLY access, could be stored in the constant memory)
+//--- global parameters (READ-ONLY access, could be stored in the constant
+//    memory)
+uint Nnmdasyn;  // total number of synapses with adaptation
+uint NNmType;   // number of different types of nmda synapses
+float4 *NmdaType2;// L=NNmdSyn; parameters of nmda synapses:
+                // x - k
+                // y - half-voltage
+                // z - slope
+                // w - reserved
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -15,23 +23,40 @@
 //------------------------------------------------------------------------
 // kernel specific variables
 //--- local parameters (READ-ONLY access, stored in global memory and could be cached in the shared memory)
-uint Npsyn;     // total number of
-uint4 *PSynLUT; // L=Npsyn; look-up-tables for
+uint4 *NmdaLUT; // L=Nnmdasyn; look-up-tables for
                 // x - look-up-table of types of synaptic adaptation
                 // y - look-up-table of dendrites which receive synaptic input
-                // z - look-up-table of outputs
-                // w - reserved
+                // z - concentration of Mg+ inside the cell
+                // w - look-up-table of outputs
+float *PreSyn;  // L=Nadaptsyn; outputs of synaptic plasticity
+float *V;       // L=Nv (see stage 1); membrane potential of all compartments
+float *IonsIn;  // L=Nin (see stage ?); concentration of ions inside cell
 
 //--- <kernel 3.1>
-void adapt_presyn( void )
+void adapt_nmda( uint id )
 {
-    for( uint syn = 0; syn < Npsyn; ++syn ){
-        // load to shared memory (?)
-        uint type = PSynLUT[i].x;
-        uint dendrite = PSynLUT[i].y;
-        uint out = PSynLUT[i].z;
-        //...
-    }
-
+    // load from shared memory (?)
+    uint type = NmdaLUT[id].x;  // make sure type < NNmType
+    uint dendr = NmdaLUT[id].y; // make sure dendr < Nv
+    uint ion = NmdaLUT[id].z;   // make sure dendr < Nin
+    uint out = NmdaLUT[id].w;   // make sure out < Nnmdasyn
+    // load from constant memory
+    float km = NmdaType2[type].x;
+    float hv = NmdaType2[type].y;
+    float slp = NmdaType2[type].z;
+    // load from global memory
+    float mg = IonsIn[ion];
+    float v = V[dendr];
+    // math & store to global memory
+    PreSyn[out] = 1./( 1.+mg/km*exp(-( v-hv )/slp );
 }
+
+//--- call <kernel 3.1> for all nmda synapses
+void adapt_nmda( void )
+{
+    for( uint i = 0; i < Nnmdasyn; ++i ){
+        kernel_adapt_nmda( i );
+    }
+}
+
 #endif // __ADAPT_SKETCH_H

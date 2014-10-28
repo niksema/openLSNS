@@ -29,19 +29,24 @@ float2 *SiType; // L=NSiType; parameters of sigma synapses:
                 // y - slope
 
 uint NAType;    // number of different types of alpha synapses (AMPA/GABA)
-float2 *ATypCnt;// L=NAType; constant parameters of alpha synapses:
+float2 *AType1; // L=NAType; constant parameters of alpha synapses:
                 // x - a0
                 // y - a
-float4 *AType;  // L=NAType; parameters of alpha synapses:
+float4 *AType2;  // L=NAType; parameters of alpha synapses:
                 // x - alpha
                 // y - half-voltage
                 // z - slope
                 // w - time constant
 
 uint NNmType;   // number of different types of nmda synapses
-float2 *NmdaType;// L=NNmdSyn; parameters of nmda synapses:
+float2 *NmdaType1;// L=NNmdSyn; parameters of nmda synapses:
                 // x - alpha
                 // y - T
+float4 *NmdaType2;// L=NNmdSyn; parameters of nmda synapses: (see stage 3)
+                // x - k
+                // y - half-voltage
+                // z - slope
+                // w - reserved
 
 //--- shared variables (READ/WRITE access, stored in global memory)
 uint *Spike;    // L=Nv; 1 if spike is generated, otherwise 0
@@ -205,12 +210,12 @@ void kernel_alpha_presyn( uint id )
     uint axon = ASynLUT[id].y;  // make sure axon < Nv
     uint out = ASynLUT[id].z;   // make sure out < Nout
     // load from constant memory (?)
-    float a0 = ATypCnt[type].x;
-    float a = ATypCnt[type].y;
-    float alpha = AType[type].x;
-    float hv = AType[type].y;
-    float slp = AType[type].z;
-    float t = AType[type].w;
+    float a0 = AType1[type].x;
+    float a = AType1[type].y;
+    float alpha = AType2[type].x;
+    float hv = AType2[type].y;
+    float slp = AType2[type].z;
+    float t = AType2[type].w;
 
     // load from global memory
     float presyn = PreSyn[out];
@@ -257,14 +262,14 @@ void kernel_nmda_presyn( uint id )
     uint out = NSynLUT[id].z;   // make sure out < Nout
     uint atype = NSynLUT[id].w; // make sure type < NAType
     // load from constant memory (?)
-    float a0 = ATypCnt[atype].x;
-    float a = ATypCnt[atype].y;
-    float alpha = AType[atype].x;
-    float hv = AType[atype].y;
-    float slp = AType[atype].z;
-    float t = AType[atype].w;
-    float nmda_alpha = NmdaType[ntype].x;
-    float nmda_t = NmdaType[ntype].y;
+    float a0 = AType1[atype].x;
+    float a = AType1[atype].y;
+    float alpha = AType2[atype].x;
+    float hv = AType2[atype].y;
+    float slp = AType2[atype].z;
+    float t = AType2[atype].w;
+    float nmda_alpha = NmdaType1[ntype].x;
+    float nmda_t = NmdaType1[ntype].y;
     // load from global memory
     float v = V[axon];
     float presyn_ = PreSyn_[id];
