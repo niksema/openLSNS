@@ -200,7 +200,11 @@ uint4 *ASynLUT; // L=Nasyn; look-up-tables for alpha synapses:
                 // z - look-up-table of presynaptic outputs
                 // w - reserved
 
-//--- <kernel 1.4> presynaptic output is calculating according to <publication(s)>
+//--- <kernel 1.4> presynaptic output is calculating according to
+// Wang X-J, Tegner J, Constantinidis C, Goldman-Rakic PS (2004)
+// Division of labor among distinct subtypes of inhibitory neurons in a cortical microcircuit of working memory.
+// Proc. Natl. Acad. Sci. (USA), 101, 1368-1373
+// (see, http://www.cns.nyu.edu/wanglab/publications/pdf/wang04.pnas.pdf)
 // T*dOut/dt = out0-Out*(out0+1), where out0 = alpha*T*f, f = a0+a/(1+exp(-( v-Hv )/Slp ))
 // the result is stored in array PreSyn.
 void kernel_alpha_presyn( uint id )
@@ -250,7 +254,11 @@ uint4 *NSynLUT; // L=Nnsyn; look-up-tables for nmda synapses:
                 // w - look-up-table of a-types of nmda synapses
 float *PreSyn_; // L=Nnsyn; temporal variables needed for calculation
 
-//--- <kernel 1.5> presynaptic output is calculating according to <publication(s)>
+//--- <kernel 1.5> presynaptic output is calculating according to
+// Wang X-J, Tegner J, Constantinidis C, Goldman-Rakic PS (2004)
+// Division of labor among distinct subtypes of inhibitory neurons in a cortical microcircuit of working memory.
+// Proc. Natl. Acad. Sci. (USA), 101, 1368-1373
+// (see, http://www.cns.nyu.edu/wanglab/publications/pdf/wang04.pnas.pdf)
 // T*dOut/dt = out0-Out*(out0+1), where out0 = alpha*T*f, f is the "output" function of
 // alpha synapse. The result is stored to array PreSyn, the intermediate result stored
 // to array PreSyn_.
