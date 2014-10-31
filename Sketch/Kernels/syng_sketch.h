@@ -30,9 +30,9 @@ uint4 *SynLUT;  // L=Nsyn: look-up-tables to calculate a synaptic conductance
 //--- shared variables (READ) (stored in global memory)
 float *SynGates;// L<=3*Nsyn: synaptic gate variables
                 // (synaptic transmission; presynaptic inhibition; synaptic plasticity)
-float *Gmax;    // L=Nsyn: maximal conductance
+float *Gmax;    // L=Nsyn: array of maximal conductance of synapses
 //--- shared variables (WRITE) (stored in global memory)
-float *Gsyn;    // L=Nsyn: conductance
+float *Gsyn;    // L=Nsyn: array of synaptic conductance
 
 //--- kernel 4.1 calculating the synaptic conductance
 // The result is stored in array Gsyn (synaptic conductances).
