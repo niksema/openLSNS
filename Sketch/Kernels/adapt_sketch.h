@@ -6,16 +6,20 @@
 #ifndef __ADAPT_SKETCH_H
 #define __ADAPT_SKETCH_H
 //////////////////////////////////////////////////////////////////////////
-// global variables
+// global parameters and variables
 //--- global parameters (READ-ONLY access, could be stored in the constant
 //    memory)
-uint Nnmdasyn;  // total number of synapses with adaptation
-uint NNmType;   // number of different types of nmda synapses
-float4 *NmdaType2;// L=NNmdSyn; parameters of nmda synapses:
-                // x - k
-                // y - half-voltage
-                // z - slope
-                // w - reserved
+extern uint Nv;         // total number of all compartments
+extern uint Nnmdasyn;   // total number of synapses with adaptation
+extern uint NNmType;    // number of different types of nmda synapses
+extern float4 *NmdaType2;// L=NNmdSyn; parameters of nmda synapses:
+                        // x - k
+                        // y - half-voltage
+                        // z - slope
+                        // w - reserved
+//--- shared variables (READ/WRITE access, stored in global memory)
+extern float *V;        // L=Nv; membrane potential of all compartments
+extern float *MgIn;     // L=Nin; concentration of Mg ions inside cell
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -29,8 +33,6 @@ uint4 *NmdaLUT; // L=Nnmdasyn; look-up-tables for
                 // z - concentration of Mg+ inside the cell
                 // w - look-up-table of outputs
 float *PreSyn;  // L=Nadaptsyn; outputs of synaptic plasticity
-float *V;       // L=Nv (see stage 1); membrane potential of all compartments
-float *IonsIn;  // L=Nin (see stage ?); concentration of ions inside cell
 
 //--- <kernel 3.1>
 void adapt_nmda( uint id )
@@ -45,7 +47,7 @@ void adapt_nmda( uint id )
     float hv = NmdaType2[type].y;
     float slp = NmdaType2[type].z;
     // load from global memory
-    float mg = IonsIn[ion];
+    float mg = MgIn[ion];
     float v = V[dendr];
     // math & store to global memory
     PreSyn[out] = 1./( 1.+mg/km*exp(-( v-hv )/slp );

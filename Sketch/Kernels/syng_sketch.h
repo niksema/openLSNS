@@ -21,18 +21,18 @@
 // kernel specific variables
 //--- local parameters (READ-ONLY access, stored in global memory and
 // could be cached in the shared memory)
-uint Nsyn;      // total number of synapses
-uint4 *SynLUT;  // L=Nsyn: look-up-tables to calculate a synaptic conductance
-                // x - look-up-table of components for synaptic transmission
-                // y - look-up-table of components for presynaptic inhibition
-                // z - look-up-table of components for synaptic plasticity
-                // w - look-up-table of components for synaptic conductance
+extern uint Nsyn;       // total number of synapses
+extern uint4 *SynLUT;   // L=Nsyn: look-up-tables to calculate a synaptic conductance
+                        // x - look-up-table of components for synaptic transmission
+                        // y - look-up-table of components for presynaptic inhibition
+                        // z - look-up-table of components for synaptic plasticity
+                        // w - look-up-table of components for synaptic conductance
 //--- shared variables (READ) (stored in global memory)
-float *SynGates;// L<=3*Nsyn: synaptic gate variables
-                // (synaptic transmission; presynaptic inhibition; synaptic plasticity)
-float *Gmax;    // L=Nsyn: array of maximal conductance of synapses
+float *SynGates;        // L<=3*Nsyn: synaptic gate variables
+                        // (synaptic transmission; presynaptic inhibition; synaptic plasticity)
+extern float *Gmax;     // L=Nsyn: array of maximal conductance of synapses
 //--- shared variables (WRITE) (stored in global memory)
-float *Gsyn;    // L=Nsyn: array of synaptic conductance
+extern float *Gsyn;     // L=Nsyn: array of synaptic conductance
 
 //--- kernel 4.1 calculating the synaptic conductance
 // The result is stored in array Gsyn (synaptic conductances).

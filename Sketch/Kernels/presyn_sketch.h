@@ -11,48 +11,43 @@
 #ifndef __PRESYN_SKETCH_H
 #define __PRESYN_SKETCH_H
 //////////////////////////////////////////////////////////////////////////
-// global variables
+// global parameters and variables
 //--- global parameters (READ-ONLY access, could be stored in the constant
 //    memory)
-float Theshold; // the threshold for spike discrimination
-uint Nv;        // total number of all compartments
-uint Nout;      // total number of all synapses (either type) in the network
-
-uint NStType;   // number of different types (AMPA/GABA etc) of "standars" synapses
-float2 *StType; // L=NStdSyn; parameters of "standard" synapses:
-                // x - time constant
-                // y - amplitude jump
-
-uint NSiType;   // number of different types of sigma synapses
-float2 *SiType; // L=NSiType; parameters of sigma synapses:
-                // x - half-voltage
-                // y - slope
-
-uint NAType;    // number of different types of alpha synapses (AMPA/GABA)
-float2 *AType1; // L=NAType; constant parameters of alpha synapses:
-                // x - a0
-                // y - a
-float4 *AType2;  // L=NAType; parameters of alpha synapses:
-                // x - alpha
-                // y - half-voltage
-                // z - slope
-                // w - time constant
-
-uint NNmType;   // number of different types of nmda synapses
-float2 *NmdaType1;// L=NNmdSyn; parameters of nmda synapses:
-                // x - alpha
-                // y - T
-float4 *NmdaType2;// L=NNmdSyn; parameters of nmda synapses: (see stage 3)
-                // x - k
-                // y - half-voltage
-                // z - slope
-                // w - reserved
-
+extern float Theshold;  // the threshold for spike discrimination
+extern uint Nv;         // total number of all compartments
+extern uint Nout;       // total number of all synapses (either type) in the network
+extern uint NStType;    // number of different types (AMPA/GABA etc) of "standars" synapses
+extern float2 *StType;  // L=NStdSyn; parameters of "standard" synapses:
+                        // x - time constant
+                        // y - amplitude jump
+extern uint NSiType;    // number of different types of sigma synapses
+extern float2 *SiType;  // L=NSiType; parameters of sigma synapses:
+                        // x - half-voltage
+                        // y - slope
+extern uint NAType;     // number of different types of alpha synapses (AMPA/GABA)
+extern float2 *AType1;  // L=NAType; constant parameters of alpha synapses:
+                        // x - a0
+                        // y - a
+extern float4 *AType2;  // L=NAType; parameters of alpha synapses:
+                        // x - alpha
+                        // y - half-voltage
+                        // z - slope
+                        // w - time constant
+extern uint NNmType;    // number of different types of nmda synapses
+extern float2 *NmdaType1;// L=NNmdSyn; parameters of nmda synapses:
+                        // x - alpha
+                        // y - T
+extern float4 *NmdaType2;// L=NNmdSyn; parameters of nmda synapses: (see stage 3)
+                        // x - k
+                        // y - half-voltage
+                        // z - slope
+                        // w - reserved
 //--- shared variables (READ/WRITE access, stored in global memory)
-uint *Spike;    // L=Nv; 1 if spike is generated, otherwise 0
-uint *Spike_;   // L=Nv; 1 if V >= Threshold, otherwise 0
-float *V;       // L=Nv; membrane potential of all compartments
-float *PreSyn;  // L=Nout; presynaptic outputs
+extern uint *Spike;     // L=Nv; 1 if spike is generated, otherwise 0
+extern uint *Spike_;    // L=Nv; 1 if V >= Threshold, otherwise 0
+extern float *V;        // L=Nv; membrane potential of all compartments
+extern float *PreSyn;   // L=Nout; presynaptic outputs
 
 //////////////////////////////////////////////////////////////////////////
 // <kernel 1.1> spike discrimination
@@ -60,7 +55,7 @@ float *PreSyn;  // L=Nout; presynaptic outputs
 // Optimization strategy: optimize the look-up-table in SpikeLUT array to
 // provide coalescing memory accesses for V, Spike, Spike_ arrays.
 //------------------------------------------------------------------------
-// kernel specific variables
+// kernel specific parameters and variables
 //--- local parameters (READ-ONLY access, stored in global memory and could
 //    be cached in the shared memory)
 uint Nspikes;   // total number of neurons (axon compartments) involved
@@ -95,42 +90,6 @@ void spike_presyn( void )
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// <kernel 1.2> presynaptic transformation of membrane potentials for
-// standard synapses
-//------------------------------------------------------------------------
-// Optimization strategy: optimize the look-up-table in SSynLUT array to
-// provide coalescing memory accesses for Spike & PreSyn arrays.
-//------------------------------------------------------------------------
-// kernel specific variables
-//--- local parameters (READ-ONLY access, stored in global memory and could
-//    be cached in the shared memory)
-uint Nssyn;     // total number of "standard" synapses
-uint4 *SSynLUT; // L=Nssyn; look-up-tables for "standard" synapses:
-                // x - look-up-table of types of "standard" synapses
-                // y - look-up-table of axons provided synaptic inputs to other neurons
-                // z - look-up-table of presynaptic outputs
-                // w - reserved
-
-//--- <kernel 1.2> presynaptic output is calculating according to <publication(s)>
-// Out = Out*exp(-step/T )+Spike*Jump;
-// the result is stored in array PreSyn.
-void kernel_std_presyn( uint id )
-{
-    // load to shared memory (?)
-    uint type = SSynLUT[id].x;  // make sure type < NStType
-    uint axon = SSynLUT[id].y;  // make sure axon < Nv
-    uint out = SSynLUT[id].z;   // make sure out < Nout
-    // load from constant memory (?)
-    float t = StType[type].x;
-    float a = StType[type].y;
-    // load from global memory
-    float presyn = PreSyn[out];
-    uint spike = Spike[axon];
-    // math & store to global memory
-    PreSyn[out] = presyn*exp(-step/t )+a*spike;
-}
-
 //--- call <kernel 1.2> for all compartments which involved in presynaptic
 // processing for "standard" synapses
 void std_presyn( void )
@@ -141,13 +100,13 @@ void std_presyn( void )
 }
 
 //////////////////////////////////////////////////////////////////////////
-// <kernel 1.3> presynaptic transformation of membrane potentials for
-// sigma synapses
+// <kernel 1.2> presynaptic transformation of membrane potentials for
+// sigma transformation of membrane potential
 //------------------------------------------------------------------------
 // Optimization strategy: optimize the look-up-table in SiSynLUT array to
 // provide coalescing memory accesses for V & PreSyn arrays.
 //------------------------------------------------------------------------
-// kernel specific variables
+// kernel specific parameters and variables
 //--- local parameters (READ-ONLY access, stored in global memory and could
 //    be cached in the shared memory)
 uint Nsisyn;    // total number of sigma synapses
@@ -157,7 +116,7 @@ uint4 *SiSynLUT;// L=Nsisyn; look-up-tables for sigma synapses:
                 // z - look-up-table of presynaptic outputs
                 // w - reserved
 
-//--- <kernel 1.3> presynaptic output is calculating according to <publication(s)>
+//--- <kernel 1.2> presynaptic output is calculating according to <publication(s)>
 // Out = 1./( 1.+exp(-( v-Hv )/Slp ))
 // the result is stored in array PreSyn.
 void kernel_sigma_presyn( uint id )
@@ -184,6 +143,48 @@ void sigma_presyn( void )
     }
 }
 
+
+/////////////////////////////////////////--------------------------------
+// not sure. TODO synaptic summation needs to be clarify
+
+
+//////////////////////////////////////////////////////////////////////////
+// <kernel 1.3> presynaptic transformation of membrane potentials for
+// standard synapses
+//------------------------------------------------------------------------
+// Optimization strategy: optimize the look-up-table in SSynLUT array to
+// provide coalescing memory accesses for Spike & PreSyn arrays.
+//------------------------------------------------------------------------
+// kernel specific parameters and variables
+//--- local parameters (READ-ONLY access, stored in global memory and could
+//    be cached in the shared memory)
+uint Nssyn;     // total number of "standard" synapses
+uint4 *SSynLUT; // L=Nssyn; look-up-tables for "standard" synapses:
+                // x - look-up-table of types of "standard" synapses
+                // y - look-up-table of axons provided synaptic inputs to other neurons
+                // z - look-up-table of presynaptic outputs
+                // w - reserved
+
+//--- <kernel 1.3> presynaptic output is calculating according to <publication(s)>
+// Out = Out*exp(-step/T )+Spike*Jump;
+// the result is stored in array PreSyn.
+void kernel_std_presyn( uint id )
+{
+    // load to shared memory (?)
+    uint type = SSynLUT[id].x;  // make sure type < NStType
+    uint axon = SSynLUT[id].y;  // make sure axon < Nv
+    uint out = SSynLUT[id].z;   // make sure out < Nout
+    // load from constant memory (?)
+    float t = StType[type].x;
+    float a = StType[type].y;
+    // load from global memory
+    float presyn = PreSyn[out];
+    uint spike = Spike[axon];
+    // math & store to global memory
+    PreSyn[out] = presyn*exp(-step/t )+a*spike;
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // <kernel 1.4> presynaptic transformation of membrane potentials for
 // alpha synapses (AMPA/GABA)
@@ -191,7 +192,7 @@ void sigma_presyn( void )
 // Optimization strategy: optimize the look-up-table in SSynLUT array to
 // provide coalescing memory accesses for V & PreSyn arrays.
 //------------------------------------------------------------------------
-// kernel specific variables
+// kernel specific parameters and variables
 //--- local parameters (READ-ONLY access, stored in global memory and could be cached in the shared memory)
 uint Nasyn;     // total number of alpha synapses
 uint4 *ASynLUT; // L=Nasyn; look-up-tables for alpha synapses:
@@ -244,7 +245,7 @@ void alpha_presyn( void )
 // <kernel 1.5> presynaptic transformation of membrane potentials for
 // nmda synapses
 //------------------------------------------------------------------------
-// kernel specific variables
+// kernel specific parameters and variables
 //--- local parameters (READ-ONLY access, stored in global memory and could be cached in the shared memory)
 uint Nnsyn;     // total number of nmda synapses
 uint4 *NSynLUT; // L=Nnsyn; look-up-tables for nmda synapses:
