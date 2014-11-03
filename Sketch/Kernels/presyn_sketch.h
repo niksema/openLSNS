@@ -15,11 +15,12 @@
 //--- global parameters (READ-ONLY access, could be stored in the constant
 //    memory)
 extern float Theshold;  // the threshold for spike discrimination
+extern float Step;      // the integration step
 extern uint Nv;         // total number of all compartments
 extern uint Nout;       // total number of all synapses (either type) in the network
-extern uint NStType;    // number of different types (AMPA/GABA etc) of "standars" synapses
+extern uint NStType;    // number of different types of "standars" synapses (AMPA/GABA)
 extern float2 *StType;  // L=NStdSyn; parameters of "standard" synapses:
-                        // x - time constant
+                        // x - exp(-Step/T) where T is a time constant
                         // y - amplitude jump
 extern uint NSiType;    // number of different types of sigma synapses
 extern float2 *SiType;  // L=NSiType; parameters of sigma synapses:
@@ -87,15 +88,6 @@ void spike_presyn( void )
 {
     for( uint i = 0; i < Nspikes; ++i ){
         kernel_spike_presyn( i );
-    }
-}
-
-//--- call <kernel 1.2> for all compartments which involved in presynaptic
-// processing for "standard" synapses
-void std_presyn( void )
-{
-    for( uint i = 0; i < Nssyn; ++i ){
-        kernel_std_presyn( i );
     }
 }
 
@@ -175,15 +167,23 @@ void kernel_std_presyn( uint id )
     uint axon = SSynLUT[id].y;  // make sure axon < Nv
     uint out = SSynLUT[id].z;   // make sure out < Nout
     // load from constant memory (?)
-    float t = StType[type].x;
+    float expt = StType[type].x;
     float a = StType[type].y;
     // load from global memory
     float presyn = PreSyn[out];
     uint spike = Spike[axon];
     // math & store to global memory
-    PreSyn[out] = presyn*exp(-step/t )+a*spike;
+    PreSyn[out] = presyn*expt+a*spike;
 }
 
+//--- call <kernel 1.2> for all compartments which involved in presynaptic
+// processing for "standard" synapses
+void std_presyn( void )
+{
+    for( uint i = 0; i < Nssyn; ++i ){
+        kernel_std_presyn( i );
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////
 // <kernel 1.4> presynaptic transformation of membrane potentials for
