@@ -92,13 +92,14 @@ void spike_presyn( void )
 }
 
 //////////////////////////////////////////////////////////////////////////
-// <kernel 1.2> presynaptic transformation of membrane potentials for
-// sigma transformation of membrane potential
+// <kernel 1.2> presynaptic transformation. The normalized concentration
+// of the postsynaptic transmitter-receptor complex is calculating by this
+// kernel
 //------------------------------------------------------------------------
 // Optimization strategy: optimize the look-up-table in SiSynLUT array to
 // provide coalescing memory accesses for V & PreSyn arrays.
 //------------------------------------------------------------------------
-// kernel specific parameters and variables
+// kernel specific parameters and variablesq
 //--- local parameters (READ-ONLY access, stored in global memory and could
 //    be cached in the shared memory)
 uint Nsisyn;    // total number of sigma synapses
@@ -108,9 +109,15 @@ uint4 *SiSynLUT;// L=Nsisyn; look-up-tables for sigma synapses:
                 // z - look-up-table of presynaptic outputs
                 // w - reserved
 
-//--- <kernel 1.2> presynaptic output is calculating according to <publication(s)>
-// Out = 1./( 1.+exp(-( v-Hv )/Slp ))
-// the result is stored in array PreSyn.
+//--- <kernel 1.2> presynaptic output is calculating as sigmoid function
+// Out = 1./( 1.+exp(-( v-Hv )/Slp )) and could be consider as normalized
+// concentration of transmitter (see: (1) Destexhe, A., Mainen, Z.F. and
+// Sejnowski, T.J. An efficient method for computing synaptic conductances
+// based on a kinetic model of receptor binding. Neural Computation 6: 14-18,
+// 1994; (2) Destexhe, A., Mainen, Z.F. and Sejnowski, T.J. Synthesis of models
+// for excitable membranes, synaptic transmission and neuromodulation using
+// a common kinetic formalism. J. Computational Neuroscience 1: 195-230, 1994).
+// The result is stored in array PreSyn.
 void kernel_sigma_presyn( uint id )
 {
     // load to shared memory (?)
@@ -126,7 +133,7 @@ void kernel_sigma_presyn( uint id )
     PreSyn[out] = 1./( 1.+exp(-( v-hv )/slp ));
 }
 
-//--- call <kernel 1.3> for all compartments which involved in presynaptic
+//--- call <kernel 1.2> for all compartments which involved in presynaptic
 // processing for sigma synapses
 void sigma_presyn( void )
 {
@@ -137,7 +144,7 @@ void sigma_presyn( void )
 
 
 /////////////////////////////////////////--------------------------------
-// not sure. TODO synaptic summation needs to be clarify
+// not sure. TODO the synaptic summation needs to be clarify
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -176,7 +183,7 @@ void kernel_std_presyn( uint id )
     PreSyn[out] = presyn*expt+a*spike;
 }
 
-//--- call <kernel 1.2> for all compartments which involved in presynaptic
+//--- call <kernel 1.3> for all compartments which involved in presynaptic
 // processing for "standard" synapses
 void std_presyn( void )
 {
