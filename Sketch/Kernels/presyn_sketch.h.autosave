@@ -154,6 +154,7 @@ void std_presyn( void )
     }
 }
 
+
 //////////////////////////////////////////////////////////////////////////
 // <kernel 1.4> presynaptic transformation of membrane potentials for
 // alpha synapses (AMPA/GABA)
