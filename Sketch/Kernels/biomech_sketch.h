@@ -66,6 +66,51 @@
     xdot(2) = x(4); % angle in lower joint
     xdot(3) = (a2*Q1-b*Q2)/D; % angular velocity in upper joint
     xdot(4) = (a1*Q2-b*Q1)/D; % angular velocity in lower joint
+
+function [L, V, Hup, Hdw] = geometry_block( theta, thetaV )
+global A1min A1max A2min A2max;    % restriction angles for upper and lower joints
+global Lopt R
+
+% muscles map
+% [shoulder_flexor shoulder_extensor elbow_flexor elbow_extensor
+% bifunc_flexor bifunc_extensor]
+
+    lm = 0.97*[A1max-A1min, A2max-A2min];                 %range
+    phi = [pi/2-theta(1), pi-theta(2)];
+    alpha = [phi(1)-A1min, A1max-phi(1), phi(2)-A2min, A2max-phi(2)];
+    alpha = max( alpha, 0 );
+    a = [alpha(1)/lm(1), alpha(2)/lm(1), alpha(3)/lm(2), alpha(4)/lm(2), ...
+        (alpha(1)+alpha(3))/(lm(1)+lm(2)), (alpha(2)+alpha(4))/(lm(1)+lm(2))];
+    L = a.*Lopt;                                      %muscle lenghts
+    vA = [-thetaV(1), -thetaV(2)];                    %positive then extension, negative then flexion
+    V = [vA(1)*R(1), vA(1)*R(2), vA(2)*R(3), vA(2)*R(4), ...
+         vA(1)*R(5)+vA(2)*R(7), vA(1)*R(6)+vA(2)*R(8)]; %muscles velocities
+    Hup = [R(1), R(2), 0,    0,    R(5), R(6)];
+    Hdw = [0,    0,    R(3), R(4), R(7), R(8)];
+
+% Calculate muscle forces
+% MN - motoneuronal activation
+% L - lenght of muscles
+% V - muscles velocity
+function F = muscles( MN, L, V )
+    global Fmax Lopt Beta Omega Ro Av1 Bv1 Bv2; % properties of the muscle model
+    lnorm = max( L./Lopt, 0 ); %normalized lenght
+    Fl_active = exp( -(abs( (lnorm.^Beta-1))/Omega ).^Ro );
+    FL_passive = 3.5*log( exp( (lnorm-1.4)./0.05 )+1.0 )...
+                - 0.02*( exp( -18.7*(lnorm-0.79) )-1.0 );
+    FL_passive = FL_passive.*max( lnorm-1, 0.0 );
+    FV = zeros( 1, length(V) );
+    for i = 1:length(V)
+        if V(i) <= 0.0
+            FV(i) = (Bv1-Av1*V(i))/(V(i)+Bv1);
+        else
+            FV(i) = (Bv2-(-5.34*lnorm(i)*lnorm(i)...
+                   + 8.41* lnorm(i)-4.7)*V(i))/(V(i)+Bv2);
+        end
+    end;
+    F = Fmax.*( MN.*Fl_active.*FV+FL_passive );
+
+
 */
 
 
@@ -82,7 +127,6 @@ typedef struct __biomech_data{
         L[0] = l1;
         D[0] = l1/2.;
         I[0] = ( m1*l1*l1 )/3.;
-
 
         M[1] = m2;
         L[1] = l2;
@@ -134,18 +178,6 @@ typedef struct __biomech_data{
     double MLD;   // M[1]*L[0]*D[1]
 } bm_data;
 
-//---- calculating non-conservative forces (viscosity - calc_vforce, elastic - calc_eforce)
-double calc_vforce( double v )
-{
-    return -BJ*v;
-}
-
-double calc_eforce( double x, double v )
-{
-    int mul = int( x > 0 && v > 0 );
-    return -( KJr*x+BJr*v )*mul; // return ( x > 0 && v > 0 )? -KJr*x-BJr*v: 0;
-}
-
 //---- calculating Coriolis conservative force
 double calc_cforce( double x, double v )
 {
@@ -156,6 +188,83 @@ double calc_cforce( double x, double v )
 double calc_gforce( double m, double l, double x )
 {
     return m*g*l*sin(x);
+}
+
+//---- calculating non-conservative viscosity force
+double calc_vforce( double v )
+{
+    return -BJ*v;
+}
+
+//---- calculating non-conservative elastic force
+double calc_eforce( double x, double v )
+{
+    int mul = int( x > 0 && v > 0 );
+    return -( KJr*x+BJr*v )*mul; // return ( x > 0 && v > 0 )? -KJr*x-BJr*v: 0;
+}
+
+//---- calculating non-conservative muscle force
+double calc_mforce( double mn, double lnorm, double v )
+{
+    lnorm = (lnorm>0.)? lnorm:0.;
+    double fl_a = exp(-(abs((lnorm^Beta-1))/Omega )^Ro ); // active component
+    double fl_p = 3.5*log(exp((lnorm-1.4)/0.05 )+1.0 )-0.02*(exp(-18.7*(lnorm-0.79))-1.0); // passive component
+    fl_p = (fl_p>0.)? fl_p:0.;
+    fv = (v>0.)?(Bv2-(-5.34*lnorm*lnorm+8.41*lnorm-4.7)*v)/(v+Bv2):(Bv1-Av1*v)/(v+Bv1);    // velocity component
+    return Fmax*( mn*fl_a*fv+fl_p);
+}
+
+/*
+function [L, V, Hup, Hdw] = geometry_block( theta, thetaV )
+global A1min A1max A2min A2max;    % restriction angles for upper and lower joints
+global Lopt R
+
+% muscles map
+% [shoulder_flexor shoulder_extensor elbow_flexor elbow_extensor
+% bifunc_flexor bifunc_extensor]
+
+    lm = 0.97*[A1max-A1min, A2max-A2min];                 %range
+    phi = [pi/2-theta(1), pi-theta(2)];
+    alpha = [phi(1)-A1min, A1max-phi(1), phi(2)-A2min, A2max-phi(2)];
+    alpha = max( alpha, 0 );
+    a = [alpha(1)/lm(1), alpha(2)/lm(1), alpha(3)/lm(2), alpha(4)/lm(2), ...
+        (alpha(1)+alpha(3))/(lm(1)+lm(2)), (alpha(2)+alpha(4))/(lm(1)+lm(2))];
+    L = a.*Lopt;                                      %muscle lenghts
+    Hup = [R(1), R(2), 0,    0,    R(5), R(6)];
+    Hdw = [0,    0,    R(3), R(4), R(7), R(8)];
+
+    vA = [-thetaV(1), -thetaV(2)];                    %positive then extension, negative then flexion
+    V = [vA(1)*R(1), vA(1)*R(2), vA(2)*R(3), vA(2)*R(4), ...
+         vA(1)*R(5)+vA(2)*R(7), vA(1)*R(6)+vA(2)*R(8)]; %muscles velocities
+*/
+
+double get_musclel( double x_up, double x_dw )
+{
+    return 0;
+/*
+    lm = 0.97*[A1max-A1min, A2max-A2min];                <-- calculate in advance
+
+    phi = [pi/2-theta(1), pi-theta(2)];
+    alpha = [phi(1)-A1min, A1max-phi(1), phi(2)-A2min, A2max-phi(2)];
+    alpha = max( alpha, 0 );
+    a = [alpha(1)/lm(1), alpha(2)/lm(1), alpha(3)/lm(2), alpha(4)/lm(2), ...
+        (alpha(1)+alpha(3))/(lm(1)+lm(2)), (alpha(2)+alpha(4))/(lm(1)+lm(2))];
+    L = a.*Lopt;                                      %muscle lenghts
+    Hup = [R(1), R(2), 0,    0,    R(5), R(6)];
+    Hdw = [0,    0,    R(3), R(4), R(7), R(8)];
+*/
+}
+
+double get_musclev( double v_up, double v_dw )
+{
+    return 0;
+/*
+    vA = [-v_up, -v_dw];                    %positive then extension, negative then flexion
+    V = [vA(1)*R(1), vA(1)*R(2), vA(2)*R(3), vA(2)*R(4), ...
+         vA(1)*R(5)+vA(2)*R(7), vA(1)*R(6)+vA(2)*R(8)]; %muscles velocities
+    Hup = [R(1), R(2), 0,    0,    R(5), R(6)];
+    Hdw = [0,    0,    R(3), R(4), R(7), R(8)];
+*/
 }
 
 ////// solve the system of dynamic equations for biomechanics
@@ -173,8 +282,10 @@ void solve_biomech( void )
     double theta[2] = {x(1), x(2)-x(1)};         // shoulder; elbow
     double thetaV[2] = {x(3), x(4)-x(3)};        // shoulder; elbow
     /*
-        [lm, vm, h_up, h_dw] = geometry_block( theta, thetaV ); %get muscle geomerty
-
+    for( int i = 0; i < 6; ++i ){
+        lm[i] = get_musclel( theta[0], theta[1] );   // get muscle geometry
+        vm[i] = get_musclev( thetaV[0], thetaV[1] ); // get muscle velocity
+    }
     */
     double q1m[6] = {0};
     double q2m[6] = {0};
@@ -198,7 +309,7 @@ void solve_biomech( void )
     //---- calculating non-conservative forces produced by muscles
     for( int i = 0; i < 6; ++i ){
     //<one thread>
-        f[i] = muscles( mn[i], lm[i], vm[i] );
+        f[i] = calc_mforce( mn[i], lm[i]/lopt[i], vm[i] );
         q1m[i] = f[i]*h_up[i];
         q2m[i] = f[i]*h_dw[i];
     //</one thread>
