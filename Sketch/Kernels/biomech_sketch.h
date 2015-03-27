@@ -134,40 +134,7 @@ typedef struct __biomech_data{
     double MLD;   // M[1]*L[0]*D[1]
 } bm_data;
 
-//---- calculating total non-conservative forces (Q1n, Q2n)
-void calc_ncforces( double &q1n, double &q2n )
-{
-    //--- viscosity in upper joint
-    double q1v = calc_vforce( thetaV[0] );
-    //--- joints restrictions (elastic and viscosity components) for upper joint
-    double q1e = calc_eforce( theta[0]-ThetaMax[0], thetaV[0] )*calc_eforce( -( theta[0]-ThetaMin[0] ), -thetaV[0] );
-
-    //--- viscosity in lower joint
-    double q2v = calc_vforce( thetaV[1] );
-    //--- joints restrictions (elastic and viscosity components) for lower joint
-    double q2e = calc_eforce( theta[1]-ThetaMax[1], thetaV[1] )*calc_eforce( -( theta[1]-ThetaMin[1] ), -thetaV[1] );
-
-    //---- calculating muscle force
-    double q1m = 0;
-    double q2m = 0;
-    /*
-        [l, v, h_up, h_dw] = geometry_block( theta, thetaV ); %get muscle geomerty
-        f = muscles( mn, l, v );
-        double q1m = sum(f.*h_up);
-        double q2m = sum(f.*h_dw);
-    */
-    //---- calculating total non-conservative forces
-    q1n = q1v+q1e+q1m-q2v-q2e-q2m; // upper joint
-    q2n = q2v+q2e+q2m;             // lower joint
-}
-
-double calc_ncforce( double x, double v, double xmin, double xmax )
-{
-    double qv = calc_vforce( v );
-    double qe = calc_eforce( x-xmax, v )*calc_eforce( -( x-xmin ), -v );
-    return qv+qe;
-}
-
+//---- calculating non-conservative forces (viscosity - calc_vforce, elastic - calc_eforce)
 double calc_vforce( double v )
 {
     return -BJ*v;
@@ -176,23 +143,19 @@ double calc_vforce( double v )
 double calc_eforce( double x, double v )
 {
     int mul = int( x > 0 && v > 0 );
-    return -( KJr*x+BJr*v )*mul;
+    return -( KJr*x+BJr*v )*mul; // return ( x > 0 && v > 0 )? -KJr*x-BJr*v: 0;
 }
 
-//---- calculating total conservative forces (q1c, q2c)
+//---- calculating Coriolis conservative force
 double calc_cforce( double x, double v )
 {
     return MLD*sin(x)*v*v;
-/*
-    double f1c = -MLD*sin(x(1)-x(2))*x(4)*x(4);
-    double f2c = MLD*sin(x(1)-x(2))*x(3)*x(3);
+}
 
-    double f1g = -( M[0]*g*D1g*sin(x(1))+M[1]*g*L1g*sin(x(1)));
-    double f2g = -( M[1]*g*D2g*sin(x(2)));
-
-    q1c = f1c+f1g; // upper joint
-    q2c = f2c+f2g; // lower joint
-*/
+//---- calculating gravity conservative forces
+double calc_gforce( double m, double l, double x )
+{
+    return m*g*l*sin(x);
 }
 
 ////// solve the system of dynamic equations for biomechanics
@@ -209,41 +172,45 @@ void solve_biomech( void )
     //---- joints' angles and angular velocities
     double theta[2] = {x(1), x(2)-x(1)};         // shoulder; elbow
     double thetaV[2] = {x(3), x(4)-x(3)};        // shoulder; elbow
+    /*
+        [lm, vm, h_up, h_dw] = geometry_block( theta, thetaV ); %get muscle geomerty
+
+    */
+    double q1m[6] = {0};
+    double q2m[6] = {0};
 //  <synch> 1
     //---- pre-calculations
     double b = MLD*cos( x(1)-x(2) );
     double d = A[2]-b*b;
-    //---- calculating coreolis conservative forces
-    double q1c = calc_cforce( x(2)-x(1), x(4) ); // upper segment; double q1c = -MLD*sin(x(1)-x(2))*x(4)*x(4);
-    double q2c = calc_cforce( x(1)-x(2), x(3) ); // lower segment; double q2c = MLD*sin(x(1)-x(2))*x(3)*x(3);
+    //---- calculating Coriolis conservative forces
+    double q1c = calc_cforce(x(2)-x(1),x(4));    // upper segment; double q1c = -MLD*sin(x(1)-x(2))*x(4)*x(4);
+    double q2c = calc_cforce(x(1)-x(2),x(3));    // lower segment; double q2c = MLD*sin(x(1)-x(2))*x(3)*x(3);
     //---- calculating gravity conservative forces
-    double q1g = 0; // upper segment; double q1g = -( M[0]*g*D1g*sin(x(1))+M[1]*g*L1g*sin(x(1)));
-    double q2g = 0; // lower segment; double q2g = -( M[1]*g*D2g*sin(x(2)));
+    double q1g = -calc_gforce(M[0],D1g,x(1))-calc_gforce(M[1],L1g,x(1)); // upper segment; double q1g = -M[0]*g*D1g*sin(x(1))-M[1]*g*L1g*sin(x(1));
+    double q2g = -calc_gforce(M[1],D2g,x(2));                            // lower segment; double q2g = -M[1]*g*D2g*sin(x(2));
     //---- calculating total non-conservative forces (excluding muscles)
-    double q1v = calc_vforce( thetaV[0] );       // upper segment
-    double q2v = calc_vforce( thetaV[1] );       // lower segment
-    double q1e1 = calc_eforce( theta[0]-ThetaMax[0], thetaV[0] );       // upper segment
-    double q1e2 = calc_eforce( -( theta[0]-ThetaMin[0] ), -thetaV[0] ); // upper segment
-    double q2e1 = calc_eforce( theta[1]-ThetaMax[1], thetaV[1] );       // lower segment
-    double q2e2 = calc_eforce( -( theta[1]-ThetaMin[1] ), -thetaV[1] ); // lower segment
+    double q1v = calc_vforce(thetaV[0]);         // viscosity for upper segment
+    double q2v = calc_vforce(thetaV[1]);         // viscosity for lower segment
+    double q1e1 = calc_eforce(theta[0]-ThetaMax[0],thetaV[0]);     // max restriction for upper segment
+    double q1e2 = calc_eforce(-(theta[0]-ThetaMin[0]),-thetaV[0]); // min restriction for upper segment
+    double q2e1 = calc_eforce(theta[1]-ThetaMax[1],thetaV[1]);     // max restriction for lower segment
+    double q2e2 = calc_eforce(-(theta[1]-ThetaMin[1]),-thetaV[1]); // min restriction for lower segment
     //---- calculating non-conservative forces produced by muscles
-    double q1m = 0;
-    double q2m = 0;
-    /*
-        [l, v, h_up, h_dw] = geometry_block( theta, thetaV ); %get muscle geomerty
-        f = muscles( mn, l, v );
-        double q1m = sum(f.*h_up);
-        double q2m = sum(f.*h_dw);
-    */
+    for( int i = 0; i < 6; ++i ){
+    //<one thread>
+        f[i] = muscles( mn[i], lm[i], vm[i] );
+        q1m[i] = f[i]*h_up[i];
+        q2m[i] = f[i]*h_dw[i];
+    //</one thread>
+    }
 // <synch> 2
     //---- calculating total conservative and non-conservative forces
-    double q1 = q1c+q1g+q1v+q1e1*q1e2+q1m-q2v-q2e1*q2e2-q2m; // total torque in upper joint;
-    double q2 = q2c+q2g+q2v+q2e1*q2e2+q2m;                   // total torque in lower joint;
+    double q1 = q1c+q1g+q1v+q1e1+q1e2+q1m-q2v-q2e1-q2e2-q2m; // total torque in upper joint;
+    double q2 = q2c+q2g+q2v+q2e1+q2e2+q2m;                   // total torque in lower joint;
 // <synch> 3
     //---- solve the system of differential equations
     xdot(3) = (A[0]*q1-b*q2)/d;                  // angular velocity in upper joint
     xdot(4) = (A[1]*q2-b*q1)/d;                  // angular velocity in lower joint
-// <synch> 4
     xdot(1) = x(3);                              // angle in upper joint
     xdot(2) = x(4);                              // angle in lower joint
 /*
