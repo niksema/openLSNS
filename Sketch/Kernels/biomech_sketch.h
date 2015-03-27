@@ -150,12 +150,12 @@ void calc_ncforces( double &q1n, double &q2n )
     //---- calculating muscle force
     double q1m = 0;
     double q2m = 0;
-/*
-    [l, v, h_up, h_dw] = geometry_block( theta, thetaV ); %get muscle geomerty
-    f = muscles( mn, l, v );
-    double q1m = sum(f.*h_up);
-    double q2m = sum(f.*h_dw);
-*/
+    /*
+        [l, v, h_up, h_dw] = geometry_block( theta, thetaV ); %get muscle geomerty
+        f = muscles( mn, l, v );
+        double q1m = sum(f.*h_up);
+        double q2m = sum(f.*h_dw);
+    */
     //---- calculating total non-conservative forces
     q1n = q1v+q1e+q1m-q2v-q2e-q2m; // upper joint
     q2n = q2v+q2e+q2m;             // lower joint
@@ -180,9 +180,9 @@ double calc_eforce( double x, double v )
 }
 
 //---- calculating total conservative forces (q1c, q2c)
-double calc_cforce( double x1, double x2 )
+double calc_cforce( double x, double v )
 {
-    return MLD*sin(x1)*x2*x2;
+    return MLD*sin(x)*v*v;
 /*
     double f1c = -MLD*sin(x(1)-x(2))*x(4)*x(4);
     double f2c = MLD*sin(x(1)-x(2))*x(3)*x(3);
@@ -207,32 +207,45 @@ double calc_cforce( double x1, double x2 )
 void solve_biomech( void )
 {
     //---- joints' angles and angular velocities
-    double theta[2] = {x(1s), x(2)-x(1)};  // shoulder; elbow
-    double thetaV[2] = {x(3), x(4)-x(3)}; // shoulder; elbow
+    double theta[2] = {x(1), x(2)-x(1)};         // shoulder; elbow
+    double thetaV[2] = {x(3), x(4)-x(3)};        // shoulder; elbow
 //  <synch> 1
     //---- pre-calculations
-    double b = MLD*cos(x(1)-x(2));
+    double b = MLD*cos( x(1)-x(2) );
     double d = A[2]-b*b;
-    //---- calculating total conservative forces
-    double q1c = calc_cforce( x(2)-x(1), x(4)); // upper segment
-    double q2c = calc_cforce( x(1)-x(2), x(3)); // lower segment
+    //---- calculating coreolis conservative forces
+    double q1c = calc_cforce( x(2)-x(1), x(4) ); // upper segment; double q1c = -MLD*sin(x(1)-x(2))*x(4)*x(4);
+    double q2c = calc_cforce( x(1)-x(2), x(3) ); // lower segment; double q2c = MLD*sin(x(1)-x(2))*x(3)*x(3);
+    //---- calculating gravity conservative forces
+    double q1g = 0; // upper segment; double q1g = -( M[0]*g*D1g*sin(x(1))+M[1]*g*L1g*sin(x(1)));
+    double q2g = 0; // lower segment; double q2g = -( M[1]*g*D2g*sin(x(2)));
     //---- calculating total non-conservative forces (excluding muscles)
-    double q1n = calc_ncforce( theta[0], thetaV[0], ThetaMin[0], ThetaMax[0] ); // upper segment
-    double q2n = calc_ncforce( theta[1], thetaV[1], ThetaMin[1], ThetaMax[1] ); // lower segment
+    double q1v = calc_vforce( thetaV[0] );       // upper segment
+    double q2v = calc_vforce( thetaV[1] );       // lower segment
+    double q1e1 = calc_eforce( theta[0]-ThetaMax[0], thetaV[0] );       // upper segment
+    double q1e2 = calc_eforce( -( theta[0]-ThetaMin[0] ), -thetaV[0] ); // upper segment
+    double q2e1 = calc_eforce( theta[1]-ThetaMax[1], thetaV[1] );       // lower segment
+    double q2e2 = calc_eforce( -( theta[1]-ThetaMin[1] ), -thetaV[1] ); // lower segment
     //---- calculating non-conservative forces produced by muscles
     double q1m = 0;
     double q2m = 0;
-// <synch>
+    /*
+        [l, v, h_up, h_dw] = geometry_block( theta, thetaV ); %get muscle geomerty
+        f = muscles( mn, l, v );
+        double q1m = sum(f.*h_up);
+        double q2m = sum(f.*h_dw);
+    */
+// <synch> 2
     //---- calculating total conservative and non-conservative forces
-    double q1 = q1c+q1n+q1m-q2n-q2m; // total torque in upper joint;
-    double q2 = q2c+q2n+q2m;          // total torque in lower joint;
-// <synch>
+    double q1 = q1c+q1g+q1v+q1e1*q1e2+q1m-q2v-q2e1*q2e2-q2m; // total torque in upper joint;
+    double q2 = q2c+q2g+q2v+q2e1*q2e2+q2m;                   // total torque in lower joint;
+// <synch> 3
     //---- solve the system of differential equations
-    xdot(3) = (A[0]*q1-b*q2)/d;       // angular velocity in upper joint
-    xdot(4) = (A[1]*q2-b*q1)/d;       // angular velocity in lower joint
-// <synch>
-    xdot(1) = x(3);                   // angle in upper joint
-    xdot(2) = x(4);                   // angle in lower joint
+    xdot(3) = (A[0]*q1-b*q2)/d;                  // angular velocity in upper joint
+    xdot(4) = (A[1]*q2-b*q1)/d;                  // angular velocity in lower joint
+// <synch> 4
+    xdot(1) = x(3);                              // angle in upper joint
+    xdot(2) = x(4);                              // angle in lower joint
 /*
     Euler method
     k1 = step*F(t,y(t));
