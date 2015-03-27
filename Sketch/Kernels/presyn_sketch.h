@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
 // Stage 1. Common presynaptic operations (spikes discrimination
 //          and transformation of membrane potentials of neurons) for signal
 //          transmission between neurons and/or nerves
@@ -153,6 +153,7 @@ void std_presyn( void )
         kernel_std_presyn( i );
     }
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // <kernel 1.4> presynaptic transformation of membrane potentials for
