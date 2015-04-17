@@ -38,7 +38,7 @@ extern float *Gsyn;     // L=Nsyn: array of synaptic conductance
 // The result is stored in array Gsyn (synaptic conductances).
 // The variables in arrays SynGates & Gmax must be specified before.
 void kernel_syn_g( uint id )
-{kxzj
+{
     // load to shared memory (?)
     uint mi = SynLUT[id].x;       // id-th component in look-up-table for synaptic transmission
     uint hi = SynLUT[id].y;       // id-th component in look-up-table for presynaptic inhibition
