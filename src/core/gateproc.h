@@ -200,63 +200,61 @@ __lsns_inline float calc_psgate1( gate_par par, float v, float step, float gate 
 // BTW. It's funny but the current imlementation is faster then the one that
 // uses the callback function
 //=============================================================================
-#define lsns_gate( type, par, v, step, gate, pgate, power ) \
+#define lsns_gate( type, par, v, step, gate, power, powg ) \
 	switch( type ){ \
 		case LSNS_NOGATE: \
-			gate = 1; /*calc_nogate( par, v, step, gate );*/ \
-			pgate = 1; \
+			gate = powg = 1; \
 			break; \
 		case LSNS_BYPASSGATE: \
-			/* gate = calc_passgate( par, v, step, gate );*/ \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_GENERIC_INSTANT: \
 			gate = calc_ggate1( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_GENERIC_T: \
 			gate = calc_ggate2( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_GENERIC_TMOD: \
 			gate = calc_ggate3( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_GENERIC_TAMOD: \
 			gate = calc_ggate4( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_ALPHABETA_INSTANT: \
 			gate = calc_abgate1( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_ALPHABETA_T: \
 			gate = calc_abgate2( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_ZGENERIC_INSTANT: \
 			gate = calc_zgate1( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_ZGENERIC_T: \
 			gate = calc_zgate2( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_ZAPHABETA_INSTANT: \
 			gate = calc_zgate3( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_ZAPHABETA_T: \
 			gate = calc_zgate4( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		case LSNS_PS_NMDA: \
 			gate = calc_psgate1( par, v, step, gate ); \
-			pgate = lsns_power( gate, power ); \
+			powg = lsns_pow( gate, power ); \
 			break; \
 		default: \
-			gate = 0;\
-			pgate = 0;\
-	}
+			powg = gate = 0;\
+	} 
+	
 
 #endif /*__GATEPROC_H*/
