@@ -200,10 +200,11 @@ __lsns_inline float calc_psgate1( gate_par par, float v, float step, float gate 
 // BTW. It's funny but the current imlementation is faster then the one that
 // uses the callback function
 //=============================================================================
-#define lsns_gate( type, par, v, step, gate ) \
+#define lsns_gate( type, par, v, step, gate, pgate, power ) \
 	switch( type ){ \
 		case LSNS_NOGATE: \
-			gate = calc_nogate( par, v, step, gate ); \
+			gate = 1; /*calc_nogate( par, v, step, gate );*/ \
+			pgate = 1; \
 			break; \
 		case LSNS_BYPASSGATE: \
 			gate = calc_passgate( par, v, step, gate ); \
