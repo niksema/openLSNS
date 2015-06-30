@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Gates ids and descriptions
 //=============================================================================
-enum __lsns_gtypes{
+enum __lsns_gate_types{
 	LSNS_NOGATE				= 0,
 	LSNS_BYPASSGATE			= 1,
 	LSNS_GENERIC_INSTANT		= 2,
