@@ -1,0 +1,16 @@
+Start the CUDA kernel benchmark. Please wait ...
+Data size 32
+ data.G = 0x7048a0000; data.MH = 0x7048a0200; data.TypeMH = 0x7048a0400; data.SharedVar = 0x7048a0600
+Kernel performance: total time 0.006144 msec, time per call 0.006144 msec
+Start the CUDA kernel benchmark. Please wait ...
+Data size 49152
+ data.G = 0x7048a0000; data.MH = 0x7049a0000; data.TypeMH = 0x704aa0000; data.SharedVar = 0x704ba0000
+Kernel performance: total time 0.017504 msec, time per call 0.017504 msec
+Start the CUDA kernel benchmark. Please wait ...
+Data size 49152
+ data.G = 0x7048a0000; data.MH = 0x7049a0000; data.TypeMH = 0x704aa0000; data.SharedVar = 0x704ba0000
+Kernel performance: total time 0.018816 msec, time per call 0.018816 msec
+Start the CUDA kernel benchmark. Please wait ...
+Data size 49152
+ data.G = 0x7048a0000; data.MH = 0x7049a0000; data.TypeMH = 0x704aa0000; data.SharedVar = 0x704ba0000
+Kernel performance: total time 0.018880 msec, time per call 0.018880 msec

@@ -12,10 +12,10 @@ include Makefile.host
 # host compiler & flags
 HOST_COMPILER ?= g++
 NVCC          := $(CUDA_PATH)/bin/nvcc -ccbin $(HOST_COMPILER)
-NVCCFLAGS     := -m${TARGET_SIZE} --use_fast_math
+NVCCFLAGS     := -m${TARGET_SIZE} --use_fast_math -arch=sm_35 -rdc=true
 CCFLAGS       := 
 LDFLAGS       :=
-GENCODE_FLAGS := -gencode arch=compute_20,code=compute_20
+GENCODE_FLAGS := -gencode arch=compute_35,code=compute_35
 BUILD_TYPE    :=
 include Makefile.flags
 
@@ -36,9 +36,9 @@ OUTDIR        := bin
 COREDIR       := core
 CUDADIR       := cuda
 LIBRARIES     :=
-INCLUDES      := -I./src/include -I./src/include/cuda -I./src/core -I./src/code/cuda
-DEPS          := info.h kernel.h config.h cuda_timer.h lsnsmath.h gates.h gateproc.h
-_OBJ          = info.o kernel.o gates.o
+INCLUDES      := -I../common/inc -I../experiments -I./core -I./cuda
+DEPS          := info.h kernel.h config.h ./cuda/cuda_timer.h ./core/lsnsmath.h ./core/gates.h ./core/gateproc.h ./core/pumps.h ./core/pumpproc.h ./core/ions.h ./core/ionproc.h
+_OBJ          = benchmark.o info.o kernel.o gates.o pumps.o ions.o
 OBJ_          = $(patsubst %,$(OUTDIR)/%,$(_OBJ))
 include Makefile.cuda
 ifeq ($(BUILD_ENABLED),0)
@@ -48,7 +48,7 @@ endif
 # Target rules
 all: build
 
-build: lsns
+build: benchmark
 
 check.deps:
 $(OUTDIR)/%.o: %.cpp $(DEPS)
@@ -60,13 +60,16 @@ $(OUTDIR)/%.o:%.cu $(DEPS)
 $(OUTDIR)/%.o: $(CUDADIR)/%.cpp $(DEPS)
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-lsns: $(OBJ_)
+benchmark: $(OBJ_)
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+	$(EXEC) mkdir -p ../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
+	$(EXEC) cp $@ ../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 
 run: build
-	$(EXEC) ./lsns
+	$(EXEC) ./benchmark
 
 clean:
 	rm -f $(OBJ_)
+	rm -rf ../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/benchmark
 
 clobber: clean
