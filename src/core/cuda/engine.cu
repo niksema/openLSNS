@@ -27,16 +27,14 @@ __global__ void ichan_kernel( int4 *chan_type, int4 *chan_shared, float4 *chan_g
 	//--- 1.2. load shared variables
 // todo: check the range for _gate_v( sh ) and _gate_e( sh ) indices for cell_v [0...MaxCells] and ions_e [0...MaxIons] variables in debug mode 
 // todo: the possible optimization is to use shared variables to load v and e parameters
-	float4 v = cell_v[_gate_v( sh )];			// load cells properties like: membrane potential, etc 
-	float4 e = ions_e[_gate_e( sh )];			// load properties of ions like: resting potential, ions inside the cell, ions ouside of cell, etc
+	float eds = _ions_eds( ions_e[_gate_e( sh )] );		// extract resting potential from 'ions_e'
+	float vm = _cell_v( cell_v[_gate_v( sh )] );		// extract membrane potential from 'cell_v'
 // todo: check the range for _gate_in_m( sh ) and _gate_in_m( sh ) indices for ions_e variable in debug mode [0...MaxIons]
-	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels if needed
+	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
 	float in_m = ( _gate_typem( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( ions_e[_gate_inm( sh )] ):0;
-	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels if needed
+	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
 	float in_h = ( _gate_typeh( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( ions_e[_gate_inh( sh )] ):0;
 	//--- 2. perform calculations
-	float eds = _ions_eds( e );				// extract resting potential from 'e'
-	float vm = _cell_v( v );				// extract membrane potential from 'v'
 	float mp, hp;
 	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], in_m, vm, step, _gate_powm( mh ), _gate_m( mh ), mp );
 	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], in_h, vm, step, _gate_powh( mh ), _gate_h( mh ), hp );
