@@ -108,3 +108,4 @@ typedef struct __gate_par{
 extern const char *lsns_gate_types[LSNS_MAX_GATE];
 
 #endif /*__GATES_H*/
+

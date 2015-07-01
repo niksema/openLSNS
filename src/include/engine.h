@@ -36,8 +36,8 @@
 //	w - G*Eds production
 #define _gate_gmax( g ) ( g ).x
 #define _gate_g( g ) ( g ).y
-#define _gate_i( g ) ( g ).z
-#define _gate_ge( g ) ( g ).w
+#define _gate_ge( g ) ( g ).z
+#define _gate_i( g ) ( g ).w
 
 ///////////////////////////////////////////////////////////////////////////////
 // parameters of gate variables of ion channel
@@ -80,8 +80,11 @@
 #define _ions_typeeds( tp ) ( tp ).y
 
 ///////////////////////////////////////////////////////////////////////////////
-// cell_v: V(x), reserver(y), reserved(z), reserved(w)
+// cell_v: V(x), C (y), spike onset(z), reserved(w)
 #define _cell_v( v ) ( v ).x
+#define _cell_c( v ) ( v ).y
+#define _cell_spike( v ) ( v ).z
+#define _cell_iadd( v ) ( v ).w
 
 #endif /*__LSNS_ENGINE_H*/
 

@@ -31,9 +31,9 @@ __global__ void ichan_kernel( int4 *chan_type, int4 *chan_shared, float4 *chan_g
 	float vm = _cell_v( cell_v[_gate_v( sh )] );		// extract membrane potential from 'cell_v'
 // todo: check the range for _gate_in_m( sh ) and _gate_in_m( sh ) indices for ions_e variable in debug mode [0...MaxIons]
 	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
-	float in_m = ( _gate_typem( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( ions_e[_gate_inm( sh )] ):0;
+	float in_m = ( _gate_typem( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( e ):0;
 	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
-	float in_h = ( _gate_typeh( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( ions_e[_gate_inh( sh )] ):0;
+	float in_h = ( _gate_typeh( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( e ):0;
 	//--- 2. perform calculations
 	float mp, hp;
 	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], in_m, vm, step, _gate_powm( mh ), _gate_m( mh ), mp );
