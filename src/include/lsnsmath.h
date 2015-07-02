@@ -2,6 +2,7 @@
 #define __LSNS_MATH_H
 
 #include "config.h"
+#include "debug.h"
 
 #if defined( __CUDA__ )
 	#include <cuda.h>
@@ -25,7 +26,7 @@
 // stores the results into 'res'. The series is located in 'data' array. 'fn' is the method 
 // to extract the actual number from 'data[i]'. The 'lut' keeps the actual size (<24) of 
 // the series and reference to actual position of the particular element in the array 'data'.
-#define lsns_fastsum( fn, data, lut, res )\
+#define lsns_fastsum( fn, data, lut, res, N )\
 {\
 	int4 lut1 = ( lut )[0], lut2, lut3, lut4, lut5, lut6; \
 	int n = lut1.x; \
@@ -46,72 +47,95 @@
 	switch( n ){ \
 		case 23: \
 			i = lut6.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 22: \
 			i = lut6.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 21: \
 			i = lut6.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 20: \
 			i = lut6.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 19: \
 			i = lut5.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 18: \
 			i = lut5.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 17: \
 			i = lut5.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 16: \
 			i = lut5.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 15: \
 			i = lut4.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 14: \
 			i = lut4.z;\
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 13: \
 			i = lut4.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 12: \
 			i = lut4.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 11: \
 			i = lut3.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i]); \
 		case 10: \
 			i = lut3.z;\
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 9: \
 			i = lut3.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 8: \
 			i = lut3.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 7: \
 			i = lut2.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 6: \
 			i = lut2.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 5: \
 			i = lut2.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 4: \
 			i = lut2.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 3: \
 			i = lut1.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 2: \
 			i = lut1.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		case 1: \
 			i = lut1.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res += fn(( data )[i] ); \
 		default:; \
 	} \
@@ -121,7 +145,7 @@
 // stores the results into 'res'. The series is located in 'data' array. 'fn' is the method 
 // to extract the actual number from 'data[i]'. The 'lut' keeps the actual size (<24) of 
 // the series and reference to actual position of the particular element in the array 'data'.
-#define lsns_fastsum2( fn1, fn2, data, lut, res1, res2 )\
+#define lsns_fastsum2( fn1, fn2, data, lut, res1, res2, N )\
 {\
 	int4 lut1 = ( lut )[0], lut2, lut3, lut4, lut5, lut6; \
 	int n = lut1.x; \
@@ -142,94 +166,117 @@
 	switch( n ){ \
 		case 23: \
 			i = lut6.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 22: \
 			i = lut6.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 21: \
 			i = lut6.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 20: \
 			i = lut6.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 19: \
 			i = lut5.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 18: \
 			i = lut5.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 17: \
 			i = lut5.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 16: \
 			i = lut5.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 15: \
 			i = lut4.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 14: \
 			i = lut4.z;\
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 13: \
 			i = lut4.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 12: \
 			i = lut4.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 11: \
 			i = lut3.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 10: \
 			i = lut3.z;\
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 9: \
 			i = lut3.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 8: \
 			i = lut3.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 7: \
 			i = lut2.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 6: \
 			i = lut2.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 5: \
 			i = lut2.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 4: \
 			i = lut2.x; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 3: \
 			i = lut1.w; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 2: \
 			i = lut1.z; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		case 1: \
 			i = lut1.y; \
+			__lsns_assert( i >= 0 && i < N )\
 			res1 += fn1(( data )[i]); \
 			res2 += fn2(( data )[i]); \
 		default:; \
@@ -241,6 +288,8 @@
 	( y )+( step )*( f )
 // 1-step exponential Euler method : y = exp(-step/t )*( y-y0 )+y0
 #define lsns_exp_euler( y, y0, step, t ) \
+	__lsns_assert( t > 0.0 )\
 	lsns_exp(-lsns_div( step, t ))*(( y )-( y0 ))+( y0 )
 
 #endif /*__LSNS_MATH_H*/
+
