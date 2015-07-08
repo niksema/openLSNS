@@ -101,7 +101,7 @@ enum __lsns_gate_types{
 // Structure 'gatepar' to store all constant parameters for gata variables
 // of all types
 //=============================================================================
-typedef struct __gate_par{
+typedef struct __lsns_align( 16 ) __gate_par{
 	float4 Par1;
 	float4 Par2;
 	float4 Par3;

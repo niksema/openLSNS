@@ -93,7 +93,7 @@
 #define _ions_lut_v( sh ) ( sh ).x
 
 ///////////////////////////////////////////////////////////////////////////////
-// cell_v: V(x), C (y), spike onset(z), reserved(w)
+// CellV: V(x), C (y), spike onset(z), reserved(w)
 #define _cell_v( v ) ( v ).x
 #define _cell_c( v ) ( v ).y
 #define _cell_spike( v ) ( v ).z
@@ -101,78 +101,97 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // 
-typedef struct __ions_proc{
+typedef struct __lsns_align( 16 ) __ions_data{
 	// local variables (read-only)
-	int4 *ions_type;					// type of ions: x - pump type, y - eds type
-	int4 *ions_shared;					// indices of shared variables: x - cell_v array
-	int4 *gchan_lut;					// look-up-table of channel current: x - counter, the rest are actual indices of chan_g array
+	int4 __lsns_align( 16 ) *IonsType;			// type of ions: x - pump type, y - eds type
+	int4 __lsns_align( 16 ) *IonsShared;			// indices of shared variables: x - CellV array
+	int4 __lsns_align( 16 ) *GchanLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
 	// local variables (read/write)
-	float4 *ions_e;						// reversal potential
-	float4 *ions_i;						// ion currents
+	float4 __lsns_align( 16 ) *IonsE;			// reversal potential
+	float4 __lsns_align( 16 ) *IonsI;			// ion currents
 	// shared variables
-	float4 *chan_g;						// conductance
-	float4 *cell_v;						// membrane potential
-} ionproc;
+	float4 __lsns_align( 16 ) *ChanG;			// conductance
+	float4 __lsns_align( 16 ) *CellV;			// membrane potential
+} iondat;
 
 ///////////////////////////////////////////////////////////////////////////////
 // 
-typedef struct __channel_proc{
+typedef struct __lsns_align( 16 ) __channel_data{
 	// local variables (read-only)
-	int4 *chan_type;					// type of channel
-	int4 *chan_shared;					// indices of shared variables: x - cell_v, y - ions_e/eds, z - ions_e/in for m, w - ions_e/in for h
+	int4 __lsns_align( 16 ) *ChanType;			// type of channel
+	int4 __lsns_align( 16 ) *ChanShared;			// indices of shared variables: x - CellV, y - IonsE/eds, z - IonsE/in for m, w - IonsE/in for h
 	// local variables (read-write)
-	float4 *chan_g;						// conductance
-	float4 *chan_mh;					// gate variables
+	float4 __lsns_align( 16 ) *ChanG;			// conductance
+	float4 __lsns_align( 16 ) *ChanMH;			// gate variables
 	// shared variables
-	float4 *cell_v;						// membrane potential
-	float4 *ions_e;						// reversal potential
-} chanproc;
+	float4 __lsns_align( 16 ) *CellV;			// membrane potential
+	float4 __lsns_align( 16 ) *IonsE;			// reversal potential
+} chandat;
 
 ///////////////////////////////////////////////////////////////////////////////
 // 
-typedef struct __cell_proc{
+typedef struct __lsns_align( 16 ) __cell_data{
 	// local variables (read-only)
-	int4 *gchan_lut;					// look-up-table of channel current: x - counter, the rest are actual indices of chan_g array
-	int4 *ipump_lut;					// look-up-table of pump current: x - counter, the rest are actual indices of ions_i array
+	int4 __lsns_align( 16 ) *GchanLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
+	int4 __lsns_align( 16 ) *IpumpLUT;			// look-up-table of pump current: x - counter, the rest are actual indices of IonsI array;
 	// local variables (read-write)
-	float4 *cell_v;						// membrane potential
+	float4 __lsns_align( 16 ) *CellV;			// membrane potential
 	// shared variables
-	float4 *chan_g;						// channel currents
-	float4 *ions_i;						// pump currents
-} cellproc;
+	float4 __lsns_align( 16 ) *ChanG;			// channel currents
+	float4 __lsns_align( 16 ) *IonsI;			// ion currents
+} celldat;
+
+///////////////////////////////////////////////////////////////////////////////
+// 
+typedef struct __lsns_align( 16 ) __iobuf{
+	// local variables (read-write)
+	float4 __lsns_align( 16 ) *IOData;			// data to display
+	// local variables (read-only). LUT format: from
+	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table for IonsI
+	int4 __lsns_align( 16 ) *IonsELUT;			// look-up-table for IonsE
+	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table for ChanG
+	int4 __lsns_align( 16 ) *ChanMHLUT;			// look-up-table for ChanMH
+	int4 __lsns_align( 16 ) *CellVLUT;			// look-up-table for CellV
+	// shared variables
+	float4 __lsns_align( 16 ) *IonsI;			// ion and pump currents
+	float4 __lsns_align( 16 ) *IonsE;			// reversal potential, concentration of ions inside and ouside cell 
+	float4 __lsns_align( 16 ) *ChanG;			// channel conguctance, currents etc
+	float4 __lsns_align( 16 ) *ChanMH;			// gate variables
+	float4 __lsns_align( 16 ) *CellV;			// membrane potential, spike onset etc
+
+} iodat;
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // 
-typedef struct __network_proc{
+typedef struct __lsns_align( 16 ) __network_data{
+	// global memory on host
+	iondat Ions;						// ions
+	chandat Channels;					// channels
+	celldat Cells;						// neurons (compartments)
+	iodat IOData;						// data buffer to display the results of simulation
+	// global memory on device
+	struct __lsns_align( 16 ) __network_data *DevMap;	// 
+} netdat;
+
+///////////////////////////////////////////////////////////////////////////////
+// 
+typedef struct __lsns_align( 16 ) __network_parameters{
+	// constant memory
 	float Step
 	int MaxIons;
 	int MaxChan;
 	int MaxCells;
-	gatepar Gates[????];
-	ionproc Ions;
-	chanproc Channels;
-	cellproc Cells;
-} netproc;
+	gatepar Gates[LSNS_MAX_GPARS];
+} netpar; 
 
-#if !defined (__CUDA__)
 
 ///////////////////////////////////////////////////////////////////////////////
-// calculate the properties of ions dynamics such as pump current, concentration 
-// of ions inside the cell, etc.
-extern void ions_kernel( float step, int index, ionproc *data );
-
-///////////////////////////////////////////////////////////////////////////////
-// calculate the properties of channel and synaptic currents such as conductance, 
-// current etc.
-extern void chan_kernel( float step, int index, chanproc *data );
-
-///////////////////////////////////////////////////////////////////////////////
-// calculate the properties of Hodgkin-Huxley cell such as membrane potential,
-// onset of the spike etc.
-extern void cell_kernel( float step, int index, cellproc *data );
-
-#endif
+// interface 
+extern netdat *lsns_alloc( netpar &par );			// allocate memory on host
+extern void lsns_free( netdat *data );				// free memory both on host and device
+extern bool lsns_map2dev( netdat *data, netpar &parpar );	// allocate memory on device and copy the network configuration from host to device.
+extern bool lsns_run( floar step = -1. );			// run simulation
 
 #endif /*__LSNS_ENGINE_H*/
 
