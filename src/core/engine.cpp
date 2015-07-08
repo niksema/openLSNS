@@ -27,10 +27,22 @@
 #define lsns_ipump_lut data->IpumpLUT
 
 static float Step = -1.;
+static int Counter = 0;
 static int MaxChan = 0;
 static int MaxIons = 0;
 static int MaxCells = 0;
 static gatepar Gates[LSNS_MAX_GPARS] = {0};
+
+///////////////////////////////////////////////////////////////////////////////
+// control_kernel: 
+// Input parameters:
+// Output parameters:
+void control_kernel( int index /*, chandat *data*/ )
+{
+	if( index == 0 ){
+		Counter++;
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // ions_kernel: the engine kernel to calculate the properties of ions dynamics.
@@ -42,7 +54,8 @@ void ions_kernel( int index, iondat *data )
 	__lsns_assert( index < MAX_IONS );			// DEBUG: check the range for 'index' variable
 	// load 
 	float step = Step;
-	int4 tp = lsns_ions_type[index];			// load type of ions 
+	// load type of ions (Na, K, Ca etc, and type of ion dynamics)
+	int4 tp = lsns_ions_type[index];
 	int type_dyn = _ions_typepump( tp );
 	int type_eds = _ions_typeeds( tp );
 	if( type_dyn != LSNS_NO_DYN ){
@@ -100,6 +113,14 @@ void ions_kernel( int index, iondat *data )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// connect_kernel: 
+// Input parameters:
+// Output parameters:
+void connect_kernel( int index /*, chandat *data*/ )
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // chan_kernel: the engine kernel to calculate the properties of channel and 
 // synaptic currents such as conductance, current etc.
 // Input parameters:
@@ -108,9 +129,10 @@ void chan_kernel( int index, chandat *data )
 {
 	__lsns_assert( index < MAX_CHAN );			// DEBUG: check the range for 'index' variable 
 	float step = Step;
-	int4 tp = lsns_chan_type[index];			// load type of ion channel (generic, a-b, etc) and its parameters (half-voltage, slope, etc)
-	int4 sh = lsns_chan_shared[index];			// load references to external parameters (membrane potential, rest potential, etc)
-	float4 g = lsns_chan_g[index];				// load properties of ions channel (conductance, current, etc)
+	// load type of ion channel (generic, a-b, etc) and its parameters (half-voltage, slope, etc)
+	int4 tp = lsns_chan_type[index];
+	// load references to external parameters (membrane potential, rest potential, etc)
+	int4 sh = lsns_chan_shared[index];
 	__lsns_assert( _gate_typem( tp ) < MAX_GATES );		// DEBUG: check the range for _gate_typem( tp )
 	__lsns_assert( _gate_typeh( tp ) < MAX_GATES );		// DEBUG: check the range for  _gate_typeh( tp ) 
 	__lsns_assert( _gate_parm( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parm( tp ) 
@@ -119,6 +141,8 @@ void chan_kernel( int index, chandat *data )
 	__lsns_assert( _chan_lut_e( sh ) < MAX_IONS );		// DEBUG: check the range for _chan_lut_e( sh )
 	__lsns_assert( _chan_lut_inm( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_inm( sh )
 	__lsns_assert( _chan_lut_inh( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_inh( sh )
+	// load properties of ions channel (conductance, current, etc)
+	float4 g = lsns_chan_g[index];
 	// load properties of gate variables (activation, inactivation, etc) if needed
 	float4 mh = ( _gate_typem( tp )+_gate_typeh( tp ) != LSNS_NOGATE)? lsns_chan_mh[index]: float4();
 //--->>> possible CUDA optimization (try to use shared variables)
@@ -137,10 +161,11 @@ void chan_kernel( int index, chandat *data )
 	_chan_g( g ) = _chan_gmax( g )*mp*hp;			// g
 	_chan_ge( g ) = _chan_g( g )*eds;			// ge
 	_chan_i( g ) = _chan_g( g )*( vm-eds );			// I
-	// store the results of simulation
-	lsns_chan_g[index] = g;					// save properties of ions channel (conductance, current, etc)
+	// save properties of ions channel (conductance, current, etc)
+	lsns_chan_g[index] = g;
 	if( _gate_typem( tp )+_gate_typeh( tp ) != LSNS_NOGATE ){
-		lsns_chan_mh[index] = mh;			// save properties of gate variables (activation, inactivation, etc) if needed
+		// save properties of gate variables (activation, inactivation, etc) if needed
+		lsns_chan_mh[index] = mh;
 	}
 }
 
@@ -172,8 +197,15 @@ void cell_kernel( int index, celldat *data )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// interface 
+// store_kernel: 
+// Input parameters:
+// Output parameters:
+void store_kernel( int index /*, chandat *data*/ )
+{
+}
 
+///////////////////////////////////////////////////////////////////////////////
+// interface 
 #define lsns_checkmem() \
 	__lsns_assert( Step > 0. );\
 	__lsns_assert( MaxIons > 0 );\
@@ -183,10 +215,11 @@ void cell_kernel( int index, celldat *data )
 // allocate memory on host
 netdat *lsns_alloc( netpar &par )
 {
-	Step = par.Step; MaxIons = par.MaxIons; MaxChan = par.MaxChan; MaxCells = par.MaxCells;
 	lsns_checkmem();
-	memcpy ( Gates, par.Gates, sizeof( netpar )*LSNS_MAX_GPARS );
 	netdat *data = ( netdat *)malloc( sizeof( netdat )); __lsns_assert( data != NULL );
+	data->Ions->MaxIons = par.MaxIons; 
+	data->Channels->MaxChan = par.MaxChan;
+	data->Cells->Cell = par.MaxCells;
 	// allocate memory for actual parameters
 	data->Ions->IonsI = data->Cells->IonsI = data->IOData->IonsI = ( float4 *)malloc( sizeof( float4 )*MaxIons );
 	data->Ions->IonsE = data->Channels->IonsE = data->IOData->IonsE = ( float4 *)malloc( sizeof( float4 )*MaxIons );
@@ -203,6 +236,9 @@ netdat *lsns_alloc( netpar &par )
 	data->Cells->IpumpLUT = ( int4 *)malloc( sizeof( int4 )*MaxCells*( MAX_IPUMP_PER_CELL/4+1 ) );
 	// device-specific memory (for non-cuda version this is a pointer to the same data structure)
 	data->DevMap = data;
+	// setup the constant parameters of the network
+	Step = par.Step; MaxIons = par.MaxIons; MaxChan = par.MaxChan; MaxCells = par.MaxCells;
+	memcpy ( Gates, par.Gates, sizeof( netpar )*LSNS_MAX_GPARS );
 	return data;
 }
 
@@ -210,8 +246,6 @@ netdat *lsns_alloc( netpar &par )
 void lsns_free( netdat *data )
 {
 	lsns_checkmem();
-	Step = -1; MaxIons = 0; MaxChan = 0; MaxCells = 0;
-	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GPARS );
 	// free memory for actual parameters
 	free( data->Ions->IonsI ); data->Ions->IonsI = data->Cells->IonsI = data->IOData->IonsI = NULL;
 	free( data->Ions->IonsE ); data->Ions->IonsE = data->Channels->IonsE = data->IOData->IonsE = NULL;
@@ -229,6 +263,9 @@ void lsns_free( netdat *data )
 	// device-specific memory (for non-cuda version this is a pointer to the same data structure)
 	data->DevMap = NULL;
 	free( data );
+	// clean up the constant parameters of the network
+	Step = -1; MaxIons = 0; MaxChan = 0; MaxCells = 0;
+	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GPARS );
 }
 
 // allocate memory on device and copy the network configuration from host to device.

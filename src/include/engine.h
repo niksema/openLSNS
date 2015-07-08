@@ -100,8 +100,9 @@
 #define _cell_iadd( v ) ( v ).w
 
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// iondat
 typedef struct __lsns_align( 16 ) __ions_data{
+	int MaxIons;						//
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *IonsType;			// type of ions: x - pump type, y - eds type
 	int4 __lsns_align( 16 ) *IonsShared;			// indices of shared variables: x - CellV array
@@ -115,8 +116,9 @@ typedef struct __lsns_align( 16 ) __ions_data{
 } iondat;
 
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// chandat
 typedef struct __lsns_align( 16 ) __channel_data{
+	int MaxChan;						//
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *ChanType;			// type of channel
 	int4 __lsns_align( 16 ) *ChanShared;			// indices of shared variables: x - CellV, y - IonsE/eds, z - IonsE/in for m, w - IonsE/in for h
@@ -129,8 +131,9 @@ typedef struct __lsns_align( 16 ) __channel_data{
 } chandat;
 
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// celldat
 typedef struct __lsns_align( 16 ) __cell_data{
+	int MaxCells;						//
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *GchanLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
 	int4 __lsns_align( 16 ) *IpumpLUT;			// look-up-table of pump current: x - counter, the rest are actual indices of IonsI array;
@@ -142,10 +145,11 @@ typedef struct __lsns_align( 16 ) __cell_data{
 } celldat;
 
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// iodat
 typedef struct __lsns_align( 16 ) __iobuf{
 	// local variables (read-write)
-	float4 __lsns_align( 16 ) *IOData;			// data to display
+	float4 __lsns_align( 16 ) *DevData;			// data to display (located in device memory)
+	float4 __lsns_align( 16 ) *HostData;			// data to display (pinned memory located in the host)
 	// local variables (read-only). LUT format: from
 	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table for IonsI
 	int4 __lsns_align( 16 ) *IonsELUT;			// look-up-table for IonsE
@@ -163,7 +167,7 @@ typedef struct __lsns_align( 16 ) __iobuf{
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// netdat 
 typedef struct __lsns_align( 16 ) __network_data{
 	// global memory on host
 	iondat Ions;						// ions
@@ -175,7 +179,7 @@ typedef struct __lsns_align( 16 ) __network_data{
 } netdat;
 
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// netpar
 typedef struct __lsns_align( 16 ) __network_parameters{
 	// constant memory
 	float Step
