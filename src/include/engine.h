@@ -150,8 +150,10 @@ typedef struct __lsns_align( 16 ) __iobuf{
 	// local variables (read-write)
 	float4 __lsns_align( 16 ) *DevData;			// data to display (located in device memory)
 	float4 __lsns_align( 16 ) *HostData;			// data to display (pinned memory located in the host)
-	// local variables (read-only). LUT format: from
-	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table for IonsI
+	// local variables (read-only). 
+	// LUT format: bits 31..30 are coding the offset in each float4 variable (00 - x, 01 - y, 10 - z, 11 - w); 
+	// bits 29..0 are coding the offset in an arrays of shared variables
+	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table for IonsI 
 	int4 __lsns_align( 16 ) *IonsELUT;			// look-up-table for IonsE
 	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table for ChanG
 	int4 __lsns_align( 16 ) *ChanMHLUT;			// look-up-table for ChanMH

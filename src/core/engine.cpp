@@ -200,8 +200,63 @@ void cell_kernel( int index, celldat *data )
 // store_kernel: 
 // Input parameters:
 // Output parameters:
+/*
+	// local variables (read-only). 
+	// LUT format: bits 31..30 are coding the offset in each float4 variable (00 - x, 01 - y, 10 - z, 11 - w); 
+	// bits 29..0 are coding the offset in an arrays of shared variables
+	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table for IonsI 
+	int4 __lsns_align( 16 ) *IonsELUT;			// look-up-table for IonsE
+	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table for ChanG
+	int4 __lsns_align( 16 ) *ChanMHLUT;			// look-up-table for ChanMH
+	int4 __lsns_align( 16 ) *CellVLUT;			// look-up-table for CellV
+
+	float4 __lsns_align( 16 ) *IonsI;			// ion and pump currents
+	float4 __lsns_align( 16 ) *IonsE;			// reversal potential, concentration of ions inside and ouside cell 
+	float4 __lsns_align( 16 ) *ChanG;			// channel conguctance, currents etc
+	float4 __lsns_align( 16 ) *ChanMH;			// gate variables
+	float4 __lsns_align( 16 ) *CellV;			// membrane potential, spike onset etc
+
+
+	float4 __lsns_align( 16 ) *DevData;			// data to display (located in device memory)
+	float4 __lsns_align( 16 ) *HostData;			// data to display (pinned memory located in the host)
+
+*/
+// MAX_VIEWS = ( MAX_IIONS_VIEWS+MAX_EIONS_VIEWS+MAX_GCHAN_VIEWS+MAX_MHCHAN_VIEWS+MAX_CELLV_VIEWS )/4;
 void store_kernel( int index /*, chandat *data*/ )
 {
+	__lsns_assert( index < MAX_VIEWS );			// DEBUG: check the range for 'index' variable
+	int4 lut;
+	float4 data;
+	if( index < MAX_IIONS_VIEWS ){
+		int i = index;
+		int4 lut = IonsILUT[i];
+		lsns_store_data( data, lut, IonsI ); 
+	} 
+	else if( index < MAX_IIONS_VIEWS+MAX_EIONS_VIEWS ){
+		int i = index-MAX_IIONS_VIEWS;
+		int4 lut = IonsELUT[i];
+		lsns_store_data( data, lut, IonsI ); 
+	}
+	else if( index < MAX_IIONS_VIEWS+MAX_EIONS_VIEWS+MAX_GCHAN_VIEWS ){
+		int i = index-MAX_IIONS_VIEWS-MAX_EIONS_VIEWS;
+		int4 lut = ChanGLUT[i];
+		lsns_store_data( data, lut, IonsI ); 
+	}
+	else if( index < MAX_IIONS_VIEWS+MAX_EIONS_VIEWS+MAX_GCHAN_VIEWS+MAX_MHCHAN_VIEWS ){
+		int i = index-MAX_IIONS_VIEWS-MAX_EIONS_VIEWS-MAX_GCHAN_VIEWS;
+		int4 lut = ChanMHLUT[i];
+		lsns_store_data( data, lut, IonsI ); 
+	}
+	else if( index < MAX_IIONS_VIEWS+MAX_EIONS_VIEWS+MAX_GCHAN_VIEWS+MAX_MHCHAN_VIEWS+MAX_CELLV_VIEWS ){
+		int i = index-MAX_IIONS_VIEWS-MAX_EIONS_VIEWS-MAX_GCHAN_VIEWS-MAX_MHCHAN_VIEWS;
+		int4 lut = CellVLUT[i];
+		lsns_store_data( data, lut, IonsI ); 
+	}
+	DevData[index+offset] = data;
+	if( ????? ){
+	   HostData[] = 
+	}
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
