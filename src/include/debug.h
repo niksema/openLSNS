@@ -1,13 +1,13 @@
 #ifndef __LSNS_ASSERT_H
 #define __LSNS_ASSERT_H
 
-#include <assert.h>
 #include "config.h"
+#include <assert.h>
 
 #if defined( __LSNS_DEBUG__ )
-	__lsns_assert( cond ) assert( cond )
+	#define __lsns_assert( c ) assert( c )
 #else
-	__lsns_assert( cond )
+	#define __lsns_assert( c )
 #endif
 
 

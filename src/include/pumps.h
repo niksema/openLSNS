@@ -3,18 +3,19 @@
 
 #include "config.h"
 
+#define LSNS_MAX_PARPUMPS		16
 ///////////////////////////////////////////////////////////////////////////////
 // Pumps ids and descriptions
 //=============================================================================
 enum __lsns_pump_types{
-	LSNS_NOPUMP				= 0,
+	LSNS_NO_DYN			= 0,
 	LSNS_CA_PUMP			= 1,
 	LSNS_NA_PUMP			= 2,
 	LSNS_MAX_PUMP,
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Extract parameters from the structure 'pump_par'
+// Extract parameters from the structure 'pumppar'
 //=============================================================================
 // get parameter In0 for all-type-pumps
 #define _pump_in0( par ) ( par ).Par1.x
@@ -29,10 +30,10 @@ enum __lsns_pump_types{
 // Structure 'gate_par' to store all constant parameters for gata variables
 // of all types
 //=============================================================================
-typedef struct __lsns_align( 16 ) __pump_par{
+typedef struct __lsns_align( 16 ) __pumppar{
 	float4 Par1;
 	float4 Par2;
-} pump_par;
+} pumppar;
 
 extern const char *lsns_pump_types[LSNS_MAX_PUMP];
 

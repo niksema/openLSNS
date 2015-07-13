@@ -1,11 +1,11 @@
 #ifndef __LSNS_CONFIG_H
 #define __LSNS_CONFIG_H
 
-#define __CUDA__
+// #define __CUDA__
 // #define __LINUX__
 // #define __GUI__
-// #define __CONSOLE__
-// #define __WINDOWS__
+#define __CONSOLE__
+#define __WINDOWS__
 #define __LSNS_DEBUG__
 
 #if defined( __LINUX__ )

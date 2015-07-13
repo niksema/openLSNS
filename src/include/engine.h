@@ -9,6 +9,7 @@
 #define MAX_CHAN_PER_CELL	15				/*<24*/
 #define MAX_CHAN_PER_PUMP	7				/*<24*/
 #define MAX_IPUMP_PER_CELL	3				/*<24*/
+#define MAX_STORED_STEPS	16
 
 ///////////////////////////////////////////////////////////////////////////////
 // gate types of ion channel
@@ -62,6 +63,7 @@
 //	w - reserved. 
 #define _ions_typepump( tp ) ( tp ).x 
 #define _ions_typeeds( tp ) ( tp ).y
+#define _ions_parpump( tp ) ( tp ).z
 
 ///////////////////////////////////////////////////////////////////////////////
 // parameters of ions dynamics:
@@ -148,7 +150,7 @@ typedef struct __lsns_align( 16 ) __cell_data{
 // iodat
 typedef struct __lsns_align( 16 ) __iobuf{
 	// local variables (read-write)
-	float4 __lsns_align( 16 ) *DevData;			// data to display (located in device memory)
+	float4 __lsns_align( 16 ) *DevData[MAX_STORED_STEPS];	// data to display (located in device memory)
 	float4 __lsns_align( 16 ) *HostData;			// data to display (pinned memory located in the host)
 	// local variables (read-only). 
 	// LUT format: bits 31..30 are coding the offset in each float4 variable (00 - x, 01 - y, 10 - z, 11 - w); 
@@ -164,7 +166,6 @@ typedef struct __lsns_align( 16 ) __iobuf{
 	float4 __lsns_align( 16 ) *ChanG;			// channel conguctance, currents etc
 	float4 __lsns_align( 16 ) *ChanMH;			// gate variables
 	float4 __lsns_align( 16 ) *CellV;			// membrane potential, spike onset etc
-
 } iodat;
 
 
@@ -184,11 +185,13 @@ typedef struct __lsns_align( 16 ) __network_data{
 // netpar
 typedef struct __lsns_align( 16 ) __network_parameters{
 	// constant memory
-	float Step
+	float Step;
+	float Threshold;
 	int MaxIons;
 	int MaxChan;
 	int MaxCells;
 	gatepar Gates[LSNS_MAX_GPARS];
+	pumppar Pumps[LSNS_MAX_PARPUMPS];
 } netpar; 
 
 
@@ -197,7 +200,7 @@ typedef struct __lsns_align( 16 ) __network_parameters{
 extern netdat *lsns_alloc( netpar &par );			// allocate memory on host
 extern void lsns_free( netdat *data );				// free memory both on host and device
 extern bool lsns_map2dev( netdat *data, netpar &parpar );	// allocate memory on device and copy the network configuration from host to device.
-extern bool lsns_run( floar step = -1. );			// run simulation
+extern bool lsns_run( float step = -1. );			// run simulation
 
 #endif /*__LSNS_ENGINE_H*/
 

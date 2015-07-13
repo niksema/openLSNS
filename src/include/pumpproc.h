@@ -7,7 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // 0. Performes no calculation. Always returns 0.
 //=============================================================================
-__lsns_inline float calc_nopump( pump_par par, float in )
+__lsns_inline float calc_nopump( pumppar &par, float in )
 {
 	return 0;
 }
@@ -15,7 +15,7 @@ __lsns_inline float calc_nopump( pump_par par, float in )
 ///////////////////////////////////////////////////////////////////////////////
 // 1. Calculate current of Ca-pump (description+reference)
 //=============================================================================
-__lsns_inline float calc_capump( pump_par par, float in )
+__lsns_inline float calc_capump( pumppar &par, float in )
 {
 	return _pump_rpump( par )*( in-_pump_in0( par ));
 }
@@ -23,7 +23,7 @@ __lsns_inline float calc_capump( pump_par par, float in )
 ///////////////////////////////////////////////////////////////////////////////
 // 2. Calculate current of Na-pump (description+reference)
 //=============================================================================
-__lsns_inline float calc_napump( pump_par par, float in )
+__lsns_inline float calc_napump( pumppar &par, float in )
 {
 	float kp = lsns_pow( _napump_kp( par ), 3 );
 	in = lsns_pow( in, 3 );

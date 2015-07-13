@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // 0. Performes no calculation. Always returns 1.
 //=============================================================================
-__lsns_inline float proc_nogate( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_nogate( gatepar &par, float v, float step, float gate )
 {
 	return 1;
 }
@@ -34,7 +34,7 @@ __lsns_inline float proc_nogate( gate_par par, float v, float step, float gate )
 ///////////////////////////////////////////////////////////////////////////////
 // 1. Bypass the gate calculation. Always returns 'gate'
 //=============================================================================
-__lsns_inline float proc_passgate( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_passgate( gatepar &par, float v, float step, float gate )
 {
 	return gate;
 }
@@ -63,26 +63,26 @@ __lsns_inline float proc_passgate( gate_par par, float v, float step, float gate
 //		}
 //		T*d[M/H]/dt = [M/H]inf-[M/H];
 //=============================================================================
-__lsns_inline float proc_ggate1( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_ggate1( gatepar &par, float v, float step, float gate )
 {
 	return lsns_ggate( v, _ggatev12( par ), _ggateslp( par ));
 }
  
-__lsns_inline float proc_ggate2( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_ggate2( gatepar &par, float v, float step, float gate )
 {
 	float gate_inf = lsns_ggate( v, _ggatev12( par ), _ggateslp( par ));
 	float time = lsns_ggate_t( _ggatet0( par ), _ggatetmax( par ), v, _ggatev12t( par ), _ggateslpt( par ));
 	return lsns_exp_euler( gate, gate_inf, step, time );
 }
 
-__lsns_inline float proc_ggate3( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_ggate3( gatepar &par, float v, float step, float gate )
 {
 	float gate_inf = lsns_ggate( v, _ggatev12( par ), _ggateslp( par ));
 	float time = lsns_ggate_tmod( _ggatet0( par ), _ggatetmax( par ), v, _ggatev12t( par ), _ggateslpt( par ), _ggatev12t2( par ), _ggateslpt2( par ));
 	return lsns_exp_euler( gate, gate_inf, step, time );
 }
 
-__lsns_inline float proc_ggate4( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_ggate4( gatepar &par, float v, float step, float gate )
 {
 	float gate_inf = lsns_ggate( v, _ggatev12( par ), _ggateslp( par ));
 	float time = ( v < _ggatevtr( par ))? 
@@ -105,18 +105,18 @@ __lsns_inline float proc_ggate4( gate_par par, float v, float step, float gate )
 //-----------------------------------------------------------------------------
 //	Alpha/Beta = A*( B*V-V12 )/( C+exp( -( v-V12 )/Slp ));
 //=============================================================================
-__lsns_inline float proc_abgate1( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_abgate1( gatepar &par, float v, float step, float gate )
 {
 	float alpha = lsns_abgate( v, _abgatev12a( par ), _abgateslpa( par ), _abgateAa( par ), _abgateBa( par ), _abgateCa( par ));
 	float beta = lsns_abgate( v, _abgatev12b( par ), _abgateslpb( par ), _abgateAb( par ), _abgateBb( par ), _abgateCb( par ));
 	return lsns_div( alpha, alpha+beta );
 }
 
-__lsns_inline float proc_abgate2( gate_par par, float v, float step, float gate )
+__lsns_inline float proc_abgate2( gatepar &par, float v, float step, float gate )
 {
 	float alpha = lsns_abgate( v, _abgatev12a( par ), _abgateslpa( par ), _abgateAa( par ), _abgateBa( par ), _abgateCa( par ));
 	float beta = lsns_abgate( v, _abgatev12b( par ), _abgateslpb( par ), _abgateAb( par ), _abgateBb( par ), _abgateCb( par ));
-	float time = lsns_div( 1., alpha+beta );
+	float time = lsns_div( 1.f, alpha+beta );
 	float gate_inf = alpha*time;
 	time = _abgatet0( par )+_abgatetmax( par )*time;
 	return lsns_exp_euler( gate, gate_inf, step, time );
@@ -146,32 +146,32 @@ __lsns_inline float proc_abgate2( gate_par par, float v, float step, float gate 
 //		T = T0+Tmax/(alpha+beta);
 //		T*d[M/H]/dt = [M/H]inf-[M/H];
 //=============================================================================
-__lsns_inline float proc_zgate1( gate_par par, float in, float v, float step, float gate )
+__lsns_inline float proc_zgate1( gatepar &par, float in, float v, float step, float gate )
 {
 	float alpha = _zgateA( par )*lsns_pow( _zgateB( par )*in, _zgateL( par ));
-	return lsns_div( alpha, 1.+alpha );
+	return lsns_div( alpha, 1.f+alpha );
 }
 
-__lsns_inline float proc_zgate2( gate_par par, float in, float v, float step, float gate )
+__lsns_inline float proc_zgate2( gatepar &par, float in, float v, float step, float gate )
 {
 	float alpha = _zgateA( par )*lsns_pow( _zgateB( par )*in, _zgateL( par ));
-	float gate_inf = lsns_div( alpha, 1.+alpha );
-	float time = _zgatet0( par )+lsns_div( _zgatetmax( par ), 1.+_zgateG( par )*alpha );
+	float gate_inf = lsns_div( alpha, 1.f+alpha );
+	float time = _zgatet0( par )+lsns_div( _zgatetmax( par ), 1.f+_zgateG( par )*alpha );
 	return lsns_exp_euler( gate, gate_inf, step, time );
 }
 
-__lsns_inline float proc_zgate3( gate_par par, float in, float v, float step, float gate )
+__lsns_inline float proc_zgate3( gatepar &par, float in, float v, float step, float gate )
 {
 	float alpha = in*_zgateA( par )*lsns_exp( lsns_div( -( v-_zgatev12( par )), _zgateslp( par )));
 	float beta = _zgateB( par )*lsns_exp( lsns_div( v-_zgatev12( par ), _zgateslp( par )));
 	return lsns_div( alpha, alpha+beta );
 }
 
-__lsns_inline float proc_zgate4( gate_par par, float in, float v, float step, float gate )
+__lsns_inline float proc_zgate4( gatepar &par, float in, float v, float step, float gate )
 {
 	float alpha = in*_zgateA( par )*lsns_exp( lsns_div( -( v-_zgatev12( par )), _zgateslp( par )));
 	float beta = _zgateB( par )*lsns_exp( lsns_div( v-_zgatev12( par ), _zgateslp( par )));
-	float time = lsns_div( 1., alpha+beta );
+	float time = lsns_div( 1.f, alpha+beta );
 	float gate_inf = alpha*time;
 	time = _zgatet0( par )+_zgatetmax( par )*time;
 	return lsns_exp_euler( gate, gate_inf, step, time );
@@ -185,9 +185,9 @@ __lsns_inline float proc_zgate4( gate_par par, float in, float v, float step, fl
 // 	1) 'psgate1' nmda synapse:
 //		[M/H] = 1/(1+exp(−0.062*V)*[Mg]/3.57)
 //=============================================================================
-__lsns_inline float proc_psgate1( gate_par par, float in, float v, float step, float gate )
+__lsns_inline float proc_psgate1( gatepar &par, float in, float v, float step, float gate )
 {
-	return lsns_div( 1., 1.+lsns_exp( -0.062*v )*lsns_div( in, 3.57 ));
+	return lsns_div( 1.f, 1.f+lsns_exp( -0.062f*v )*lsns_div( in, 3.57f ));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
