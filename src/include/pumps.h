@@ -30,7 +30,7 @@ enum __lsns_pump_types{
 // Structure 'gate_par' to store all constant parameters for gata variables
 // of all types
 //=============================================================================
-typedef struct __lsns_align( 16 ) __pumppar{
+typedef struct __lsns_align( 16 ) __pump_par{
 	float4 Par1;
 	float4 Par2;
 } pumppar;

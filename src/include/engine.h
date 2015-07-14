@@ -5,6 +5,7 @@
 #include "gateproc.h"
 #include "ionproc.h"
 #include "pumpproc.h"
+#include "viewproc.h"
 
 #define MAX_CHAN_PER_CELL	15				/*<24*/
 #define MAX_CHAN_PER_PUMP	7				/*<24*/
@@ -107,8 +108,8 @@ typedef struct __lsns_align( 16 ) __ions_data{
 	int MaxIons;						//
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *IonsType;			// type of ions: x - pump type, y - eds type
-	int4 __lsns_align( 16 ) *IonsShared;			// indices of shared variables: x - CellV array
-	int4 __lsns_align( 16 ) *GchanLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
+	int4 __lsns_align( 16 ) *IonsLUT;			// indices of shared variables: x - CellV array
+	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
 	// local variables (read/write)
 	float4 __lsns_align( 16 ) *IonsE;			// reversal potential
 	float4 __lsns_align( 16 ) *IonsI;			// ion currents
@@ -123,7 +124,7 @@ typedef struct __lsns_align( 16 ) __channel_data{
 	int MaxChan;						//
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *ChanType;			// type of channel
-	int4 __lsns_align( 16 ) *ChanShared;			// indices of shared variables: x - CellV, y - IonsE/eds, z - IonsE/in for m, w - IonsE/in for h
+	int4 __lsns_align( 16 ) *ChanLUT;			// indices of shared variables: x - CellV, y - IonsE/eds, z - IonsE/in for m, w - IonsE/in for h
 	// local variables (read-write)
 	float4 __lsns_align( 16 ) *ChanG;			// conductance
 	float4 __lsns_align( 16 ) *ChanMH;			// gate variables
@@ -137,8 +138,8 @@ typedef struct __lsns_align( 16 ) __channel_data{
 typedef struct __lsns_align( 16 ) __cell_data{
 	int MaxCells;						//
 	// local variables (read-only)
-	int4 __lsns_align( 16 ) *GchanLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
-	int4 __lsns_align( 16 ) *IpumpLUT;			// look-up-table of pump current: x - counter, the rest are actual indices of IonsI array;
+	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
+	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table of pump current: x - counter, the rest are actual indices of IonsI array;
 	// local variables (read-write)
 	float4 __lsns_align( 16 ) *CellV;			// membrane potential
 	// shared variables
@@ -149,30 +150,27 @@ typedef struct __lsns_align( 16 ) __cell_data{
 ///////////////////////////////////////////////////////////////////////////////
 // iodat
 typedef struct __lsns_align( 16 ) __iobuf{
-	// local variables (read-write)
-	float4 __lsns_align( 16 ) *DevData[MAX_STORED_STEPS];	// data to display (located in device memory)
-	float4 __lsns_align( 16 ) *HostData;			// data to display (pinned memory located in the host)
+	int MaxViewPars;					//
 	// local variables (read-only). 
 	// LUT format: bits 31..30 are coding the offset in each float4 variable (00 - x, 01 - y, 10 - z, 11 - w); 
 	// bits 29..0 are coding the offset in an arrays of shared variables
-	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table for IonsI 
-	int4 __lsns_align( 16 ) *IonsELUT;			// look-up-table for IonsE
-	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table for ChanG
-	int4 __lsns_align( 16 ) *ChanMHLUT;			// look-up-table for ChanMH
-	int4 __lsns_align( 16 ) *CellVLUT;			// look-up-table for CellV
+	int4 __lsns_align( 16 ) *GlobalLUT;			// look-up-table for data needed to be stored
+	// local variables (read-write)
+	float4 __lsns_align( 16 ) *DevData[MAX_STORED_STEPS];	// data to display (located in device memory)
+	float4 __lsns_align( 16 ) *HostData;			// data to display (pinned memory located in the host)
 	// shared variables
-	float4 __lsns_align( 16 ) *IonsI;			// ion and pump currents
-	float4 __lsns_align( 16 ) *IonsE;			// reversal potential, concentration of ions inside and ouside cell 
-	float4 __lsns_align( 16 ) *ChanG;			// channel conguctance, currents etc
-	float4 __lsns_align( 16 ) *ChanMH;			// gate variables
-	float4 __lsns_align( 16 ) *CellV;			// membrane potential, spike onset etc
+	float4 __lsns_align( 16 ) *GlobalData;			// array of global data
 } iodat;
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // netdat 
 typedef struct __lsns_align( 16 ) __network_data{
+	int MaxGlobalData;					// = 2*MaxIons+2*MaxChan+MaxCells
 	// global memory on host
+	int4 __lsns_align( 16 ) *GlobalLUT;			// size of array: 
+	float4 __lsns_align( 16 ) *GlobalData;			// size of array: 2*MaxIons+2*MaxChan+MaxCells
+	// global memory mapped on network elements (channels, ions, cells, etc)
 	iondat Ions;						// ions
 	chandat Channels;					// channels
 	celldat Cells;						// neurons (compartments)
@@ -190,6 +188,7 @@ typedef struct __lsns_align( 16 ) __network_parameters{
 	int MaxIons;
 	int MaxChan;
 	int MaxCells;
+	int MaxGlobalData;
 	gatepar Gates[LSNS_MAX_GPARS];
 	pumppar Pumps[LSNS_MAX_PARPUMPS];
 } netpar; 

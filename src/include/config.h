@@ -27,22 +27,18 @@
 #endif
 
 #if defined( __CUDACC__ ) // NVCC
-	#define __lsns_align( n ) __align__( n )
-#elif defined( __GNUC__ ) // GCC
-	#define __lsns_align( n ) __attribute__(( aligned( n )))
-#elif defined(_MSC_VER ) // MSVC
-	#define __lsns_align( n ) __declspec( align( n ))
-#else
-	#error "Please provide a definition for __lsns_align macro for your host compiler!"
-#endif
-
-#if defined( __CUDACC__ ) // NVCC
 	#define __lsns_inline __forceinline__ __device__
+	#define __lsns_align( n ) __align__( n )
 #else
 	#define __lsns_inline inline
-#endif
+	#if defined( __GNUC__ ) // GCC
+		#define __lsns_align( n ) __attribute__(( aligned( n )))
+	#elif defined(_MSC_VER ) // MSVC
+		#define __lsns_align( n ) __declspec( align( n ))
+	#else
+		#error "Please provide a definition for __lsns_align macro for your host compiler!"
+	#endif
 
-#if !defined( __CUDACC__ )
 	typedef struct __int2{
 		int x;
 		int y;

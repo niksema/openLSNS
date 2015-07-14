@@ -1,4 +1,6 @@
-#include "pumps.h"
+#include "precompile.h"
+
+#include "pumpproc.h"
 
 const char *lsns_pump_types[LSNS_MAX_PUMP] = {
 	"None",
@@ -6,5 +8,5 @@ const char *lsns_pump_types[LSNS_MAX_PUMP] = {
 	"Na pump",
 };
 /*
- add description* 
+ add description 
  */

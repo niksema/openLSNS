@@ -30,6 +30,9 @@
     <ClCompile Include="precompile.cpp">
       <Filter>win7</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\core\view.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\include\config.h">
@@ -62,5 +65,17 @@
     <ClInclude Include="..\src\include\pumps.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\include\viewproc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\include\views.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="precompile.h">
+      <Filter>win7</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

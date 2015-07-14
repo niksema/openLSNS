@@ -5,7 +5,7 @@
 #include "pumps.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// 0. Performes no calculation. Always returns 0.
+// Performes no calculation. Always returns 0.
 //=============================================================================
 __lsns_inline float calc_nopump( pumppar &par, float in )
 {
@@ -13,7 +13,7 @@ __lsns_inline float calc_nopump( pumppar &par, float in )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// 1. Calculate current of Ca-pump (description+reference)
+// Calculate current of Ca-pump (description+reference)
 //=============================================================================
 __lsns_inline float calc_capump( pumppar &par, float in )
 {
@@ -21,7 +21,7 @@ __lsns_inline float calc_capump( pumppar &par, float in )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// 2. Calculate current of Na-pump (description+reference)
+// Calculate current of Na-pump (description+reference)
 //=============================================================================
 __lsns_inline float calc_napump( pumppar &par, float in )
 {
@@ -41,12 +41,12 @@ __lsns_inline float calc_napump( pumppar &par, float in )
 #define lsns_ipump( type, par, in, apump, ipump ) \
 	switch( type ){ \
 		case LSNS_CA_PUMP: \
-			apump = 1; \
+			apump = 1; /*todo: calculate the apump*/ \
 			ipump = calc_capump( par, in ); \
 			break; \
 		case LSNS_NA_PUMP: \
+			apump = 1; /*todo: calculate the apump*/ \
 			ipump = calc_napump( par, in ); \
-			apump = 1; \
 			break; \
 		default: \
 			apump = 0; \

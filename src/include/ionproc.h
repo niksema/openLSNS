@@ -9,7 +9,7 @@
 	( rtfz )*lsns_log(( out )/( in ))
 
 // calculate ions current that is involved into ions dynamics
-#define lsns_ichan( a, v, eds, gchan, ichan ) \
-	ichan = a*(( v )-( eds ))*( gchan );
+#define lsns_ichan( apump, v, eds, gchan, ichan ) \
+	ichan = apump*(( v )-( eds ))*( gchan );
 
 #endif /*__IONPROC_H*/

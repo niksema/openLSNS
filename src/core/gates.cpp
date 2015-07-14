@@ -1,4 +1,6 @@
-#include "gates.h"
+#include "precompile.h"
+
+#include "gateproc.h"
 
 const char *lsns_gate_types[LSNS_MAX_GATE] = {
 	"None",

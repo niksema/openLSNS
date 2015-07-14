@@ -4,10 +4,7 @@
 #include "config.h"
 
 #ifndef __CONSOLE__
-/*
-#pragma comment(lib, "comctl32.lib")
-#pragma comment(lib, "UxTheme.lib")
-*/
+
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
 #endif
