@@ -2,7 +2,7 @@
 
 #include "gateproc.h"
 
-const char *lsns_gate_types[LSNS_MAX_GATE] = {
+const char *lsns_gate_types[LSNS_MAX_GATES] = {
 	"None",
 	"Bypass",
 	"Generic instant",
@@ -49,7 +49,7 @@ class iogate{
 		bool cleate( int type, const string &description );
 		bool cleate( const string &type, const string &description );
 		string get_typename( void ) const{
-			assert( Type >= 0 && Type < LSNS_MAX_GATE );
+			assert( Type >= 0 && Type < LSNS_MAX_GATES );
 			return string( lsns_gate_types[Type] );
 		};
 		int get_type( void ) const{
@@ -64,7 +64,7 @@ class iogate{
 		gate_par Gpar;
 };
 
-const char *lsns_gate_description[LSNS_MAX_GATE] = {
+const char *lsns_gate_description[LSNS_MAX_GATES] = {
 	"Function \'calc_nogate\'.\n\
 	Performes no calculation. Always returns 1",
 

@@ -6,8 +6,7 @@
 #define LSNS_MAX_GPARS 64	/*maximal number of parameters for different types of gate variables*/
 
 ///////////////////////////////////////////////////////////////////////////////
-// Gates ids and descriptions
-//=============================================================================
+// gates ids and descriptions
 enum __lsns_gate_types{
 	LSNS_NOGATE			= 0,
 	LSNS_BYPASSGATE			= 1,
@@ -22,7 +21,7 @@ enum __lsns_gate_types{
 	LSNS_ZAPHABETA_INSTANT		= 10,
 	LSNS_ZAPHABETA_T		= 11,
 	LSNS_PS_NMDA			= 12,
-	LSNS_MAX_GATE,
+	LSNS_MAX_GATES,
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -107,7 +106,7 @@ typedef struct __lsns_align( 16 ) __gate_par{
 	float4 Par3;
 } gatepar;
 
-extern const char *lsns_gate_types[LSNS_MAX_GATE];
+extern const char *lsns_gate_types[LSNS_MAX_GATES];
 
 #endif /*__GATES_H*/
 

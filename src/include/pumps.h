@@ -32,7 +32,6 @@ enum __lsns_pump_types{
 //=============================================================================
 typedef struct __lsns_align( 16 ) __pump_par{
 	float4 Par1;
-	float4 Par2;
 } pumppar;
 
 extern const char *lsns_pump_types[LSNS_MAX_PUMP];
