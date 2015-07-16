@@ -7,7 +7,6 @@
 //=================== inline methods ==========================================
 ///////////////////////////////////////////////////////////////////////////////
 // Performes no calculation. Always returns 0.
-
 __lsns_inline float calc_nopump( pumppar &par, float in )
 {
 	return 0;

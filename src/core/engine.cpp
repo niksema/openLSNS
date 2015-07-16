@@ -38,7 +38,7 @@
 // common data for all networks elements (read-only)
 static float Threshold = -10.f;
 static float Step = -1.f;
-static int Counter = 0;
+static int StepCounter = 0;
 static int MaxIons = 0;
 static int MaxChan = 0;
 static int MaxCells = 0;
@@ -54,7 +54,7 @@ static pumppar Pumps[LSNS_MAX_PARPUMPS] = {0};
 void control_kernel( int index /*, ctrldat *data*/ )
 {
 	if( index == 0 ){
-		++Counter;
+		++StepCounter;
 	}
 }
 
@@ -135,34 +135,32 @@ void connect_kernel( int index /*, connectdat *data*/ )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// chan_kernel: the engine kernel to calculate the properties of channel and 
+// +'chan_kernel': the engine kernel to calculate the properties of channel and 
 // synaptic currents such as conductance, current etc.
-// Input parameters:
-// Output parameters:
 void chan_kernel( int index, chandat *data )
 {
-	__lsns_assert( index >= 0 && index < MAX_CHAN );	// DEBUG: check the range for 'index' variable 
+	__lsns_assert( index >= 0 && index < MAX_CHAN );				// DEBUG: check the range for 'index' variable 
 	float step = Step;
 	// load type of ion channel (generic, a-b, etc) and its parameters (half-voltage, slope, etc)
 	int4 tp = pChanType[index];
 	// load references to external parameters (membrane potential, rest potential, etc)
 	int4 sh = pChanLUT[index];
-	__lsns_assert( _gate_typem( tp ) >= 0 && _gate_typem( tp ) < MAX_GATES ); // DEBUG: check the range for _gate_typem( tp )
-	__lsns_assert( _gate_typeh( tp ) >= 0 && _gate_typeh( tp ) < MAX_GATES ); // DEBUG: check the range for  _gate_typeh( tp ) 
-	__lsns_assert( _gate_parm( tp ) >= 0 && _gate_parm( tp ) < MAX_GPARS );   // DEBUG: check the range for  _gate_parm( tp ) 
-	__lsns_assert( _gate_parh( tp ) >= 0 && _gate_parh( tp ) < MAX_GPARS );   // DEBUG: check the range for  _gate_parh( tp ) 
-	__lsns_assert( _chan_lut_v( sh ) >= 0 &&_chan_lut_v( sh ) < MAX_CELLS );  // DEBUG: check the range for _chan_lut_v( sh )
-	__lsns_assert( _chan_lut_e( sh ) >= 0 && _chan_lut_e( sh ) < MAX_IONS );  // DEBUG: check the range for _chan_lut_e( sh )
-	__lsns_assert( _chan_lut_inm( sh ) >= 0 && _chan_lut_inm( sh ) < MAX_IONS );// DEBUG: check the range for _chan_lut_inm( sh )
-	__lsns_assert( _chan_lut_inh( sh ) >= 0 && _chan_lut_inh( sh ) < MAX_IONS );// DEBUG: check the range for _chan_lut_inh( sh )
+	__lsns_assert( _gate_typem( tp ) >= 0 && _gate_typem( tp ) < MAX_GATES );	// DEBUG: check the range for _gate_typem( tp )
+	__lsns_assert( _gate_typeh( tp ) >= 0 && _gate_typeh( tp ) < MAX_GATES );	// DEBUG: check the range for  _gate_typeh( tp ) 
+	__lsns_assert( _gate_parm( tp ) >= 0 && _gate_parm( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parm( tp ) 
+	__lsns_assert( _gate_parh( tp ) >= 0 && _gate_parh( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parh( tp ) 
+	__lsns_assert( _chan_lut_v( sh ) >= 0 &&_chan_lut_v( sh ) < MAX_CELLS );	// DEBUG: check the range for _chan_lut_v( sh )
+	__lsns_assert( _chan_lut_e( sh ) >= 0 && _chan_lut_e( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_e( sh )
+	__lsns_assert( _chan_lut_inm( sh ) >= 0 && _chan_lut_inm( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_inm( sh )
+	__lsns_assert( _chan_lut_inh( sh ) >= 0 && _chan_lut_inh( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_inh( sh )
 	// load properties of ions channel (conductance, current, etc)
 	float4 g = pChanG[index];
 	// load properties of gate variables (activation, inactivation, etc) if needed
 	float4 mh = ( _gate_typem( tp )+_gate_typeh( tp ) != LSNS_NOGATE)? pChanMH[index]: float4();
 //todo: { possible CUDA optimization (try to use shared variables)
 	// load shared variables (resting potential, membrane potential, etc)
-	float eds = _ions_eds( pIonsE[_chan_lut_e( sh )] );	// extract resting potential from 'IonsE'
-	float vm = _cell_v( pCellV[_chan_lut_v( sh )] );	// extract membrane potential from 'CellV'
+	float eds = _ions_eds( pIonsE[_chan_lut_e( sh )] );				// extract resting potential from 'IonsE'
+	float vm = _cell_v( pCellV[_chan_lut_v( sh )] );				// extract membrane potential from 'CellV'
 	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
 	float in_m = ( _gate_typem( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( pIonsE[_chan_lut_inm( sh )] ):0;
 	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
@@ -172,9 +170,9 @@ void chan_kernel( int index, chandat *data )
 	float mp, hp;
 	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], in_m, vm, step, _gate_powm( mh ), _gate_m( mh ), mp );
 	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], in_h, vm, step, _gate_powh( mh ), _gate_h( mh ), hp );
-	_chan_g( g ) = _chan_gmax( g )*mp*hp;			// g
-	_chan_ge( g ) = _chan_g( g )*eds;			// ge
-	_chan_i( g ) = _chan_g( g )*( vm-eds );			// I
+	_chan_g( g ) = _chan_gmax( g )*mp*hp;						// g
+	_chan_ge( g ) = _chan_g( g )*eds;						// ge
+	_chan_i( g ) = _chan_g( g )*( vm-eds );						// I
 	// save properties of ions channel (conductance, current, etc)
 	pChanG[index] = g;
 	// save properties of gate variables (activation, inactivation, etc) if needed
@@ -184,25 +182,23 @@ void chan_kernel( int index, chandat *data )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// cell_kernel: the engine kernel to calculate the properties of Hodgkin-Huxley
+// +'cell_kernel': the engine kernel to calculate the properties of Hodgkin-Huxley
 // cell such as membrane potential, onset of the spike etc.
-// Input parameters:
-// Output parameters:
 void cell_kernel( int index, celldat *data )
 {
-	__lsns_assert( index >= 0 && index < MAX_CELLS );	// DEBUG: check the range for 'index' variable 
+	__lsns_assert( index >= 0 && index < MAX_CELLS );				// DEBUG: check the range for 'index' variable 
 	// load properties of the cell (membrane potential, etc)
 	float step = Step;
 	float threshold = Threshold;
 	float4 v = pCellV[index];
 	// preprocessing
-	float g = 1, ge = 0, ipump = 0;
-	lsns_fastsum( _ions_ipump, pIonsI, pIonsILUT+index*( MAX_IPUMP_PER_CELL/4+1 ), ipump, MAX_IONS ); // sum all ipump
-	lsns_fastsum2( _chan_g, _chan_ge, pChanG, pChanGLUT+index*( MAX_CHAN_PER_CELL/4+1 ), g, ge, MAX_CHAN ); // sum all g and ge
-	__lsns_assert( g != 0.0 );				// DEBUG: check if conductance is not zero
+	float g_sum = 0.f, ge_sum = 0.f, ipump = 0.f;
+	lsns_fastsum( _ions_ipump, pIonsI, pIonsILUT+index*( MAX_IPUMP_PER_CELL/4+1 ), ipump, MAX_IONS );		// sum all ipump
+	lsns_fastsum2( _chan_g, _chan_ge, pChanG, pChanGLUT+index*( MAX_CHAN_PER_CELL/4+1 ), g_sum, ge_sum, MAX_CHAN );	// sum all g and ge
+	__lsns_assert( g_sum != 0.0 );							// DEBUG: check if total conductance is not zero
 	// perform calculations
-	float time = _cell_c( v )/g;
-	float v_inf = ( ge+ipump+_cell_iadd( v ))/g;
+	float time = _cell_c( v )/g_sum;
+	float v_inf = ( ge_sum+ipump+_cell_iadd( v ))/g_sum;
 	float vm = lsns_exp_euler( _cell_v( v ), v_inf, step, time );
 	float spike = ( vm > threshold && _cell_v( v )  <= threshold )? 1.f: 0.f;
 	// store the results of simulation
@@ -212,49 +208,34 @@ void cell_kernel( int index, celldat *data )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// store_kernel: 
-// Input parameters:
-// Output parameters:
-///////////////////////////////////////////////////////////////////////////////
-// store2dev_kernel: Stores the preliminary saved results to device memory.
+// +'store2dev_kernel': stores the simulation results to device memory.
 // The results of the simulation store to device memory into 
-// arrays float4 *DevData[MAX_STORED_STEPS]. These arrays organized in 
-// such a way that guaranteed continues memory allocation to rich the maximal 
-// performance while I/O operations: 
+// arrays 'float4 *DevData[MAX_STORED_STEPS]'. These arrays should be organized 
+// in such a way that guarantees that memory is allocated continuously to rich 
+// the maximal performance while I/O operations: 
 //	DevData[0] = alloc(size*MAX_STORED_STEPS);
 //	for( i = 1; i < MAX_STORED_STEPS; ++i ){
 //		DevData[i] = DevData[0]+i*size;
 //	}
-// Input parameters:
-// Output parameters:
-// MAX_VIEW_PARS = ( MAX_IIONS_VIEWS+MAX_EIONS_VIEWS+MAX_GCHAN_VIEWS+MAX_MHCHAN_VIEWS+MAX_CELLV_VIEWS )/4;
-void store2dev_kernel( int index, iodat *data )
+void store2dev_kernel( int index, iodat *data, int counter )
 {
-	__lsns_assert( index >= 0 && index < MAX_VIEW_PARS );	// DEBUG: check the range for 'index' variable
-	float4 res = {0};
-	float4 *src = pGlobalDat;
+	__lsns_assert( index >= 0 && index < MAX_VIEW_PARS );				// DEBUG: check the range for 'index' variable
+	__lsns_assert( counter >= 0 && counter < MAX_STORED_STEPS );			// DEBUG: check the range for 'counter' variable
 	int4 lut = pGlobalViewLUT[index];
-	store_data( src, lut, res, MAX_PARS );
-	__lsns_assert( Counter-1 >= 0 );
-	pDevDat(( Counter-1 )%MAX_STORED_STEPS)[index] = res;
+	float4 *src = pGlobalDat;
+	float4 res = get_data( src, lut, MAX_PARS );
+	pDevDat( counter )[index] = res;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// store2host_kernel: Stores the preliminary saved results to host memory.
-// Initially, the results of the simulation store to device memory into 
-// arrays float4 *DevData[MAX_STORED_STEPS]. These arrays organized in 
-// such a way that guaranteed continues memory allocation to rich the maximal 
-// performance while I/O operations: 
-//	DevData[0] = alloc(size*MAX_STORED_STEPS);
-//	for( i = 1; i < MAX_STORED_STEPS; ++i ){
-//		DevData[i] = DevData[0]+i*size;
-//	}
-// Input parameters:
-// Output parameters:
+// +'store2host_kernel': stores the preliminary saved results to host memory.
+// Initially, the simulation results for 'MAX_STORED_STEPS' steps are stored 
+// into device memory (arrays '*DevData[MAX_STORED_STEPS]' which initialized in 
+// specific way described above)
 void store2host_kernel( int index , iodat *data )
 {
-	__lsns_assert( index >= 0 && index < MAX_VIEW_PARS*MAX_STORED_STEPS );// DEBUG: check the range for 'index' variable
-	pHostDat[index] = pDevDat(0)[index];			// copy data from device memory to host memory
+	__lsns_assert( index >= 0 && index < MAX_VIEW_PARS*MAX_STORED_STEPS );		// DEBUG: check the range for 'index' variable
+	pHostDat[index] = pDevDat(0)[index];						// copy data from device memory to host (pinned) memory
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -285,12 +266,12 @@ netdat *lsns_alloc( netpar &par )
 	data->Cells.ChanGLUT						= data->Channels.ChanLUT+par.MaxChan;
 	data->Cells.IonsILUT						= data->Cells.ChanGLUT+par.MaxCells*( MAX_CHAN_PER_CELL/4+1 ); 
 // todo: HostData is supposed to be pinned-type of memory for cuda version
-// todo: GlobalData, GlobalLUT, DevData are supposed to be device-specific for cuda version
 	// allocate memory for IO buffer and look-up-tables (for non-cuda version its the memory on host only)
 	data->IOData.HostData = ( float4 *)malloc( sizeof( float4 )*par.MaxViewPars*MAX_STORED_STEPS ); __lsns_assert( data->IOData.HostData != NULL );
 	data->IOData.GlobalViewLUT = ( int4 *)malloc( sizeof( int4 )*par.MaxViewPars ); __lsns_assert( data->IOData.GlobalViewLUT != NULL );
 	// map the arrays of specific parameters onto the global memory
 	data->IOData.GlobalData = data->GlobalData;
+// todo: DevData are supposed to be device-specific for cuda version
 	for( int i = 0; i < MAX_STORED_STEPS; ++i ){
 		data->IOData.DevData[i] = data->IOData.HostData+i*par.MaxViewPars;
 	}
@@ -298,7 +279,7 @@ netdat *lsns_alloc( netpar &par )
 	// allocate device-specific memory (for non-cuda version this is a pointer to the same data structure, so don't do anything)
 	data->DevMap = data;
 	// setup the constant parameters of the network
-	Step = par.Step; Threshold = par.Threshold; 
+	Step = par.Step; Threshold = par.Threshold; StepCounter = 0;
 	MaxIons = par.MaxIons; MaxChan = par.MaxChan; MaxCells = par.MaxCells; MaxGlobalData = par.MaxGlobalData;
 	MaxViewPars = par.MaxViewPars;
 	memcpy ( Gates, par.Gates, sizeof( netpar )*LSNS_MAX_GPARS );
@@ -324,7 +305,7 @@ void lsns_free( netdat *data )
 	// free memory for netdat structure
 	free( data );
 	// reset the constant parameters of the network
-	Step = -1.f; Threshold = -10.f; Counter = 0;
+	Step = -1.f; Threshold = -10.f; StepCounter = 0;
 	MaxIons = 0; MaxChan = 0; MaxCells = 0; MaxViewPars = MaxGlobalData = 0;
 	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GPARS );
 	memset( Pumps, 0, sizeof( pumppar )*LSNS_MAX_PARPUMPS );
@@ -333,7 +314,7 @@ void lsns_free( netdat *data )
 // allocate memory on device and copy the network configuration from host to device.
 bool lsns_map2dev( netdat *data, netpar &par )
 {
-	// allocate device-specific memory 
+	// allocate device-specific memory and copy initialized arrays from host memory to device
 	// (for non-cuda version this is a pointer to the same data structure, so don't do anything)
 	data->DevMap = data;
 	return true;

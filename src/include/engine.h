@@ -148,7 +148,7 @@ typedef struct __lsns_align( 16 ) __cell_data{
 typedef struct __lsns_align( 16 ) __iobuf{
 	// local variables (read-only). 
 	// LUT format: bits 31..30 are coding the offset in each float4 variable (00 - x, 01 - y, 10 - z, 11 - w); 
-	// bits 29..0 are coding the offset in an arrays of shared variables
+	// bits 29..0 are coding the offset in the global array 'GlobalData'
 	int4 __lsns_align( 16 ) *GlobalViewLUT;			// look-up-table for data needed to be stored
 	// local variables (read-write)
 	float4 __lsns_align( 16 ) *DevData[MAX_STORED_STEPS];	// data to display (located in device memory)

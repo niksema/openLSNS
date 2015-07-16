@@ -8,12 +8,12 @@
 // Pumps ids and descriptions
 //=============================================================================
 enum __lsns_pump_types{
-	LSNS_NO_DYN			= 0,
-	LSNS_CA_PUMP			= 1,
-	LSNS_NA_PUMP			= 2,
+	LSNS_NO_DYN			= 0,						// none
+	LSNS_CA_PUMP			= 1,						//
+	LSNS_NA_PUMP			= 2,						//
 	LSNS_MAX_PUMP,
 };
-
+extern const char *lsns_pump_types[LSNS_MAX_PUMP];
 ///////////////////////////////////////////////////////////////////////////////
 // Extract parameters from the structure 'pumppar'
 //=============================================================================
@@ -25,7 +25,6 @@ enum __lsns_pump_types{
 #define _napump_kp( par ) ( par ).Par1.z
 // get parameter pre-calculated parameter In03 = In0^3/(In0^3-Kp^3) for Na-pump 
 #define _napump_in03( par ) ( par ).Par1.w
-
 ///////////////////////////////////////////////////////////////////////////////
 // Structure 'gate_par' to store all constant parameters for gata variables
 // of all types
@@ -33,7 +32,5 @@ enum __lsns_pump_types{
 typedef struct __lsns_align( 16 ) __pump_par{
 	float4 Par1;
 } pumppar;
-
-extern const char *lsns_pump_types[LSNS_MAX_PUMP];
 
 #endif /*__PUMPS_H*/

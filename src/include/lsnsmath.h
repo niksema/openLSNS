@@ -4,6 +4,8 @@
 #include "config.h"
 #include "debug.h"
 
+///////////////////////////////////////////////////////////////////////////////
+// some useful math macroses
 #if defined( __CUDA__ )
 	#include <cuda.h>
 	
@@ -21,11 +23,12 @@
 	#define lsns_cosh( x ) cosh( x )
 	#define lsns_log( x ) log( x )
 #endif
-
-// Unroll the calculation of total sum of series that consists of up-to-24 elements and
-// stores the results into 'res'. The series is located in 'data' array. 'fn' is the method 
-// to extract the actual number from 'data[i]'. The 'lut' keeps the actual size (<24) of 
-// the series and reference to actual position of the particular element in the array 'data'.
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_fastsum' unrolls the calculation of total sum of series that consists 
+// of up-to-24 elements and stores the results into 'res'. The series is located 
+// in 'data' array. 'fn' is the method to extract the actual number from 'data[i]'. 
+// The 'lut' keeps the actual size (<24) of the series and reference to actual 
+// position (offset) of the particular element in the array 'data'.
 #define lsns_fastsum( fn, data, lut, res, N )\
 {\
 	int4 lut1 = ( lut )[0], lut2, lut3, lut4, lut5, lut6; \
@@ -140,11 +143,13 @@
 		default:; \
 	} \
 }
-
-// Unroll the calculation of total sum of series that consists of up-to-24 elements and
-// stores the results into 'res'. The series is located in 'data' array. 'fn' is the method 
-// to extract the actual number from 'data[i]'. The 'lut' keeps the actual size (<24) of 
-// the series and reference to actual position of the particular element in the array 'data'.
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_fastsum2' unrolls the calculation of total sum of series that consists 
+// of up-to-24 elements and stores the results into 'res1' and 'res2'. The series 
+// is located in 'data' array. 'fn1' and 'fn2' are the methods to extract the 
+// actual numbers from 'data[i]'. The 'lut' keeps the actual size (<24) of the 
+// series and reference to actual position (offset) of the particular element in 
+// the array 'data'.
 #define lsns_fastsum2( fn1, fn2, data, lut, res1, res2, N )\
 {\
 	int4 lut1 = ( lut )[0], lut2, lut3, lut4, lut5, lut6; \
@@ -283,11 +288,12 @@
 		default:; \
 	} \
 }
-
-// 1-step Euler method: y = y+step*f
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_euler' 1-step Euler method: y = y+step*f
 #define lsns_euler( y, f, step ) \
 	( y )+( step )*( f )
-// 1-step exponential Euler method : y = exp(-step/t )*( y-y0 )+y0
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_exp_euler' 1-step exponential Euler method: y = exp(-step/t )*( y-y0 )+y0
 #define lsns_exp_euler( y, y0, step, t ) \
 	( __lsns_assert( t > 0.0 ), lsns_exp(-lsns_div( step, t ))*(( y )-( y0 ))+( y0 ))
 

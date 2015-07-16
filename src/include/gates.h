@@ -4,28 +4,27 @@
 #include "config.h"
 
 #define LSNS_MAX_GPARS 64	/*maximal number of parameters for different types of gate variables*/
-
 ///////////////////////////////////////////////////////////////////////////////
-// gates ids and descriptions
+// +gates ids and brief descriptions
 enum __lsns_gate_types{
-	LSNS_NOGATE			= 0,
-	LSNS_BYPASSGATE			= 1,
-	LSNS_GENERIC_INSTANT		= 2,
-	LSNS_GENERIC_T			= 3,
-	LSNS_GENERIC_TMOD		= 4,
-	LSNS_GENERIC_TAMOD		= 5,
-	LSNS_ALPHABETA_INSTANT		= 6,
-	LSNS_ALPHABETA_T		= 7,
-	LSNS_ZGENERIC_INSTANT		= 8,
-	LSNS_ZGENERIC_T			= 9,
-	LSNS_ZAPHABETA_INSTANT		= 10,
-	LSNS_ZAPHABETA_T		= 11,
-	LSNS_PS_NMDA			= 12,
+	LSNS_NOGATE			= 0,						// none (gate is always 1)
+	LSNS_BYPASSGATE			= 1,						// bypass (bypass calulation)
+	LSNS_GENERIC_INSTANT		= 2,						// generic instant
+	LSNS_GENERIC_T			= 3,						// generic standard
+	LSNS_GENERIC_TMOD		= 4,						// generic modified
+	LSNS_GENERIC_TAMOD		= 5,						// generic A-current
+	LSNS_ALPHABETA_INSTANT		= 6,						// alpha/beta instant
+	LSNS_ALPHABETA_T		= 7,						// alpha/beta standard
+	LSNS_ZGENERIC_INSTANT		= 8,						// z-current instant
+	LSNS_ZGENERIC_T			= 9,						// z-current standard
+	LSNS_ZAPHABETA_INSTANT		= 10,						// z-current (alpha/beta) instant
+	LSNS_ZAPHABETA_T		= 11,						// z-current (alpha/beta) standard
+	LSNS_PS_NMDA			= 12,						// nmda post-synapse
 	LSNS_MAX_GATES,
 };
-
+extern const char *lsns_gate_types[LSNS_MAX_GATES];
 ///////////////////////////////////////////////////////////////////////////////
-// Extract parameters for all generic descriptions from the structure 'gatepar'
+// +extract parameters for all generic descriptions from the structure 'gatepar'
 //=============================================================================
 // get half-voltage for gate variable 
 #define _ggatev12( par ) ( par ).Par1.x
@@ -47,9 +46,8 @@ enum __lsns_gate_types{
 #define _ggatev12t2( par ) ( par ).Par2.z
 // get slope-2 for time constant
 #define _ggateslpt2( par ) ( par ).Par2.w
-
 ///////////////////////////////////////////////////////////////////////////////
-// Extract parameters for alpha/beta descriptions from the structure 'gatepar'
+// +extract parameters for alpha/beta descriptions from the structure 'gatepar'
 //=============================================================================
 // get half-voltage for alpha component of gate variable 
 #define _abgatev12a( par ) ( par ).Par1.x
@@ -75,9 +73,8 @@ enum __lsns_gate_types{
 #define _abgatet0( par ) ( par ).Par3.z
 // get parameter Tmax for beta component of gate variable 
 #define _abgatetmax( par ) ( par ).Par3.w
-
 ///////////////////////////////////////////////////////////////////////////////
-// Extract parameters for all z-descriptions from the structure 'gatepar'
+// +extract parameters for all z-descriptions from the structure 'gatepar'
 //=============================================================================
 // get parameter Alpha z-gate variable
 #define _zgateA( par ) ( par ).Par1.z
@@ -95,18 +92,14 @@ enum __lsns_gate_types{
 #define _zgatet0( par ) ( par ).Par2.x
 // get parameter Tmax z-gate variable
 #define _zgatetmax( par ) ( par ).Par2.y
-
 ///////////////////////////////////////////////////////////////////////////////
-// Structure 'gatepar' to store all constant parameters for gata variables
+// +structure 'gatepar' to store all constant parameters for gata variables
 // of all types
-//=============================================================================
 typedef struct __lsns_align( 16 ) __gate_par{
 	float4 Par1;
 	float4 Par2;
 	float4 Par3;
 } gatepar;
-
-extern const char *lsns_gate_types[LSNS_MAX_GATES];
 
 #endif /*__GATES_H*/
 
