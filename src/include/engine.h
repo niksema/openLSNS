@@ -4,7 +4,6 @@
 #include "config.h"
 #include "gateproc.h"
 #include "ionproc.h"
-#include "pumpproc.h"
 #include "viewproc.h"
 
 #define MAX_CHAN_PER_PUMP	7				/*<24*/
@@ -42,11 +41,10 @@
 // parameters of ion current (decodes IonsI):
 //	x - pump current;
 //	y - channels current;
-//	z - time constant of ions dynamics;
+//	z - reserved;
 //	w - reserved.
 #define _ions_ipump( i ) ( i ).x
 #define _ions_ichan( i ) ( i ).y
-#define _ions_tau( i ) ( i ).z
 ///////////////////////////////////////////////////////////////////////////////
 // iondat maps data which are related to ions dynamics onto global memory
 typedef struct __lsns_align( 16 ) __ions_data{
@@ -187,8 +185,8 @@ typedef struct __lsns_align( 16 ) __network_parameters{
 	int MaxViewPars;					// total number of network parameters
 	int MaxGlobalData;					// = 2*MaxIons+2*MaxChan+MaxCells
 	int MaxGlobalLUT;					// = MaxIons*( 3+MAX_CHAN_PER_PUMP/4 )+2*MaxChan+MaxCells*(2+MAX_CHAN_PER_CELL/4+MAX_IPUMP_PER_CELL/4)
-	gatepar Gates[LSNS_MAX_GPARS];				// properties of ion channels
-	pumppar Pumps[LSNS_MAX_PARPUMPS];			// properties of ion dynamics
+	gatepar Gates[LSNS_MAX_GATEPARS];			// properties of ion channels
+	ionspar Ions[LSNS_MAX_IONPARS];				// properties of ion dynamics
 } netpar; 
 
 //=============================================================================

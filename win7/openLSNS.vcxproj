@@ -83,7 +83,6 @@
     <ClCompile Include="..\src\core\engine.cpp" />
     <ClCompile Include="..\src\core\gates.cpp" />
     <ClCompile Include="..\src\core\ions.cpp" />
-    <ClCompile Include="..\src\core\pumps.cpp" />
     <ClCompile Include="..\src\core\view.cpp" />
     <ClCompile Include="console.cpp" />
     <ClCompile Include="precompile.cpp" />
@@ -97,8 +96,6 @@
     <ClInclude Include="..\src\include\ionproc.h" />
     <ClInclude Include="..\src\include\ions.h" />
     <ClInclude Include="..\src\include\lsnsmath.h" />
-    <ClInclude Include="..\src\include\pumpproc.h" />
-    <ClInclude Include="..\src\include\pumps.h" />
     <ClInclude Include="..\src\include\viewproc.h" />
     <ClInclude Include="..\src\include\views.h" />
     <ClInclude Include="precompile.h" />

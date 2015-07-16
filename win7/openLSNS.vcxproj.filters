@@ -21,9 +21,6 @@
     <ClCompile Include="..\src\core\ions.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\core\pumps.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="console.cpp">
       <Filter>win7</Filter>
     </ClCompile>
@@ -57,12 +54,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\src\include\lsnsmath.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\include\pumpproc.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\include\pumps.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\src\include\viewproc.h">
