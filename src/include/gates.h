@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-#define LSNS_MAX_GPARS 64	/*maximal number of parameters for different types of gate variables*/
+#define LSNS_MAX_GATEPARS 64	/*maximal number of parameters for different types of gate variables*/
 ///////////////////////////////////////////////////////////////////////////////
 // +gates ids and brief descriptions
 enum __lsns_gate_types{

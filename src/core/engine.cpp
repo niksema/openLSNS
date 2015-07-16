@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // macroses which define the dimension the network data
 #define MAX_GATES LSNS_MAX_GATES
-#define MAX_GPARS LSNS_MAX_GPARS
+#define MAX_GPARS LSNS_MAX_GATEPARS
 #define MAX_CHAN MaxChan
 #define MAX_IONS MaxIons
 #define MAX_CELLS MaxCells
@@ -44,8 +44,8 @@ static int MaxChan = 0;
 static int MaxCells = 0;
 static int MaxViewPars = 0;
 static int MaxGlobalData = 0;
-static gatepar Gates[LSNS_MAX_GPARS] = {0};
-static pumppar Pumps[LSNS_MAX_PARPUMPS] = {0};
+static gatepar Gates[LSNS_MAX_GATEPARS] = {0};
+static ionspar Ions[LSNS_MAX_IONPARS] = {0};
 
 ///////////////////////////////////////////////////////////////////////////////
 // control_kernel: 
@@ -74,14 +74,15 @@ void ions_kernel( int index, iondat *data )
 	int type_eds = _ions_typeeds( tp );
 	if( type_dyn != LSNS_NO_DYN ){
 		// load ions parameters, resting potential, ions concentrations if needed
-		pumppar par = Pumps[_ions_parpump( tp )];	// load pump properties
+		ionspar par = Ions[_ions_parpump( tp )];	// load pump properties
 		int4 lut = pIonsLUT[index];			// load references to external parameters (channel conductances etc)
 		float4 e = pIonsE[index];			// load ions parameters
 		float4 i = pIonsI[index];			// load ions parameters
+		float4 v = pCellV[_ions_lut_v( lut )];		// load cell parameters
 //--->>> possible CUDA optimization (try to use shared variables)
-		float v = _cell_v( pCellV[_ions_lut_v( lut )] );// get membrane potential
+		float vm = _cell_v( v );			// get membrane potential
 //---<<< possible CUDA optimization
-		float tau = _ions_tau( i );			// get time constant for ions dynamics
+		float tau = _pump_tau( par );			// get time constant for ions dynamics
 		float out = _ions_out( e );			// concentation of ions outside cell
 		float rtfz = _ions_rtfz( e );			// rtfz for specific neurons
 		// start calculations
@@ -92,18 +93,18 @@ void ions_kernel( int index, iondat *data )
 		// sub-step 1
 		float in = _ions_in( e );			// concentation of ions inside the cell
 		float eds = _ions_eds( e );			// resting potential
-		lsns_ipump( type_dyn, par, in, apump, ipump );	// calculate pump current
-		lsns_ichan( apump, v, eds, gchan, ichan );	// calculate channels current
+		lsns_ipump( type_dyn, par, in, apump, ipump, KCA );// calculate pump current
+		lsns_ichan( apump, vm, eds, gchan, ichan );	// calculate channels current
 		// sub-step 2
 		float in1 = in-step*( ichan+ipump )/( 2*tau );
 		eds = ( type_eds != LSNS_NOSPEC_EDS )? lsns_eds( rtfz, in1, out ): eds; // calculate resting potential if needed
-		lsns_ipump( type_dyn, par, in1, apump, ipump );	// calculate pump current
-		lsns_ichan( apump, v, eds, gchan, ichan );	// calculate channels current
+		lsns_ipump( type_dyn, par, in1, apump, ipump, KCA );// calculate pump current
+		lsns_ichan( apump, vm, eds, gchan, ichan );	// calculate channels current
 		// the final calculations for in, eds, ichan
 		in = in-step*( ichan+ipump )/tau;
 		eds = ( type_eds != LSNS_NOSPEC_EDS )? lsns_eds( rtfz, in, out ): eds; // calculate resting potential if needed
-		lsns_ipump( type_dyn, par, in, apump, ipump );	// calculate pump current
-		lsns_ichan( apump, v, eds, gchan, ichan );	// calculate channels current
+		lsns_ipump( type_dyn, par, in, apump, ipump, KCA );// calculate pump current
+		lsns_ichan( apump, vm, eds, gchan, ichan );	// calculate channels current
 		// store the results
 		_ions_in( e ) = in;
 		_ions_out( e ) = out;
@@ -282,8 +283,8 @@ netdat *lsns_alloc( netpar &par )
 	Step = par.Step; Threshold = par.Threshold; StepCounter = 0;
 	MaxIons = par.MaxIons; MaxChan = par.MaxChan; MaxCells = par.MaxCells; MaxGlobalData = par.MaxGlobalData;
 	MaxViewPars = par.MaxViewPars;
-	memcpy ( Gates, par.Gates, sizeof( netpar )*LSNS_MAX_GPARS );
-	memcpy ( Pumps, par.Pumps, sizeof( pumppar )*LSNS_MAX_PARPUMPS );
+	memcpy ( Gates, par.Gates, sizeof( netpar )*LSNS_MAX_GATEPARS );
+	memcpy ( Ions, par.Ions, sizeof( ionspar )*LSNS_MAX_IONPARS );
 	return data;
 }
 
@@ -307,8 +308,8 @@ void lsns_free( netdat *data )
 	// reset the constant parameters of the network
 	Step = -1.f; Threshold = -10.f; StepCounter = 0;
 	MaxIons = 0; MaxChan = 0; MaxCells = 0; MaxViewPars = MaxGlobalData = 0;
-	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GPARS );
-	memset( Pumps, 0, sizeof( pumppar )*LSNS_MAX_PARPUMPS );
+	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GATEPARS );
+	memset( Ions, 0, sizeof( ionspar )*LSNS_MAX_IONPARS );
 }
 
 // allocate memory on device and copy the network configuration from host to device.
