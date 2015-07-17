@@ -30,10 +30,10 @@
 #define pCellV ( data->CellV )
 #define pChanGLUT ( data->ChanGLUT )
 #define pIonsILUT ( data->IonsILUT )
-#define pDevDat( index ) ( data->DevData[index] )
-#define pHostDat ( data->HostData )
+#define pDevDat( index ) ( data->ViewData[index] )
+#define pHostDat ( data->GlobalViewData )
 #define pGlobalDat ( data->GlobalData )
-#define pGlobalViewLUT ( data->GlobalViewLUT )
+#define pGlobalViewLUT ( data->ViewLUT )
 ///////////////////////////////////////////////////////////////////////////////
 // common data for all networks elements (read-only)
 static float Threshold = -10.f;
@@ -59,7 +59,15 @@ void control_kernel( int index /*, ctrldat *data*/ )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// ions_kernel: the engine kernel to calculate the properties of ions dynamics.
+// connect_kernel: 
+// Input parameters:
+// Output parameters:
+void connect_kernel( int index /*, connectdat *data*/ )
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// +'ions_kernel': the engine kernel to calculate the properties of ions dynamics.
 // such as pump current, concentration of ions inside the cell, etc.
 // Input parameters:
 // Output parameters:
@@ -125,14 +133,6 @@ void ions_kernel( int index, iondat *data )
 		// store the results
 		pIonsE[index] = e;
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// connect_kernel: 
-// Input parameters:
-// Output parameters:
-void connect_kernel( int index /*, connectdat *data*/ )
-{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,16 +211,10 @@ void cell_kernel( int index, celldat *data )
 ///////////////////////////////////////////////////////////////////////////////
 // +'store2dev_kernel': stores the simulation results to device memory.
 // The results of the simulation store to device memory into 
-// arrays 'float4 *DevData[MAX_STORED_STEPS]'. These arrays should be organized 
-// in such a way that guarantees that memory is allocated continuously to rich 
-// the maximal performance while I/O operations: 
-//	DevData[0] = alloc(size*MAX_STORED_STEPS);
-//	for( i = 1; i < MAX_STORED_STEPS; ++i ){
-//		DevData[i] = DevData[0]+i*size;
-//	}
+// arrays 'float4 *ViewData[MAX_STORED_STEPS]'. 
 void store2dev_kernel( int index, iodat *data, int counter )
 {
-	__lsns_assert( index >= 0 && index < MAX_VIEW_PARS );				// DEBUG: check the range for 'index' variable
+	__lsns_assert( index >= 0 && index < MAX_VIEW_PARS/4+1 );			// DEBUG: check the range for 'index' variable
 	__lsns_assert( counter >= 0 && counter < MAX_STORED_STEPS );			// DEBUG: check the range for 'counter' variable
 	int4 lut = pGlobalViewLUT[index];
 	float4 *src = pGlobalDat;
@@ -229,103 +223,139 @@ void store2dev_kernel( int index, iodat *data, int counter )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// +'store2host_kernel': stores the preliminary saved results to host memory.
+// +'store2host_kernel': copies the preliminary saved results to host memory.
 // Initially, the simulation results for 'MAX_STORED_STEPS' steps are stored 
-// into device memory (arrays '*DevData[MAX_STORED_STEPS]' which initialized in 
-// specific way described above)
+// into device memory 
 void store2host_kernel( int index , iodat *data )
 {
-	__lsns_assert( index >= 0 && index < MAX_VIEW_PARS*MAX_STORED_STEPS );		// DEBUG: check the range for 'index' variable
+	__lsns_assert( index >= 0 && index < ( MAX_VIEW_PARS/4+1 )*MAX_STORED_STEPS );	// DEBUG: check the range for 'index' variable
 	pHostDat[index] = pDevDat(0)[index];						// copy data from device memory to host (pinned) memory
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // interface 
-// ============================================================================
-// allocate memory on host
+//=================== global methods ==========================================
+///////////////////////////////////////////////////////////////////////////////
+//+'lsns_alloc' allocates memory on host 
 netdat *lsns_alloc( netpar &par )
 {
-	// setup the constant parameters of the network
-	netdat *data = ( netdat *)malloc( sizeof( netdat )); __lsns_assert( data != NULL );
+	// allocate memory for 'netdat' structure
+	par.Data = ( netdat *)malloc( sizeof( netdat )); __lsns_assert( par.Data != NULL );
+	// calculate the dimension of arrays of actual parameters and look-up-tables
 	par.MaxGlobalData = 2*par.MaxIons+2*par.MaxChan+par.MaxCells;
 	par.MaxGlobalLUT = ( 3+MAX_CHAN_PER_PUMP/4 )*par.MaxIons+2*par.MaxChan+(2+MAX_CHAN_PER_CELL/4+MAX_IPUMP_PER_CELL/4)*par.MaxCells;
 	// allocate memory for actual parameters and look-up-tables
-	data->GlobalData = ( float4 *)malloc( sizeof( float4 )*par.MaxGlobalData ); __lsns_assert( data->GlobalData != NULL );
-	data->GlobalLUT = ( int4 * )malloc( sizeof( int4 )*par.MaxGlobalLUT ); __lsns_assert( data->GlobalLUT != NULL );
+	par.Data->GlobalLUT = ( int4 * )malloc( sizeof( int4 )*par.MaxGlobalLUT ); __lsns_assert( par.Data->GlobalLUT != NULL );
+	par.Data->GlobalData = ( float4 *)malloc( sizeof( float4 )*par.MaxGlobalData ); __lsns_assert( par.Data->GlobalData != NULL );
+	par.Data->GlobalViewLUT = ( int4 * )malloc( sizeof( int4 )*( par.MaxViewPars/4+1 )); __lsns_assert( par.Data->GlobalViewLUT != NULL );
+	par.Data->GlobalViewData = ( float4 * )malloc( sizeof( float4 )*( par.MaxViewPars/4+1 )*MAX_STORED_STEPS ); __lsns_assert( par.Data->GlobalViewData != NULL ); // pinned-memory for cuda version
 	// map the arrays of specific parameters onto the global memory
-	data->Ions.IonsI = data->Cells.IonsI				= data->GlobalData;
-	data->Ions.IonsE = data->Channels.IonsE				= data->Ions.IonsI+par.MaxIons;
-	data->Channels.ChanG = data->Cells.ChanG = data->Ions.ChanG	= data->Ions.IonsE+par.MaxIons;
-	data->Channels.ChanMH						= data->Channels.ChanG+par.MaxChan;
-	data->Cells.CellV = data->Channels.CellV = data->Ions.CellV	= data->Channels.ChanMH+par.MaxChan;
-	// map the arrays of specific look-up-tables onto the global memory
-	data->Ions.IonsType						= data->GlobalLUT;
-	data->Ions.IonsLUT						= data->Ions.IonsType+par.MaxIons;
-	data->Ions.ChanGLUT						= data->Ions.IonsLUT+par.MaxIons;
-	data->Channels.ChanType						= data->Ions.ChanGLUT+par.MaxIons*( MAX_CHAN_PER_PUMP/4+1 );
-	data->Channels.ChanLUT						= data->Channels.ChanType+par.MaxChan;
-	data->Cells.ChanGLUT						= data->Channels.ChanLUT+par.MaxChan;
-	data->Cells.IonsILUT						= data->Cells.ChanGLUT+par.MaxCells*( MAX_CHAN_PER_CELL/4+1 ); 
-// todo: HostData is supposed to be pinned-type of memory for cuda version
-	// allocate memory for IO buffer and look-up-tables (for non-cuda version its the memory on host only)
-	data->IOData.HostData = ( float4 *)malloc( sizeof( float4 )*par.MaxViewPars*MAX_STORED_STEPS ); __lsns_assert( data->IOData.HostData != NULL );
-	data->IOData.GlobalViewLUT = ( int4 *)malloc( sizeof( int4 )*par.MaxViewPars ); __lsns_assert( data->IOData.GlobalViewLUT != NULL );
-	// map the arrays of specific parameters onto the global memory
-	data->IOData.GlobalData = data->GlobalData;
-// todo: DevData are supposed to be device-specific for cuda version
+	par.Data->Cells.IonsI			= 
+	par.Data->Ions.IonsI			= par.Data->GlobalData;
+	par.Data->Channels.IonsE		= 
+	par.Data->Ions.IonsE			= par.Data->Ions.IonsI+par.MaxIons;
+	par.Data->Cells.ChanG			=
+	par.Data->Ions.ChanG			=
+	par.Data->Channels.ChanG		= par.Data->Ions.IonsE+par.MaxIons;
+	par.Data->Channels.ChanMH		= par.Data->Channels.ChanG+par.MaxChan;
+	par.Data->Cells.CellV			=
+	par.Data->Ions.CellV			=
+	par.Data->Channels.CellV		= par.Data->Channels.ChanMH+par.MaxChan;
+	par.Data->IOData.GlobalData		= par.Data->GlobalData;
+	par.Data->IOData.GlobalViewData		= par.Data->GlobalViewData;	// pinned-memory for cuda version
 	for( int i = 0; i < MAX_STORED_STEPS; ++i ){
-		data->IOData.DevData[i] = data->IOData.HostData+i*par.MaxViewPars;
+		par.Data->IOData.ViewData[i]	= par.Data->IOData.GlobalViewData+i*(par.MaxViewPars/4+1);
 	}
-// todo: DevMap is supposed to be device-specific for cuda version
-	// allocate device-specific memory (for non-cuda version this is a pointer to the same data structure, so don't do anything)
-	data->DevMap = data;
-	// setup the constant parameters of the network
+	// map the arrays of specific look-up-tables onto the global memory
+	par.Data->Ions.IonsType			= par.Data->GlobalLUT;
+	par.Data->Ions.IonsLUT			= par.Data->Ions.IonsType+par.MaxIons;
+	par.Data->Ions.ChanGLUT			= par.Data->Ions.IonsLUT+par.MaxIons;
+	par.Data->Channels.ChanType		= par.Data->Ions.ChanGLUT+par.MaxIons*( MAX_CHAN_PER_PUMP/4+1 );
+	par.Data->Channels.ChanLUT		= par.Data->Channels.ChanType+par.MaxChan;
+	par.Data->Cells.ChanGLUT		= par.Data->Channels.ChanLUT+par.MaxChan;
+	par.Data->Cells.IonsILUT		= par.Data->Cells.ChanGLUT+par.MaxCells*( MAX_CHAN_PER_CELL/4+1 );
+	par.Data->IOData.ViewLUT		= par.Data->GlobalViewLUT;
+	// reset device-specific memory
+	par.Data->DevMap = NULL;
+	return par.Data;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_free': frees both host and device memory
+bool lsns_free( netpar &par )
+{
+	__lsns_assert( par.Data != NULL );
+	// free device-specific memory for actual parameters and look-up-tables 
+	// (for non-cuda version this is a pointer to the same data structure, so don't do anything)
+	par.Data->DevMap = NULL;
+	// free host-specific memory for both actual parameters and look-up-tables
+	__lsns_assert( par.Data->GlobalData != NULL ); free( par.Data->GlobalData ); 
+	__lsns_assert( par.Data->GlobalLUT != NULL ); free( par.Data->GlobalLUT );
+	// free IO buffer memory for both look-up tables and actual data (for non-cuda version its the memory on host only)
+	__lsns_assert( par.Data->GlobalViewData != NULL ); free( par.Data->GlobalViewData ); 
+	__lsns_assert( par.Data->GlobalViewLUT != NULL ); free( par.Data->GlobalViewLUT );
+	// free memory for netdat structure
+	free( par.Data );
+	// reset the constant parameters of the network
+	Step = -1.f; Threshold = -10.f; StepCounter = 0;
+	MaxIons = MaxChan = MaxCells = MaxViewPars = MaxGlobalData = 0;
+	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GATEPARS );
+	memset( Ions, 0, sizeof( ionspar )*LSNS_MAX_IONPARS );
+	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_map2dev': allocates memory on device and copy the network configuration 
+// from host to device setup the constant parameters of the network
+bool lsns_map2dev( netpar &par )
+{
+	// setup the constant parameters of the network which are stored in constant memody for cuda version
 	Step = par.Step; Threshold = par.Threshold; StepCounter = 0;
 	MaxIons = par.MaxIons; MaxChan = par.MaxChan; MaxCells = par.MaxCells; MaxGlobalData = par.MaxGlobalData;
 	MaxViewPars = par.MaxViewPars;
 	memcpy ( Gates, par.Gates, sizeof( netpar )*LSNS_MAX_GATEPARS );
 	memcpy ( Ions, par.Ions, sizeof( ionspar )*LSNS_MAX_IONPARS );
-	return data;
-}
-
-// free memory both on host and device
-void lsns_free( netdat *data )
-{
-	__lsns_assert( data != NULL );
-	// free device-specific memory for actual parameters and look-up-tables 
+	// allocate device-specific memory and copy initialized arrays from host memory to device memory
 	// (for non-cuda version this is a pointer to the same data structure, so don't do anything)
-	data->DevMap = NULL;
-	// free IO buffer memory (look-up tables and actual buffers both on device and host)
-	// (for non-cuda version its the memory on host only)
-	__lsns_assert( data->IOData.HostData != NULL ); free( data->IOData.HostData ); 
-	__lsns_assert( data->IOData.GlobalViewLUT != NULL ); free( data->IOData.GlobalViewLUT );
-	for( int i = 0; i < MAX_STORED_STEPS; data->IOData.DevData[i] = NULL, ++i );
-	// free host-specific memory for both actual parameters and look-up-tables
-	__lsns_assert( data->GlobalData != NULL ); free( data->GlobalData ); 
-	__lsns_assert( data->GlobalLUT != NULL ); free( data->GlobalLUT );
-	// free memory for netdat structure
-	free( data );
-	// reset the constant parameters of the network
-	Step = -1.f; Threshold = -10.f; StepCounter = 0;
-	MaxIons = 0; MaxChan = 0; MaxCells = 0; MaxViewPars = MaxGlobalData = 0;
-	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GATEPARS );
-	memset( Ions, 0, sizeof( ionspar )*LSNS_MAX_IONPARS );
-}
-
-// allocate memory on device and copy the network configuration from host to device.
-bool lsns_map2dev( netdat *data, netpar &par )
-{
-	// allocate device-specific memory and copy initialized arrays from host memory to device
-	// (for non-cuda version this is a pointer to the same data structure, so don't do anything)
-	data->DevMap = data;
+	par.Data->DevMap = par.Data;
+	///////////////////////////////////////////////////////////////////////////////
+	// cuda version notes:
+	// the array 'GlobalViewData' must be allocated ones as pinned-memory on host machine;
+	// the arrays 'ViewData' must be allocated on device memory and should be organized in 
+	// specific was that guarantees the maximal performance while coping the result of 
+	// simulation (see 'store2host_kernel' method):
+	//-------------------------------------------------------------------------------
+	//	ViewData[0] = alloc_on_device(size*MAX_STORED_STEPS);
+	//	for( i = 1; i < MAX_STORED_STEPS; ++i ){
+	//		ViewData[i] = ViewData[0]+i*size;
+	//	}
 	return true;
 }
 
-// run simulation
-bool lsns_run( float step )
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_run' runs simulation
+bool lsns_run( netpar &par, int max_step )
 {
+	for( int step = 0; step < max_step; ++step ){
+		control_kernel( 0 ); // don't do anything now
+		connect_kernel( 0 ); // don't do anything now
+		for( int ion = 0; ion < MaxIons; ++ion ){
+			ions_kernel( ion, &( par.Data->DevMap->Ions ));
+		}
+		for( int chan = 0; chan < MaxChan; ++chan ){
+			chan_kernel( chan, &( par.Data->DevMap->Channels ));
+		}
+		for( int cell = 0; cell < MaxCells; ++cell ){
+			cell_kernel( cell, &( par.Data->DevMap->Cells ));
+		}
+		for( int view = 0; view < par.MaxViewPars/4+1; ++view ){
+			store2dev_kernel( view, &( par.Data->DevMap->IOData ), step%MAX_STORED_STEPS );
+		}
+		for( int view = 0; view < ( par.MaxViewPars/4+1 )*MAX_STORED_STEPS; ++view ){
+			store2host_kernel( view, &( par.Data->DevMap->IOData ));
+		}
+	}
 	return true;
 }
 
 #endif
-

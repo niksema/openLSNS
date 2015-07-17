@@ -147,12 +147,12 @@ typedef struct __lsns_align( 16 ) __iobuf{
 	// local variables (read-only). 
 	// LUT format: bits 31..30 are coding the offset in each float4 variable (00 - x, 01 - y, 10 - z, 11 - w); 
 	// bits 29..0 are coding the offset in the global array 'GlobalData'
-	int4 __lsns_align( 16 ) *GlobalViewLUT;			// look-up-table for data needed to be stored
+	int4 __lsns_align( 16 ) *ViewLUT;			// look-up-table for data needed to be stored (located both in device and host memory)
 	// local variables (read-write)
-	float4 __lsns_align( 16 ) *DevData[MAX_STORED_STEPS];	// data to display (located in device memory)
-	float4 __lsns_align( 16 ) *HostData;			// data to display (pinned memory located in the host)
+	float4 __lsns_align( 16 ) *ViewData[MAX_STORED_STEPS];	// data to display (located in device memory)
+	float4 __lsns_align( 16 ) *GlobalViewData;		// data to display (pinned memory located in host memory)
 	// shared variables
-	float4 __lsns_align( 16 ) *GlobalData;			// array of global data
+	float4 __lsns_align( 16 ) *GlobalData;			// array of global data (located in device memory)
 } iodat;
 
 //=============================================================================
@@ -160,33 +160,37 @@ typedef struct __lsns_align( 16 ) __iobuf{
 // netdat contains the pointers to global memory which are related to network
 // parameters and structure
 typedef struct __lsns_align( 16 ) __network_data{
-	// global memory on host
-	int4 __lsns_align( 16 ) *GlobalLUT;			// size = MaxGlobalLUT
-	float4 __lsns_align( 16 ) *GlobalData;			// size = MaxGlobalData
-	// global memory mapped on network elements (channels, ions, cells, etc)
+	// global memory
+	int4 __lsns_align( 16 ) *GlobalLUT;			// look-up-tables (located in both device and host memory); size = MaxGlobalLUT
+	float4 __lsns_align( 16 ) *GlobalData;			// array of global data (located in both device and host memory); size = MaxGlobalData
+	int4 __lsns_align( 16 ) *GlobalViewLUT;			// look-up-table for data needed to be stored (located both in device and host memory)
+	float4 __lsns_align( 16 ) *GlobalViewData;		// array of data to be displayed (pinned memory located in host)
+	// network elements (channels, ions, cells, etc) mapped on global memory
 	iondat Ions;						// ions data
 	chandat Channels;					// channels data
 	celldat Cells;						// cells (compartments) data
-	iodat IOData;						// data buffer to display the results of simulation
+	iodat IOData;						// data buffer to display the results of simulations
 	// global memory on device
-	struct __lsns_align( 16 ) __network_data *DevMap;	// 
+	struct __lsns_align( 16 ) __network_data *DevMap;	// pointer to device-specific memory (for non-cuda version this is a pointer to the same data structure)
 } netdat;
 
 //=============================================================================
 ///////////////////////////////////////////////////////////////////////////////
 // netpar structure
 typedef struct __lsns_align( 16 ) __network_parameters{
-	// constant memory
+	// data which have to be initialized before memory allocation by 'lsns_alloc' method
 	float Threshold;					// threshold for spike discrimination
 	float Step;						// integration step
 	int MaxIons;						// total number of ions parameters
 	int MaxChan;						// total number of ion channels (includeing synapses)
 	int MaxCells;						// total numbed of parameters to be displayed
 	int MaxViewPars;					// total number of network parameters
-	int MaxGlobalData;					// = 2*MaxIons+2*MaxChan+MaxCells
-	int MaxGlobalLUT;					// = MaxIons*( 3+MAX_CHAN_PER_PUMP/4 )+2*MaxChan+MaxCells*(2+MAX_CHAN_PER_CELL/4+MAX_IPUMP_PER_CELL/4)
 	gatepar Gates[LSNS_MAX_GATEPARS];			// properties of ion channels
 	ionspar Ions[LSNS_MAX_IONPARS];				// properties of ion dynamics
+	// data which will initialized after memory allocation by 'lsns_alloc' method
+	int MaxGlobalData;					// = 2*MaxIons+2*MaxChan+MaxCells
+	int MaxGlobalLUT;					// = MaxIons*( 3+MAX_CHAN_PER_PUMP/4 )+2*MaxChan+MaxCells*(2+MAX_CHAN_PER_CELL/4+MAX_IPUMP_PER_CELL/4)
+	netdat *Data;						// pointer to network data
 } netpar; 
 
 //=============================================================================

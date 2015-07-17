@@ -14,9 +14,9 @@ __lsns_inline float4 get_data( float4 *src, int4 lut, int imax )
 {
 	int4vw *_lut = ( int4vw *)&lut;
 	float4 d = {0};
+	float4vw *_src = ( float4vw *)&d;
 	float4 res = {0};
 	float4vw *_res = ( float4vw *)&res;
-	float4vw *_src = ( float4vw *)&d;
 	for( int i = 0, pos = -1, index = 0, _index = -1; i < 4; _index = index, ++i ){
 		pos = ( _lut->pDat[i] ) >> 30;						// get offset (00 - x, 01 - y, 10 - z, 11 - w)
 		index = ( _lut->pDat[i] ) & 0x3FFFFFFF;					// get index
