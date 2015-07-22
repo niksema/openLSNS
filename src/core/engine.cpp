@@ -10,6 +10,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // macroses which define the dimension the network data
+#define MAX_WSYNS 1	/*todo: implement synaptic summation*/
 #define MAX_GATES LSNS_MAX_GATES
 #define MAX_GPARS LSNS_MAX_GATEPARS
 #define MAX_CHAN MaxChan
@@ -28,6 +29,7 @@
 #define pChanMH ( data->ChanMH )
 #define pChanLUT ( data->ChanLUT )
 #define pCellV ( data->CellV )
+#define pWsyn ( data->Wsyn )
 #define pChanGLUT ( data->ChanGLUT )
 #define pIonsILUT ( data->IonsILUT )
 #define pDevDat( index ) ( data->ViewData[index] )
@@ -152,25 +154,23 @@ void chan_kernel( int index, chandat *data )
 	__lsns_assert( _gate_parh( tp ) >= 0 && _gate_parh( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parh( tp ) 
 	__lsns_assert( _chan_lut_v( sh ) >= 0 &&_chan_lut_v( sh ) < MAX_CELLS );	// DEBUG: check the range for _chan_lut_v( sh )
 	__lsns_assert( _chan_lut_e( sh ) >= 0 && _chan_lut_e( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_e( sh )
-	__lsns_assert( _chan_lut_inm( sh ) >= 0 && _chan_lut_inm( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_inm( sh )
-	__lsns_assert( _chan_lut_inh( sh ) >= 0 && _chan_lut_inh( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_inh( sh )
+	__lsns_assert( _gate_typem( tp ) <= LSNS_PS_NMDA && _chan_lut_m( sh ) >= 0 && _chan_lut_m( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_m( sh )
+	__lsns_assert( _gate_typeh( tp ) <= LSNS_PS_NMDA && _chan_lut_h( sh ) >= 0 && _chan_lut_h( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_h( sh )
+	__lsns_assert( _gate_typem( tp ) > LSNS_PS_NMDA && _chan_lut_m( sh ) >= 0 && _chan_lut_m( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_m( sh )
+	__lsns_assert( _gate_typeh( tp ) > LSNS_PS_NMDA && _chan_lut_h( sh ) >= 0 && _chan_lut_h( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_h( sh )
 	// load properties of ions channel (conductance, current, etc)
 	float4 g = pChanG[index];
 	// load properties of gate variables (activation, inactivation, etc) if needed
 	float4 mh = ( _gate_typem( tp )+_gate_typeh( tp ) != LSNS_NOGATE)? pChanMH[index]: float4();
 //todo: { possible CUDA optimization (try to use shared variables)
-	// load shared variables (resting potential, membrane potential, etc)
+	// load shared variables (resting potential, membrane potential, etc) to shared memory
 	float eds = _ions_eds( pIonsE[_chan_lut_e( sh )] );				// extract resting potential from 'IonsE'
 	float vm = _cell_v( pCellV[_chan_lut_v( sh )] );				// extract membrane potential from 'CellV'
-	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
-	float in_m = ( _gate_typem( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( pIonsE[_chan_lut_inm( sh )] ):0;
-	// load Mg- or Ca- concentration inside the cell for NMDA synapse or Z-channels from 'ions_e' if needed
-	float in_h = ( _gate_typeh( tp ) >= LSNS_ZGENERIC_INSTANT )? _ions_in( pIonsE[_chan_lut_inh( sh )] ):0;
 //todo: } possible CUDA optimization
 	// perform calculations
 	float mp, hp;
-	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], in_m, vm, step, _gate_powm( mh ), _gate_m( mh ), mp );
-	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], in_h, vm, step, _gate_powh( mh ), _gate_h( mh ), hp );
+	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lut_m( sh ), pIonsE, pWsyn, _gate_modm( mh ), _gate_m( mh ), mp );
+	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_lut_h( sh ), pIonsE, pWsyn, _gate_modh( mh ), _gate_h( mh ), hp );
 	_chan_g( g ) = _chan_gmax( g )*mp*hp;						// g
 	_chan_ge( g ) = _chan_g( g )*eds;						// ge
 	_chan_i( g ) = _chan_g( g )*( vm-eds );						// I
@@ -351,8 +351,10 @@ bool lsns_run( netpar &par, int max_step )
 		for( int view = 0; view < par.MaxViewPars/4+1; ++view ){
 			store2dev_kernel( view, &( par.Data->DevMap->IOData ), step%MAX_STORED_STEPS );
 		}
-		for( int view = 0; view < ( par.MaxViewPars/4+1 )*MAX_STORED_STEPS; ++view ){
-			store2host_kernel( view, &( par.Data->DevMap->IOData ));
+		if( step > 0 && step%MAX_STORED_STEPS == 0 ){
+			for( int view = 0; view < ( par.MaxViewPars/4+1 )*MAX_STORED_STEPS; ++view ){
+				store2host_kernel( view, &( par.Data->DevMap->IOData ));
+			}
 		}
 	}
 	return true;

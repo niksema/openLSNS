@@ -181,64 +181,98 @@ __lsns_inline float proc_psgate1( gatepar &par, float in, float v, float step, f
 {
 	return lsns_div( 1.f, 1.f+lsns_exp( -0.062f*v )*lsns_div( in, 3.57f ));
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// implements synaptic summation of gate variable [M/H]  for synaptic current
+// [M/H] = [M/H]*Edt+A*h*w*Dt, where:
+//	A is rate of transmitter release,
+//	h is synaptic plasticity,
+//	w is total sum of all pre-synaptic neurons accumulated on the synapse
+//-----------------------------------------------------------------------------
+// 	1) 'proc_syngate1' pulse synapse:
+//		Edt = exp( step/T ) where T is time constant, Dt = 1 
+//=========================== psgate1 =========================================
+__lsns_inline float proc_syngate1( gatepar &par, float w, float mod, float gate )
+{
+	return gate*_syngateEdt( par )+w*_syngateA( par )*mod*_syngateDt( par );
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // +macros to calculate gate variable of any type
 // BTW. It's funny but the current imlementation is faster then the one that
 // uses the callback function
-#define proc_gate( type, par, in, v, step, power, gate, powg ) \
+//-----------------------------------------------------------------------------
+// 'type' is channel's type;
+// 'par' are channels' parameters;
+// 'step' is step of integration
+// 'v' is membrane potential;
+// 'in_lut' is index for 'ions' aray;
+// 'ions' is array of ions' parameters of Ca- or Mg- ions which are used for NMDA synapse or Z-channels correspondingly;
+// 'mod' is either power of gate variable for channels or synaptic plasticity for synapses
+// 'gate' is gate variable;
+// 'G' is 'gate'^'mod'  for channels or 'gate' for synapses
+#define proc_gate( type, par, step, v, lut, ions, wsyn, mod, gate, G ) \
 	switch( type ){ \
 		case LSNS_NOGATE: \
-			gate = powg = 1; \
+			( gate ) = ( G ) = 1; \
 			break; \
 		case LSNS_BYPASSGATE: \
-			powg = lsns_pow( gate, power ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_GENERIC_INSTANT: \
-			gate = proc_ggate1( par, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			( gate ) = proc_ggate1( par, v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_GENERIC_T: \
-			gate = proc_ggate2( par, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			( gate ) = proc_ggate2( par, v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_GENERIC_TMOD: \
-			gate = proc_ggate3( par, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			( gate ) = proc_ggate3( par, v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_GENERIC_TAMOD: \
-			gate = proc_ggate4( par, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			( gate ) = proc_ggate4( par, v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ALPHABETA_INSTANT: \
-			gate = proc_abgate1( par, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			( gate ) = proc_abgate1( par, v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ALPHABETA_T: \
-			gate = proc_abgate2( par, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			( gate ) = proc_abgate2( par, v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZGENERIC_INSTANT: \
-			gate = proc_zgate1( par, in, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			( gate ) = proc_zgate1( par, _ions_in( ions[lut] ), v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZGENERIC_T: \
-			gate = proc_zgate2( par, in, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			( gate ) = proc_zgate2( par, _ions_in( ions[lut] ), v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZAPHABETA_INSTANT: \
-			gate = proc_zgate3( par, in, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			( gate ) = proc_zgate3( par, _ions_in( ions[lut] ), v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZAPHABETA_T: \
-			gate = proc_zgate4( par, in, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			( gate ) = proc_zgate4( par, _ions_in( ions[lut] ), v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_PS_NMDA: \
-			gate = proc_psgate1( par, in, v, step, gate ); \
-			powg = lsns_pow( gate, power ); \
+			/* _ions_in( ions[in_lut] loads Mg- concentration inside the cell for NMDA synapse*/\
+			( gate ) = proc_psgate1( par, _ions_in( ions[lut] ), v, step, gate ); \
+			( G ) = lsns_pow( gate, mod ); \
+			break; \
+		case LSNS_SYN_FAST: \
+			( G ) = ( gate ) = proc_syngate1( par, _wsyn_total( wsyn[lut] ), mod, gate ); \
 			break; \
 		default: \
-			powg = gate = 0;\
+			G = gate = 0;\
 	} 
 	
 #endif /*__GATEPROC_H*/

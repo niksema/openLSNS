@@ -20,6 +20,7 @@ enum __lsns_gate_types{
 	LSNS_ZAPHABETA_INSTANT		= 10,						// z-current (alpha/beta) instant
 	LSNS_ZAPHABETA_T		= 11,						// z-current (alpha/beta) standard
 	LSNS_PS_NMDA			= 12,						// nmda post-synapse
+	LSNS_SYN_FAST			= 13,						// pulse synapse
 	LSNS_MAX_GATES,
 };
 extern const char *lsns_gate_types[LSNS_MAX_GATES];
@@ -92,6 +93,15 @@ extern const char *lsns_gate_types[LSNS_MAX_GATES];
 #define _zgatet0( par ) ( par ).Par2.x
 // get parameter Tmax z-gate variable
 #define _zgatetmax( par ) ( par ).Par2.y
+///////////////////////////////////////////////////////////////////////////////
+// +extract parameters for all synaptic current from the structure 'gatepar'
+//=============================================================================
+// get rate of transmitter release
+#define _syngateA( par ) ( par ).Par1.x
+// get parameter Edt: exp( -step/T ) for fast synapse or 1-step/T for other types of synapses
+#define _syngateEdt( par ) ( par ).Par1.y
+// get parameter Dt: 1 for fast synapse or step/T for other types of synapses
+#define _syngateDt( par ) ( par ).Par1.z
 ///////////////////////////////////////////////////////////////////////////////
 // +structure 'gatepar' to store all constant parameters for gata variables
 // of all types
