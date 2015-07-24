@@ -66,6 +66,12 @@ void control_kernel( int index /*, ctrldat *data*/ )
 // Output parameters:
 void connect_kernel( int index /*, connectdat *data*/ )
 {
+	__lsns_assert( index >= 0 && index < MAX_WSYNS );	// DEBUG: check the range for 'index' variable
+	/*
+	wtab - synapse type, parameters, index for wsyn&wlut, index for placticity
+	wsyn is float4 array (x - total sum, rest)
+	wlut is look-up-table (x - size, rest indecis for cellv array)
+	*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,25 +158,25 @@ void chan_kernel( int index, chandat *data )
 	__lsns_assert( _gate_typeh( tp ) >= 0 && _gate_typeh( tp ) < MAX_GATES );	// DEBUG: check the range for  _gate_typeh( tp ) 
 	__lsns_assert( _gate_parm( tp ) >= 0 && _gate_parm( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parm( tp ) 
 	__lsns_assert( _gate_parh( tp ) >= 0 && _gate_parh( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parh( tp ) 
-	__lsns_assert( _chan_lut_v( sh ) >= 0 &&_chan_lut_v( sh ) < MAX_CELLS );	// DEBUG: check the range for _chan_lut_v( sh )
-	__lsns_assert( _chan_lut_e( sh ) >= 0 && _chan_lut_e( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_e( sh )
-	__lsns_assert( _gate_typem( tp ) <= LSNS_PS_NMDA && _chan_lut_m( sh ) >= 0 && _chan_lut_m( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_m( sh )
-	__lsns_assert( _gate_typeh( tp ) <= LSNS_PS_NMDA && _chan_lut_h( sh ) >= 0 && _chan_lut_h( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_h( sh )
-	__lsns_assert( _gate_typem( tp ) > LSNS_PS_NMDA && _chan_lut_m( sh ) >= 0 && _chan_lut_m( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_m( sh )
-	__lsns_assert( _gate_typeh( tp ) > LSNS_PS_NMDA && _chan_lut_h( sh ) >= 0 && _chan_lut_h( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_h( sh )
+	__lsns_assert( _chan_lutv( sh ) >= 0 &&_chan_lutv( sh ) < MAX_CELLS );		// DEBUG: check the range for _chan_lut_v( sh )
+	__lsns_assert( _chan_lute( sh ) >= 0 && _chan_lute( sh ) < MAX_IONS );		// DEBUG: check the range for _chan_lut_e( sh )
+	__lsns_assert( _gate_typem( tp ) <= LSNS_PS_NMDA && _chan_lutm( sh ) >= 0 && _chan_lutm( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_m( sh )
+	__lsns_assert( _gate_typeh( tp ) <= LSNS_PS_NMDA && _chan_luth( sh ) >= 0 && _chan_luth( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_h( sh )
+	__lsns_assert( _gate_typem( tp ) > LSNS_PS_NMDA && _chan_lutm( sh ) >= 0 && _chan_lutm( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_m( sh )
+	__lsns_assert( _gate_typeh( tp ) > LSNS_PS_NMDA && _chan_luth( sh ) >= 0 && _chan_luth( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_h( sh )
 	// load properties of ions channel (conductance, current, etc)
 	float4 g = pChanG[index];
 	// load properties of gate variables (activation, inactivation, etc) if needed
 	float4 mh = ( _gate_typem( tp )+_gate_typeh( tp ) != LSNS_NOGATE)? pChanMH[index]: float4();
 //todo: { possible CUDA optimization (try to use shared variables)
 	// load shared variables (resting potential, membrane potential, etc) to shared memory
-	float eds = _ions_eds( pIonsE[_chan_lut_e( sh )] );				// extract resting potential from 'IonsE'
-	float vm = _cell_v( pCellV[_chan_lut_v( sh )] );				// extract membrane potential from 'CellV'
+	float eds = _ions_eds( pIonsE[_chan_lute( sh )] );				// extract resting potential from 'IonsE'
+	float vm = _cell_v( pCellV[_chan_lutv( sh )] );					// extract membrane potential from 'CellV'
 //todo: } possible CUDA optimization
 	// perform calculations
 	float mp, hp;
-	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lut_m( sh ), pIonsE, pWsyn, _gate_modm( mh ), _gate_m( mh ), mp );
-	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_lut_h( sh ), pIonsE, pWsyn, _gate_modh( mh ), _gate_h( mh ), hp );
+	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( sh ), pIonsE, pWsyn, _gate_modm( mh ), _gate_m( mh ), mp );
+	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( sh ), pIonsE, pWsyn, _gate_modh( mh ), _gate_h( mh ), hp );
 	_chan_g( g ) = _chan_gmax( g )*mp*hp;						// g
 	_chan_ge( g ) = _chan_g( g )*eds;						// ge
 	_chan_i( g ) = _chan_g( g )*( vm-eds );						// I
@@ -313,7 +319,7 @@ bool lsns_map2dev( netpar &par )
 	Step = par.Step; Threshold = par.Threshold; StepCounter = 0;
 	MaxIons = par.MaxIons; MaxChan = par.MaxChan; MaxCells = par.MaxCells; MaxGlobalData = par.MaxGlobalData;
 	MaxViewPars = par.MaxViewPars;
-	memcpy ( Gates, par.Gates, sizeof( netpar )*LSNS_MAX_GATEPARS );
+	memcpy ( Gates, par.Gates, sizeof( gatepar )*LSNS_MAX_GATEPARS );
 	memcpy ( Ions, par.Ions, sizeof( ionspar )*LSNS_MAX_IONPARS );
 	// allocate device-specific memory and copy initialized arrays from host memory to device memory
 	// (for non-cuda version this is a pointer to the same data structure, so don't do anything)

@@ -77,10 +77,10 @@ typedef struct __lsns_align( 16 ) __ions_data{
 //	y - resting potential;
 //	z - concentration of ions inside the cell for activation for z-channels/or total weight of connections for the synapse (for m component);
 //	w - concentration of ions inside the cell for inactivation for z-channels/or total weight of connections for the synapse (for h component)
-#define _chan_lut_v( lut ) ( lut ).x
-#define _chan_lut_e( lut ) ( lut ).y
-#define _chan_lut_m( lut ) ( lut ).z
-#define _chan_lut_h( lut ) ( lut ).w
+#define _chan_lutv( lut ) ( lut ).x
+#define _chan_lute( lut ) ( lut ).y
+#define _chan_lutm( lut ) ( lut ).z
+#define _chan_luth( lut ) ( lut ).w
 ///////////////////////////////////////////////////////////////////////////////
 // parameters of gate variables of ion channel (decodes ChanMH):
 //	x - activation;
@@ -120,7 +120,7 @@ typedef struct __lsns_align( 16 ) __channel_data{
 	// shared variables
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 	float4 __lsns_align( 16 ) *IonsE;			// ions properties: x - reversal potential (Eds), y - concentration of ions inside the cell, z - concentration of ions outside the cell, w - RT/Fz constant for specific ions
-	float4 __lsns_align( 16 ) *Wsyn;			// synaptic weights: x - total weight of all connections, y,z,w are reserved
+	float4 __lsns_align( 16 ) *Wsyn;			// synaptic weights: x - total weight of all connections converged on the synapse, y,z,w are reserved
 } chandat;
 
 //=================== celldat macroses ========================================

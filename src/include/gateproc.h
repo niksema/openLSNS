@@ -187,7 +187,7 @@ __lsns_inline float proc_psgate1( gatepar &par, float in, float v, float step, f
 // [M/H] = [M/H]*Edt+A*h*w*Dt, where:
 //	A is rate of transmitter release,
 //	h is synaptic plasticity,
-//	w is total sum of all pre-synaptic neurons accumulated on the synapse
+//	w is total sum of all pre-synaptic neurons converged on the synapse
 //-----------------------------------------------------------------------------
 // 	1) 'proc_syngate1' pulse synapse:
 //		Edt = exp( step/T ) where T is time constant, Dt = 1 
@@ -206,7 +206,7 @@ __lsns_inline float proc_syngate1( gatepar &par, float w, float mod, float gate 
 // 'par' are channels' parameters;
 // 'step' is step of integration
 // 'v' is membrane potential;
-// 'in_lut' is index for 'ions' aray;
+// 'lut' is either index for 'ions' aray or index for 'wsyn' array;
 // 'ions' is array of ions' parameters of Ca- or Mg- ions which are used for NMDA synapse or Z-channels correspondingly;
 // 'mod' is either power of gate variable for channels or synaptic plasticity for synapses
 // 'gate' is gate variable;
@@ -244,31 +244,32 @@ __lsns_inline float proc_syngate1( gatepar &par, float w, float mod, float gate 
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZGENERIC_INSTANT: \
-			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			/* _ions_in( ions[lut] loads Ca- concentration inside the cell for Z-channels */\
 			( gate ) = proc_zgate1( par, _ions_in( ions[lut] ), v, step, gate ); \
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZGENERIC_T: \
-			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			/* _ions_in( ions[lut] loads Ca- concentration inside the cell for Z-channels */\
 			( gate ) = proc_zgate2( par, _ions_in( ions[lut] ), v, step, gate ); \
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZAPHABETA_INSTANT: \
-			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			/* _ions_in( ions[lut] loads Ca- concentration inside the cell for Z-channels */\
 			( gate ) = proc_zgate3( par, _ions_in( ions[lut] ), v, step, gate ); \
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_ZAPHABETA_T: \
-			/* _ions_in( ions[in_lut] loads Ca- concentration inside the cell for Z-channels */\
+			/* _ions_in( ions[lut] loads Ca- concentration inside the cell for Z-channels */\
 			( gate ) = proc_zgate4( par, _ions_in( ions[lut] ), v, step, gate ); \
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_PS_NMDA: \
-			/* _ions_in( ions[in_lut] loads Mg- concentration inside the cell for NMDA synapse*/\
+			/* _ions_in( ions[lut] loads Mg- concentration inside the cell for NMDA synapse*/\
 			( gate ) = proc_psgate1( par, _ions_in( ions[lut] ), v, step, gate ); \
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_SYN_FAST: \
+			/* _wsyn_total( wsyn[lut]  loads total weight of connections converged on the synapse*/\
 			( G ) = ( gate ) = proc_syngate1( par, _wsyn_total( wsyn[lut] ), mod, gate ); \
 			break; \
 		default: \
