@@ -192,9 +192,9 @@ __lsns_inline float proc_psgate1( gatepar &par, float in, float v, float step, f
 // 	1) 'proc_syngate1' pulse synapse:
 //		Edt = exp( step/T ) where T is time constant, Dt = 1 
 //=========================== psgate1 =========================================
-__lsns_inline float proc_syngate1( gatepar &par, float w, float mod, float gate )
+__lsns_inline float proc_syngate1( float w, float alpha, float edt, float dt, float gate )
 {
-	return gate*_syngateEdt( par )+w*_syngateA( par )*mod*_syngateDt( par );
+	return gate*edt+w*alpha*dt;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -269,8 +269,11 @@ __lsns_inline float proc_syngate1( gatepar &par, float w, float mod, float gate 
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
 		case LSNS_SYNAPSE: \
-			/* _wsyn_total( wsyn[lut]  loads total weight of connections converged on the synapse*/\
-			( G ) = ( gate ) = proc_syngate1( par, _wsyn_total( wsyn[lut] ), _wsyn_mod( wsyn[lut] ), gate ); \
+			{\
+			/*loads total weight of connections converged on the synapse*/\
+			float4 w = wsyn[lut]; \
+			( G ) = ( gate ) = proc_syngate1( _wsyn_total( w ), _wsyn_alpha( w ), _wsyn_edt( w ), _wsyn_dt( w ), gate ); \
+			}\
 			break; \
 		default: \
 			G = gate = 0;\
