@@ -208,7 +208,7 @@ __lsns_inline float proc_syngate1( gatepar &par, float w, float mod, float gate 
 // 'v' is membrane potential;
 // 'lut' is either index for 'ions' aray or index for 'wsyn' array;
 // 'ions' is array of ions' parameters of Ca- or Mg- ions which are used for NMDA synapse or Z-channels correspondingly;
-// 'mod' is either power of gate variable for channels or synaptic plasticity for synapses
+// 'mod' is power of gate variable for channels
 // 'gate' is gate variable;
 // 'G' is 'gate'^'mod'  for channels or 'gate' for synapses
 #define proc_gate( type, par, step, v, lut, ions, wsyn, mod, gate, G ) \
@@ -268,9 +268,9 @@ __lsns_inline float proc_syngate1( gatepar &par, float w, float mod, float gate 
 			( gate ) = proc_psgate1( par, _ions_in( ions[lut] ), v, step, gate ); \
 			( G ) = lsns_pow( gate, mod ); \
 			break; \
-		case LSNS_SYN_FAST: \
+		case LSNS_SYNAPSE: \
 			/* _wsyn_total( wsyn[lut]  loads total weight of connections converged on the synapse*/\
-			( G ) = ( gate ) = proc_syngate1( par, _wsyn_total( wsyn[lut] ), mod, gate ); \
+			( G ) = ( gate ) = proc_syngate1( par, _wsyn_total( wsyn[lut] ), _wsyn_mod( wsyn[lut] ), gate ); \
 			break; \
 		default: \
 			G = gate = 0;\

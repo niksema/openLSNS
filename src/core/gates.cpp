@@ -16,6 +16,7 @@ const char *lsns_gate_types[LSNS_MAX_GATES] = {
 	"Z-current (AB) instant",
 	"Z-current (AB) standard",
 	"NMDA post-synapse",
+	"Synapse",
 };
 
 /*

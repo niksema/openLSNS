@@ -20,7 +20,7 @@ enum __lsns_gate_types{
 	LSNS_ZAPHABETA_INSTANT		= 10,						// z-current (alpha/beta) instant
 	LSNS_ZAPHABETA_T		= 11,						// z-current (alpha/beta) standard
 	LSNS_PS_NMDA			= 12,						// nmda post-synapse
-	LSNS_SYN_FAST			= 13,						// pulse synapse
+	LSNS_SYNAPSE			= 13,						// synaptic current
 	LSNS_MAX_GATES,
 };
 extern const char *lsns_gate_types[LSNS_MAX_GATES];

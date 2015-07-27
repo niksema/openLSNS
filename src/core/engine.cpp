@@ -10,7 +10,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // macroses which define the dimension the network data
-#define MAX_WSYNS 1	/*todo: implement synaptic summation*/
+#define MAX_WSYNS MaxSyn
 #define MAX_GATES LSNS_MAX_GATES
 #define MAX_GPARS LSNS_MAX_GATEPARS
 #define MAX_CHAN MaxChan
@@ -41,6 +41,7 @@
 static float Threshold = -10.f;
 static float Step = -1.f;
 static int StepCounter = 0;
+static int MaxSyn = 0;
 static int MaxIons = 0;
 static int MaxChan = 0;
 static int MaxCells = 0;
@@ -68,9 +69,20 @@ void connect_kernel( int index /*, connectdat *data*/ )
 {
 	__lsns_assert( index >= 0 && index < MAX_WSYNS );	// DEBUG: check the range for 'index' variable
 	/*
-	wtab - synapse type, parameters, index for wsyn&wlut, index for placticity
-	wsyn is float4 array (x - total sum, rest)
-	wlut is look-up-table (x - size, rest indecis for cellv array)
+	MaxSyn - total number of synapses
+	Size_i - the size of i-th synapse
+	Wlut[MaxSyn] int4: x - type of synapse, y - parameters, z - size, w - index for wsyn&wlut
+	Wsyn[MaxSyn] float4: x - total sum, y - plasticity, z, w - reserved
+	Wall[MaxSyn*Size_i] is float4 array: weights
+	Vsyn[MaxSyn*Size_i] is int4 look-up-table: indices for cellv array
+	Msyn[MaxSyn*Size_i] for alpha synapses 
+	*/
+}
+
+void plasticity_kernel( int index /*, connectdat *data*/ )
+{
+	/*
+
 	*/
 }
 
@@ -95,9 +107,9 @@ void ions_kernel( int index, iondat *data )
 		float4 e = pIonsE[index];			// load ions parameters
 		float4 i = pIonsI[index];			// load ions parameters
 		float4 v = pCellV[_ions_lut_v( lut )];		// load cell parameters
-//--->>> possible CUDA optimization (try to use shared variables)
+//todo: { possible CUDA optimization (try to use shared variables)
 		float vm = _cell_v( v );			// get membrane potential
-//---<<< possible CUDA optimization
+//todo: } possible CUDA optimization
 		float tau = _pump_tau( par );			// get time constant for ions dynamics
 		float out = _ions_out( e );			// concentation of ions outside cell
 		float rtfz = _ions_rtfz( e );			// rtfz for specific neurons
@@ -153,30 +165,30 @@ void chan_kernel( int index, chandat *data )
 	// load type of ion channel (generic, a-b, etc) and its parameters (half-voltage, slope, etc)
 	int4 tp = pChanType[index];
 	// load references to external parameters (membrane potential, rest potential, etc)
-	int4 sh = pChanLUT[index];
+	int4 lut = pChanLUT[index];
 	__lsns_assert( _gate_typem( tp ) >= 0 && _gate_typem( tp ) < MAX_GATES );	// DEBUG: check the range for _gate_typem( tp )
 	__lsns_assert( _gate_typeh( tp ) >= 0 && _gate_typeh( tp ) < MAX_GATES );	// DEBUG: check the range for  _gate_typeh( tp ) 
 	__lsns_assert( _gate_parm( tp ) >= 0 && _gate_parm( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parm( tp ) 
 	__lsns_assert( _gate_parh( tp ) >= 0 && _gate_parh( tp ) < MAX_GPARS );		// DEBUG: check the range for  _gate_parh( tp ) 
-	__lsns_assert( _chan_lutv( sh ) >= 0 &&_chan_lutv( sh ) < MAX_CELLS );		// DEBUG: check the range for _chan_lut_v( sh )
-	__lsns_assert( _chan_lute( sh ) >= 0 && _chan_lute( sh ) < MAX_IONS );		// DEBUG: check the range for _chan_lut_e( sh )
-	__lsns_assert( _gate_typem( tp ) <= LSNS_PS_NMDA && _chan_lutm( sh ) >= 0 && _chan_lutm( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_m( sh )
-	__lsns_assert( _gate_typeh( tp ) <= LSNS_PS_NMDA && _chan_luth( sh ) >= 0 && _chan_luth( sh ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_h( sh )
-	__lsns_assert( _gate_typem( tp ) > LSNS_PS_NMDA && _chan_lutm( sh ) >= 0 && _chan_lutm( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_m( sh )
-	__lsns_assert( _gate_typeh( tp ) > LSNS_PS_NMDA && _chan_luth( sh ) >= 0 && _chan_luth( sh ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_h( sh )
+	__lsns_assert( _chan_lutv( lut ) >= 0 &&_chan_lutv( lut ) < MAX_CELLS );	// DEBUG: check the range for _chan_lut_v( lut )
+	__lsns_assert( _chan_lute( lut ) >= 0 && _chan_lute( lut ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_e( lut )
+	__lsns_assert( _gate_typem( tp ) <= LSNS_PS_NMDA && _chan_lutm( lut ) >= 0 && _chan_lutm( lut ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_m( lut )
+	__lsns_assert( _gate_typeh( tp ) <= LSNS_PS_NMDA && _chan_luth( lut ) >= 0 && _chan_luth( lut ) < MAX_IONS );	// DEBUG: check the range for _chan_lut_h( lut )
+	__lsns_assert( _gate_typem( tp ) > LSNS_PS_NMDA && _chan_lutm( lut ) >= 0 && _chan_lutm( lut ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_m( lut )
+	__lsns_assert( _gate_typeh( tp ) > LSNS_PS_NMDA && _chan_luth( lut ) >= 0 && _chan_luth( lut ) < MAX_WSYNS );	// DEBUG: check the range for _chan_lut_h( lut )
 	// load properties of ions channel (conductance, current, etc)
 	float4 g = pChanG[index];
 	// load properties of gate variables (activation, inactivation, etc) if needed
 	float4 mh = ( _gate_typem( tp )+_gate_typeh( tp ) != LSNS_NOGATE)? pChanMH[index]: float4();
 //todo: { possible CUDA optimization (try to use shared variables)
 	// load shared variables (resting potential, membrane potential, etc) to shared memory
-	float eds = _ions_eds( pIonsE[_chan_lute( sh )] );				// extract resting potential from 'IonsE'
-	float vm = _cell_v( pCellV[_chan_lutv( sh )] );					// extract membrane potential from 'CellV'
+	float eds = _ions_eds( pIonsE[_chan_lute( lut )] );				// extract resting potential from 'IonsE'
+	float vm = _cell_v( pCellV[_chan_lutv( lut )] );				// extract membrane potential from 'CellV'
 //todo: } possible CUDA optimization
 	// perform calculations
 	float mp, hp;
-	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( sh ), pIonsE, pWsyn, _gate_modm( mh ), _gate_m( mh ), mp );
-	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( sh ), pIonsE, pWsyn, _gate_modh( mh ), _gate_h( mh ), hp );
+	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( lut ), pIonsE, pWsyn, _gate_modm( mh ), _gate_m( mh ), mp );
+	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( lut ), pIonsE, pWsyn, _gate_modh( mh ), _gate_h( mh ), hp );
 	_chan_g( g ) = _chan_gmax( g )*mp*hp;						// g
 	_chan_ge( g ) = _chan_g( g )*eds;						// ge
 	_chan_i( g ) = _chan_g( g )*( vm-eds );						// I

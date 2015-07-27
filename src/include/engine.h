@@ -10,6 +10,28 @@
 #define MAX_CHAN_PER_CELL	15				/*<24*/
 #define MAX_IPUMP_PER_CELL	3				/*<24*/
 #define MAX_STORED_STEPS	16
+//=================== syndat macroses =========================================
+///////////////////////////////////////////////////////////////////////////////
+// parameters of the synaptic weight (decodes Wsyn):
+//	x - total weight of all connections;
+//	y - plasticity
+//	z - reserved;
+//	w - reserved
+#define _wsyn_total( wsyn ) ( wsyn ).x
+#define _wsyn_mod( wsyn ) ( wsyn ).y
+///////////////////////////////////////////////////////////////////////////////
+// syndat maps data which are related to synaptic properties onto global memory
+typedef struct __lsns_align( 16 ) __synapses_data{
+	// look-up-tables for shared variables (read-only)
+	int4 __lsns_align( 16 ) *SynLUT;			//
+	int4 __lsns_align( 16 ) *CellLUT;			//
+	float4 __lsns_align( 16 ) *Wall;			// weights
+	// local variables (read/write)
+	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - plasticity, z, w - reserved
+	// shared variables
+	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
+} syndat;
+
 //=================== iondat macroses =========================================
 ///////////////////////////////////////////////////////////////////////////////
 // type of ion dynamics (decodes IonsType):
@@ -85,8 +107,8 @@ typedef struct __lsns_align( 16 ) __ions_data{
 // parameters of gate variables of ion channel (decodes ChanMH):
 //	x - activation;
 //	y - inactivation;
-//	z - power of activation for channels/or plasticity for synapse;
-//	w - power of inactivation for channels/or plasticity for synapse;
+//	z - power of activation for channels;
+//	w - power of inactivation for channels
 #define _gate_m( mh ) ( mh ).x
 #define _gate_h( mh ) ( mh ).y
 #define _gate_modm( mh ) ( mh ).z
@@ -102,25 +124,18 @@ typedef struct __lsns_align( 16 ) __ions_data{
 #define _chan_ge( g ) ( g ).z
 #define _chan_i( g ) ( g ).w
 ///////////////////////////////////////////////////////////////////////////////
-// parameters of the synaptic weight (decodes Wsyn):
-//	x - total weight of all connections;
-//	y - reserved;
-//	z - reserved;
-//	w - reserved
-#define _wsyn_total( wsyn ) ( wsyn ).x
-///////////////////////////////////////////////////////////////////////////////
 // chandat maps data which are related to ion channels onto global memory
 typedef struct __lsns_align( 16 ) __channel_data{
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *ChanType;			// type of channel: x - type of activation, y - parameters of activation, z - type of inactivation, w - parameters of inactivation.
 	int4 __lsns_align( 16 ) *ChanLUT;			// indices of shared variables: x - CellV, y - IonsE/eds, z - IonsE/in for M (z-channel)/or W total for synapse, w - IonsE/in for H (z-channel)/or W total for synapse
 	// local variables (read-write)
-	float4 __lsns_align( 16 ) *ChanMH;			// gate variables: x - activation, y - inactivation, z - power of activation (or plasticity), w - power of inactivation (or plasticity)
+	float4 __lsns_align( 16 ) *ChanMH;			// gate variables: x - activation, y - inactivation, z - power of activation, w - power of inactivation
 	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
 	// shared variables
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 	float4 __lsns_align( 16 ) *IonsE;			// ions properties: x - reversal potential (Eds), y - concentration of ions inside the cell, z - concentration of ions outside the cell, w - RT/Fz constant for specific ions
-	float4 __lsns_align( 16 ) *Wsyn;			// synaptic weights: x - total weight of all connections converged on the synapse, y,z,w are reserved
+	float4 __lsns_align( 16 ) *Wsyn;			// synaptic weights: x - total sum, y - 1 or plasticity, z, w - reserved
 } chandat;
 
 //=================== celldat macroses ========================================
