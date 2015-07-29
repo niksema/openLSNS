@@ -12,6 +12,16 @@
 #define MAX_STORED_STEPS	16
 //=================== syndat macroses =========================================
 ///////////////////////////////////////////////////////////////////////////////
+// type of synapes (decodes SynType):
+//	x - type of synapse;
+//	y - parameters
+//	z - size
+//	w - initial index in Wall&CellLUT arrays
+#define _syn_type( tp ) ( tp ).x
+#define _syn_par( tp ) ( tp ).y
+#define _syn_size( tp ) ( tp ).z
+#define _syn_lut( tp ) ( tp ).w
+///////////////////////////////////////////////////////////////////////////////
 // parameters of the synaptic weight (decodes Wsyn):
 //	x - total weight of all connections;
 //	y - production: ( rate of transmitter release )*( plasticity )
@@ -25,15 +35,14 @@
 // syndat maps data which are related to synaptic properties onto global memory
 typedef struct __lsns_align( 16 ) __synapses_data{
 	// look-up-tables for shared variables (read-only)
-	int4 __lsns_align( 16 ) *SynLUT;			//  x - type of synapse, y - parameters, z - size, w - initial index in Wall&CellLUT arrays
+	int4 __lsns_align( 16 ) *SynType;			//  x - type of synapse, y - parameters, z - size, w - initial index in Wall&CellLUT arrays
 	int4 __lsns_align( 16 ) *CellLUT;			// look-up-table for all neurons which are converged onto particular synapse
-	float4 __lsns_align( 16 ) *Wall;			// all weights for particula synapse
+	float4 __lsns_align( 16 ) *Wall;			// all weights for particular synapse
 	// local variables (read/write)
 	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - ( rate of transmitter release )*( plasticity ), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
 	// shared variables
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 } syndat;
-
 //=================== iondat macroses =========================================
 ///////////////////////////////////////////////////////////////////////////////
 // type of ion dynamics (decodes IonsType):
@@ -113,8 +122,8 @@ typedef struct __lsns_align( 16 ) __ions_data{
 //	w - power of inactivation for channels
 #define _gate_m( mh ) ( mh ).x
 #define _gate_h( mh ) ( mh ).y
-#define _gate_modm( mh ) ( mh ).z
-#define _gate_modh( mh ) ( mh ).w
+#define _gate_powm( mh ) ( mh ).z
+#define _gate_powh( mh ) ( mh ).w
 ///////////////////////////////////////////////////////////////////////////////
 // parameters of the ion channel (decodes ChanG):
 //	x - maximal conductance;
@@ -137,7 +146,7 @@ typedef struct __lsns_align( 16 ) __channel_data{
 	// shared variables
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 	float4 __lsns_align( 16 ) *IonsE;			// ions properties: x - reversal potential (Eds), y - concentration of ions inside the cell, z - concentration of ions outside the cell, w - RT/Fz constant for specific ions
-	float4 __lsns_align( 16 ) *Wsyn;			// synaptic weights: x - total sum, y - 1 or plasticity, z, w - reserved
+	float4 __lsns_align( 16 ) *Wsyn;			// synaptic weights: x - total sum, y - ( rate of transmitter release )*( plasticity ), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
 } chandat;
 
 //=================== celldat macroses ========================================

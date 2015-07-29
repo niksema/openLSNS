@@ -20,6 +20,10 @@
 #define MAX_VIEW_PARS MaxViewPars
 ///////////////////////////////////////////////////////////////////////////////
 // macroses to get access to networks data
+#define pSynType ( data->SynType )
+#define pWsyn ( data->Wsyn )
+#define pWall ( data->Wall )
+#define pCellLUT ( data->CellLUT )
 #define pIonsType ( data->IonsType )
 #define pIonsE ( data->IonsE )
 #define pIonsI ( data->IonsI )
@@ -65,10 +69,35 @@ void control_kernel( int index /*, ctrldat *data*/ )
 // connect_kernel: 
 // Input parameters:
 // Output parameters:
-void connect_kernel( int index /*, connectdat *data*/ )
+void connect_kernel( int index, syndat *data )
 {
 	__lsns_assert( index >= 0 && index < MAX_WSYNS );	// DEBUG: check the range for 'index' variable
+	// load parameters for simulation
+	float step = Step;
+	// load type of ions (Na, K, Ca etc, and type of ion dynamics)
+	int4 tp = pSynType[index];
+	// process the synaptic connections if needed (size > 0)
+	if( _syn_size( tp ) > 0 ){
+		float4 wsyn = pWsyn[index];
+		float _wsyn = 0.f;
+		for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
+			float4 _w = pWall[j];
+			int4 _vlut = pCellLUT[j];
+//todo:			_wsyn += proc_syn( _syn_type( tp ), _syn_par( tp ), pCellV, _vlut, _w );
+		}
+		_wsyn_total( wsyn ) = _wsyn;
+		pWsyn[index] = wsyn;
+	}
 	/*
+	// look-up-tables for shared variables (read-only)
+	int4 __lsns_align( 16 ) *SynLUT;			//  x - type of synapse, y - parameters, z - size, w - initial index in Wall&CellLUT arrays
+	int4 __lsns_align( 16 ) *CellLUT;			// look-up-table for all neurons which are converged onto particular synapse
+	float4 __lsns_align( 16 ) *Wall;			// all weights for particula synapse
+	// local variables (read/write)
+	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - ( rate of transmitter release )*( plasticity ), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
+	// shared variables
+	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
+
 	MaxSyn - total number of synapses
 	Size_i - the size of i-th synapse
 	Wlut[MaxSyn] int4: x - type of synapse, y - parameters, z - size, w - index for wsyn&wlut
@@ -187,8 +216,8 @@ void chan_kernel( int index, chandat *data )
 //todo: } possible CUDA optimization
 	// perform calculations
 	float mp, hp;
-	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( lut ), pIonsE, pWsyn, _gate_modm( mh ), _gate_m( mh ), mp );
-	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( lut ), pIonsE, pWsyn, _gate_modh( mh ), _gate_h( mh ), hp );
+	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( lut ), pIonsE, pWsyn, _gate_powm( mh ), _gate_m( mh ), mp );
+	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( lut ), pIonsE, pWsyn, _gate_powh( mh ), _gate_h( mh ), hp );
 	_chan_g( g ) = _chan_gmax( g )*mp*hp;						// g
 	_chan_ge( g ) = _chan_g( g )*eds;						// ge
 	_chan_i( g ) = _chan_g( g )*( vm-eds );						// I
@@ -356,6 +385,11 @@ bool lsns_run( netpar &par, int max_step )
 {
 	for( int step = 0; step < max_step; ++step ){
 		control_kernel( 0 ); // don't do anything now
+/*
+		for( int syn = 0; syn < MaxSyn; ++syn ){
+			ions_kernel( syn, &( par.Data->DevMap->Synapses ));
+		}
+*/
 		connect_kernel( 0 ); // don't do anything now
 		for( int ion = 0; ion < MaxIons; ++ion ){
 			ions_kernel( ion, &( par.Data->DevMap->Ions ));
