@@ -9,10 +9,10 @@
 #if defined( __CUDA__ )
 	#include <cuda.h>
 	
-	#define lsns_div( x, y ) fdividef(( x ),( y ))
-	#define lsns_pow( x, y ) powf(( x ),( y ))
-	#define lsns_exp( x ) expf( x )
-	#define lsns_cosh( x ) coshf( x )
+	#define lsns_div( x, y ) __fdividef(( x ),( y ))
+	#define lsns_pow( x, y ) __powf(( x ),( y ))
+	#define lsns_exp( x ) __expf( x )
+	#define lsns_cosh( x ) __coshf( x )
 	#define lsns_log( x ) __logf( x )
 #else
 	#include <math.h>

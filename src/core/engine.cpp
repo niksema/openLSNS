@@ -51,6 +51,7 @@ static int MaxChan = 0;
 static int MaxCells = 0;
 static int MaxViewPars = 0;
 static int MaxGlobalData = 0;
+static synpar Synapses[LSNS_MAX_SYNPARS] = {0};
 static gatepar Gates[LSNS_MAX_GATEPARS] = {0};
 static ionspar Ions[LSNS_MAX_IONPARS] = {0};
 
@@ -66,53 +67,53 @@ void control_kernel( int index /*, ctrldat *data*/ )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// connect_kernel: 
+// syn_kernel: 
 // Input parameters:
 // Output parameters:
-void connect_kernel( int index, syndat *data )
+// !!!!!!!!!!!!!!!must be optimized
+void syn_kernel( int index, syndat *data )
 {
 	__lsns_assert( index >= 0 && index < MAX_WSYNS );	// DEBUG: check the range for 'index' variable
-	// load parameters for simulation
-	float step = Step;
-	// load type of ions (Na, K, Ca etc, and type of ion dynamics)
+	// load type of synapse
 	int4 tp = pSynType[index];
-	// process the synaptic connections if needed (size > 0)
+	// load synapse properties
+	// process the synaptic summation if needed (size > 0)
 	if( _syn_size( tp ) > 0 ){
+		// load parameters for simulation
+		float step = Step;
+	 	synpar par = Synapses[_syn_par( tp )];
+		// load parameters synaptic weight
 		float4 wsyn = pWsyn[index];
-		float _wsyn = 0.f;
-		for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
-			float4 _w = pWall[j];
-			int4 _vlut = pCellLUT[j];
-//todo:			_wsyn += proc_syn( _syn_type( tp ), _syn_par( tp ), pCellV, _vlut, _w );
+		float w_total = 0.f, ah = _wsyn_ah( wsyn ), edt = _synEdt( par ), dt = _synDt( par );	// results of synaptic summation to be stored
+		switch( _syn_type( tp )){
+			case LSNS_BYPASS_SYN:
+				for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
+					float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
+					int4 vlut = pCellLUT[j];// load look-up-table for 4 presynaptic units (drives/outputs/feedbacks etc)
+					float4 v_raw[4] = { pCellV[vlut.x], pCellV[vlut.y], pCellV[vlut.z], pCellV[vlut.w] }; // load raw data from 4 presynaptic units
+					float4 v = {_cell_v( v_raw[0] ), _cell_v( v_raw[1] ), _cell_v( v_raw[2] ),  _cell_v( v_raw[3] ) };
+					w_total += proc_synsum( v, w );
+				}
+				break;
+			case LSNS_PULSE_SYN:
+				for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
+					float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
+					int4 vlut = pCellLUT[j];// load look-up-table for 4 presynaptic neurons
+					float4 v_raw[4] = { pCellV[vlut.x], pCellV[vlut.y], pCellV[vlut.z], pCellV[vlut.w] }; // load raw data from 4 presynaptic neurons
+					float4 v = {_cell_spike( v_raw[0] ), _cell_spike( v_raw[1] ), _cell_spike( v_raw[2] ),  _cell_spike( v_raw[3] ) };
+					w_total += proc_synsum( v, w );
+				}
+				break;
+			default:
+				ah = dt = edt = 0;		// type of synapse is not defined
 		}
-		_wsyn_total( wsyn ) = _wsyn;
+		_wsyn_total( wsyn ) = w_total;
+		_wsyn_edt( wsyn ) = edt;
+		_wsyn_dt( wsyn ) = dt;
+		_wsyn_ah( wsyn ) = ah;
+		// store parameters synaptic weight
 		pWsyn[index] = wsyn;
 	}
-	/*
-	// look-up-tables for shared variables (read-only)
-	int4 __lsns_align( 16 ) *SynLUT;			//  x - type of synapse, y - parameters, z - size, w - initial index in Wall&CellLUT arrays
-	int4 __lsns_align( 16 ) *CellLUT;			// look-up-table for all neurons which are converged onto particular synapse
-	float4 __lsns_align( 16 ) *Wall;			// all weights for particula synapse
-	// local variables (read/write)
-	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - ( rate of transmitter release )*( plasticity ), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
-	// shared variables
-	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
-
-	MaxSyn - total number of synapses
-	Size_i - the size of i-th synapse
-	Wlut[MaxSyn] int4: x - type of synapse, y - parameters, z - size, w - index for wsyn&wlut
-	Wsyn[MaxSyn] float4: x - total sum, y - plasticity, z, w - reserved
-	Wall[MaxSyn*Size_i] is float4 array: weights
-	Vsyn[MaxSyn*Size_i] is int4 look-up-table: indices for cellv array
-	Msyn[MaxSyn*Size_i] for alpha synapses 
-	*/
-}
-
-void plasticity_kernel( int index /*, connectdat *data*/ )
-{
-	/*
-
-	*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -387,10 +388,9 @@ bool lsns_run( netpar &par, int max_step )
 		control_kernel( 0 ); // don't do anything now
 /*
 		for( int syn = 0; syn < MaxSyn; ++syn ){
-			ions_kernel( syn, &( par.Data->DevMap->Synapses ));
+			syn_kernel( syn, &( par.Data->DevMap->Synapses ));
 		}
 */
-		connect_kernel( 0 ); // don't do anything now
 		for( int ion = 0; ion < MaxIons; ++ion ){
 			ions_kernel( ion, &( par.Data->DevMap->Ions ));
 		}

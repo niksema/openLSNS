@@ -65,6 +65,12 @@
     <ClInclude Include="precompile.h">
       <Filter>win7</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\include\synapses.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\include\synproc.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />

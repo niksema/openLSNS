@@ -272,7 +272,7 @@ __lsns_inline float proc_syngate1( float w, float alpha, float edt, float dt, fl
 			{\
 			/*loads total weight of connections converged on the synapse*/\
 			float4 w = wsyn[lut]; \
-			( G ) = ( gate ) = proc_syngate1( _wsyn_total( w ), _wsyn_alpha( w ), _wsyn_edt( w ), _wsyn_dt( w ), gate ); \
+			( G ) = ( gate ) = proc_syngate1( _wsyn_total( w ), _wsyn_ah( w ), _wsyn_edt( w ), _wsyn_dt( w ), gate ); \
 			}\
 			break; \
 		default: \

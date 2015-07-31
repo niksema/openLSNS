@@ -96,6 +96,8 @@
     <ClInclude Include="..\src\include\ionproc.h" />
     <ClInclude Include="..\src\include\ions.h" />
     <ClInclude Include="..\src\include\lsnsmath.h" />
+    <ClInclude Include="..\src\include\synapses.h" />
+    <ClInclude Include="..\src\include\synproc.h" />
     <ClInclude Include="..\src\include\viewproc.h" />
     <ClInclude Include="..\src\include\views.h" />
     <ClInclude Include="precompile.h" />

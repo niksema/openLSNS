@@ -4,6 +4,7 @@
 #include "config.h"
 #include "gateproc.h"
 #include "ionproc.h"
+#include "synproc.h"
 #include "viewproc.h"
 
 #define MAX_CHAN_PER_PUMP	7				/*<24*/
@@ -24,11 +25,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // parameters of the synaptic weight (decodes Wsyn):
 //	x - total weight of all connections;
-//	y - production: ( rate of transmitter release )*( plasticity )
+//	y - production: [rate of transmitter release]*[plasticity] (a*h)
 //	z - 1 for pulse model or step/T other models;
 //	w -  exp( step/T ) for pulse model or 1-step/T for othe models
 #define _wsyn_total( wsyn ) ( wsyn ).x
-#define _wsyn_alpha( wsyn ) ( wsyn ).y
+#define _wsyn_ah( wsyn ) ( wsyn ).y
 #define _wsyn_dt( wsyn ) ( wsyn ).z
 #define _wsyn_edt( wsyn ) ( wsyn ).w
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,7 +40,7 @@ typedef struct __lsns_align( 16 ) __synapses_data{
 	int4 __lsns_align( 16 ) *CellLUT;			// look-up-table for all neurons which are converged onto particular synapse
 	float4 __lsns_align( 16 ) *Wall;			// all weights for particular synapse
 	// local variables (read/write)
-	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - ( rate of transmitter release )*( plasticity ), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
+	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - [rate of transmitter release]*[plasticity] (a*h), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
 	// shared variables
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 } syndat;
