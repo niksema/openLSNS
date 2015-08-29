@@ -13,7 +13,6 @@ enum __lsns_synapse_types{
 	LSNS_MAX_SYNS,
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // +extract parameters for all synaptic current from the structure 'synpar'
 //=============================================================================

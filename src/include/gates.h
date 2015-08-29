@@ -103,4 +103,3 @@ typedef struct __lsns_align( 16 ) __gate_par{
 } gatepar;
 
 #endif /*__GATES_H*/
-
