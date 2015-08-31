@@ -4,14 +4,8 @@
 #include "lsnsmath.h"
 #include "synapses.h"
 
-__lsns_inline float proc_synsum1( float4 &v, float4 &w  )
+__lsns_inline float proc_synsum( float4 &v, float4 &w  )
 {
-	return v.x*w.x+v.y*w.y+v.z*w.z+v.w*w.w;
-}
-
-__lsns_inline float proc_synsum2( float4 &v, float4 &w  )
-{
-	/*lsns_sigma( v );*/
 	return v.x*w.x+v.y*w.y+v.z*w.z+v.w*w.w;
 }
 

@@ -211,7 +211,7 @@ __lsns_inline float proc_syngate1( float w, float alpha, float edt, float dt, fl
 // 'mod' is power of gate variable for channels
 // 'gate' is gate variable;
 // 'G' is 'gate'^'mod'  for channels or 'gate' for synapses
-#define lsns_gate( type, par, step, v, lut, ions, wsyn, mod, gate, G ) \
+#define proc_gate( type, par, step, v, lut, ions, wsyn, mod, gate, G ) \
 	switch( type ){ \
 		case LSNS_NOGATE: \
 			( gate ) = ( G ) = 1; \
