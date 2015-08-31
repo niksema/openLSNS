@@ -79,17 +79,16 @@ void syn_kernel( int index, syndat *data )
 	__lsns_assert( index >= 0 && index < MAX_WSYNS );	// DEBUG: check the range for 'index' variable
 	// load type of synapse
 	int4 tp = pSynType[index];
+	// load synapse properties
 	// process the synaptic summation if needed (size > 0)
 	if( _syn_size( tp ) > 0 ){
 		// load parameters for simulation
 		float step = Step;
-		// load synapse properties
 	 	synpar par = Synapses[_syn_par( tp )];
 		// load parameters synaptic weight
 		float4 wsyn = pWsyn[index];
 		float w_total = 0.f, ah = _wsyn_ah( wsyn ), edt = _synEdt( par ), dt = _synDt( par );	// results of synaptic summation to be stored
 		switch( _syn_type( tp )){
-<<<<<<< HEAD
 			case LSNS_WSUM_SYN:{
 					for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
 						float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
@@ -119,25 +118,8 @@ void syn_kernel( int index, syndat *data )
 						float4 v = {_cell_spike( v_raw[0] ), _cell_spike( v_raw[1] ), _cell_spike( v_raw[2] ),  _cell_spike( v_raw[3] ) };
 						w_total += proc_synsum( v, w );
 					}
-=======
-			case LSNS_BYPASS_SYN:
-				for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
-					lsns_synsum4( proc_synsum1, _cell_v, pCellV, pCellLUT[j], pWall[j], w_total );
 				}
 				break;
-			case LSNS_PULSE_SYN:
-				for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
-					lsns_synsum4( proc_synsum1, _cell_spike, pCellV, pCellLUT[j], pWall[j], w_total );
->>>>>>> origin/master
-				}
-				break;
-			/*
-			case LSNS_INSTANT_SYN:
-				for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
-					lsns_synsum4( proc_synsum2, _cell_v, pCellV, pCellLUT[j], pWall[j], w_total );
-				}
-				break;
-			*/
 			default:
 				ah = dt = edt = 0;		// type of synapse is not defined
 		}
@@ -252,8 +234,8 @@ void chan_kernel( int index, chandat *data )
 //todo: } possible CUDA optimization
 	// perform calculations
 	float mp, hp;
-	lsns_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( lut ), pIonsE, pWsyn, _gate_powm( mh ), _gate_m( mh ), mp );
-	lsns_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( lut ), pIonsE, pWsyn, _gate_powh( mh ), _gate_h( mh ), hp );
+	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( lut ), pIonsE, pWsyn, _gate_powm( mh ), _gate_m( mh ), mp );
+	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( lut ), pIonsE, pWsyn, _gate_powh( mh ), _gate_h( mh ), hp );
 	_chan_g( g ) = _chan_gmax( g )*mp*hp;						// g
 	_chan_ge( g ) = _chan_g( g )*eds;						// ge
 	_chan_i( g ) = _chan_g( g )*( vm-eds );						// I
@@ -461,3 +443,5 @@ bool lsns_run( netpar &par, int max_step )
 }
 
 #endif
+
+
