@@ -8,8 +8,9 @@
 // +gates ids and brief descriptions
 enum __lsns_synapse_types{
 	LSNS_NOSYN			= 0,						// none 
-	LSNS_BYPASS_SYN			= 1,						// bypass model of synapse (for network unit like drives, outputs etc): dt = 1; edt = 0;
-	LSNS_PULSE_SYN			= 2,						// pulse model of synapse: dt = 1; edt = exp( -step/tmax )
+	LSNS_WSUM_SYN			= 1,						// weighted-sum model of synapse (for network unit like drives, outputs etc): dt = 1; edt = 0;
+	LSNS_SIGMA_SYN			= 2,						// sigma model of synapse (for non-spiking network units): dt = 1; edt = 0
+	LSNS_PULSE_SYN			= 3,						// pulse model of synapse (for spiking network units): dt = 1; edt = exp( -step/tmax )
 	LSNS_MAX_SYNS,
 };
 

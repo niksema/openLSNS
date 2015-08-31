@@ -1,0 +1,98 @@
+========== file operations ===========
+new			[<name> (default - model.lsns)]
+			To create the new network <name>
+-------------
+open 		<filename>
+			To open the network <filename>
+-------------
+import		<filename> [-b, --subnet <name> (default <subnet>)]
+			To import the network from file <filename> and insert it to the current network as
+			a subnetwork <name>
+-------------
+export		<filename> [-b, --subnet <name>]
+			To export the whole network (or subnetwork <name>) to file <filename> 
+-------------
+save		N/A
+			To save the current network
+-------------
+saveas 		<filename>
+			To save the current network as <filename>
+-------------			
+close		N/A
+			To close the current network
+========== edit operations ===========
+create		<[pathway\]name> [-b, --subnet | -d, --drive | -f, --feedback | -o, --output | -n, --neuron (default) | -c, --channel <E>| -g, --gate <type>| -i, --ions <type>] [-t, --template <tname> [-f, --file <tfilename>]] [-s, --size <N>(1-default)]
+			To create a population <name> of element(s) of the neural network:
+				-d drive;
+				-f feedback;
+				-o output;
+				-n population of neurons;
+				-c ions channel;
+				-g gate variable;
+				-i ions dynamics.
+			The elements description can be taken from the template <tname> (optionally stored in the file <tfilename>).
+			The size of the population may be specified as parameter <N>.
+-------------
+copy		<[pathway\]oldname(including wildcard)> <newname(including wildcard)>
+			To copy the network element(s)
+-------------
+rename		<[pathway\]oldname(including wildcard)> <newname(including wildcard)>
+			To rename the network element(s) <oldname> to <newname>
+-------------
+delete		<[pathway\]name(including wildcard)>
+			To delete the network element(s) <name>
+-------------
+property	<[pathway\]name> [-t, --topology <T> | -o, --origin <O> | -d, --dimension <D> | -s, --size <N> | -r, --distribution <R>]
+			To specify the properties of the network element <name> by follow parameters:
+				-t topology <T> of the population (non, line, circle, etc)
+				-o coordinates <O> of center of population in the coordinate system of the whole network
+				-d linear dimension <D> of the population of elements (10, 10x30, 10x30x50 etc)
+				-s number of elements <N> in the population
+				-r distribution (<R> is uniform, normal, etc)
+-------------
+modify		<[pathway\]name> [-v, --value (default) <X> | [-t, --template <tname> [-f, --file <filename>]]]
+			To modify the particular parameter <name> (<X> describes such parameters as time constant, conductance, activation, 
+			inactivation, ions concentration etc) or import all parameters of element <name> from
+			template <tname> (optionally loaded from file <filename>)
+-------------
+connect		<[pathway1\]source> <[pathway2\]target> [-s, --synapse <type | [-t, --template <tname> [-f, --file <filename>]]> [-w, --weight <W>(default 0)]]
+			To espablish the connection between network elements  <target> and <source>
+			Optionally it is possible to specify the <type> of connection (--synapse) and strength of connection <W> (--weight)
+-------------
+synapse		[pathway1\]source(including wildcard) [pathway2\]target(including wildcard) -s, --synapse <type | [-t, --template <tname> [-f, --file <filename>]]> [-w, --weight <W>(default 0)]
+			To specify (or modify) the sinaptic type of the connection between <target> and <source>. Optionally the strength of connection <W> can be
+			specified as well.
+-------------
+disconnect	<[pathway1\]source> <[pathway2\]target>
+			To remove the connection between <source> and <target>
+-------------
+undo		N/A
+			Undo the current command in the command list.
+-------------
+redo		N/A	
+			Redo the next command in the command list.
+========== template operations =======
+import		<filename> -t, --template [<tname>](default all)]
+			To import the template <tname> from file <filename> 
+-------------
+export		<filename> -t, --template [<tname>](default all)]
+			To export the template <tname> to file <filename> 
+-------------
+template	<tname> [-c, --create [<type>(default) | [pathway\]name] | -s, --substitute <[pathway\]name(including wildcard)> | -m, --modify <X> | -d, --delete | -p, --plot(default)]
+			Operation with template <tname>:
+				-c create the template of network element based on predefined description <type> or network element <[pathway\]name>
+				-s substitute the <tname> instead of <[pathway\]name(including wildcard)>
+				-m modify the particular parameter according to expression <X> of the template <tname>
+				-d delete the template
+				-p plot template description
+========== navigation ================
+select		[., --current(default)|.., --up| ..., --root| <[pathway\]name>]
+-------------
+display		[[pathway\]name] [-1(default)|-2|...|-n|-a, --all]
+-------------
+help		[-?(default)|-c, --command | -p, --parameter <par>] [[pathway\]name]
+========== network control ===========
+link		<[pathway1\]parname1> <[pathway2\]parname2>
+-------------
+unlink		<[pathway\]parname>
+======================================

@@ -289,6 +289,15 @@
 	} \
 }
 ///////////////////////////////////////////////////////////////////////////////
+// +'lsns_sigm' sigmoid function: 1/( 1+exp(-x) )
+#define lsns_sigm( x ) \
+	lsns_div( 1, 1+lsns_exp( -( x )))
+///////////////////////////////////////////////////////////////////////////////
+// +'lsns_sigm' modified sigmoid function: 1/( 1+exp(-(v-v12 )/slp ))
+#define lsns_msigm( v, v12, slp ) \
+	lsns_sigm( lsns_div(( v )-( v12 ), slp ))
+/*	lsns_div( 1, 1+lsns_exp( -lsns_div(( v )-( v12 ), slp )))*/
+///////////////////////////////////////////////////////////////////////////////
 // +'lsns_euler' 1-step Euler method: y = y+step*f
 #define lsns_euler( y, f, step ) \
 	( y )+( step )*( f )

@@ -16,6 +16,7 @@
 #define MAX_CHAN MaxChan
 #define MAX_IONS MaxIons
 #define MAX_CELLS MaxCells
+#define MAX_NNUNITS MaxUnits
 #define MAX_PARS MaxGlobalData
 #define MAX_VIEW_PARS MaxViewPars
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,6 +38,7 @@
 #define pChanGLUT ( data->ChanGLUT )
 #define pIonsILUT ( data->IonsILUT )
 #define pDevDat( index ) ( data->ViewData[index] )
+#define pUnitType ( data->UnitType )
 #define pHostDat ( data->GlobalViewData )
 #define pGlobalDat ( data->GlobalData )
 #define pGlobalViewLUT ( data->ViewLUT )
@@ -49,6 +51,7 @@ static int MaxSyn = 0;
 static int MaxIons = 0;
 static int MaxChan = 0;
 static int MaxCells = 0;
+static int MaxUnits = 0;
 static int MaxViewPars = 0;
 static int MaxGlobalData = 0;
 static synpar Synapses[LSNS_MAX_SYNPARS] = {0};
@@ -86,22 +89,35 @@ void syn_kernel( int index, syndat *data )
 		float4 wsyn = pWsyn[index];
 		float w_total = 0.f, ah = _wsyn_ah( wsyn ), edt = _synEdt( par ), dt = _synDt( par );	// results of synaptic summation to be stored
 		switch( _syn_type( tp )){
-			case LSNS_BYPASS_SYN:
-				for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
-					float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
-					int4 vlut = pCellLUT[j];// load look-up-table for 4 presynaptic units (drives/outputs/feedbacks etc)
-					float4 v_raw[4] = { pCellV[vlut.x], pCellV[vlut.y], pCellV[vlut.z], pCellV[vlut.w] }; // load raw data from 4 presynaptic units
-					float4 v = {_cell_v( v_raw[0] ), _cell_v( v_raw[1] ), _cell_v( v_raw[2] ),  _cell_v( v_raw[3] ) };
-					w_total += proc_synsum( v, w );
+			case LSNS_WSUM_SYN:{
+					for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
+						float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
+						int4 vlut = pCellLUT[j];// load look-up-table for 4 presynaptic units (drives/outputs/feedbacks etc)
+						float4 v_raw[4] = { pCellV[vlut.x], pCellV[vlut.y], pCellV[vlut.z], pCellV[vlut.w] }; // load raw data from 4 presynaptic units
+						float4 v = {_cell_v( v_raw[0] ), _cell_v( v_raw[1] ), _cell_v( v_raw[2] ),  _cell_v( v_raw[3] ) };
+						w_total += proc_synsum( v, w );
+					}
 				}
 				break;
-			case LSNS_PULSE_SYN:
-				for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
-					float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
-					int4 vlut = pCellLUT[j];// load look-up-table for 4 presynaptic neurons
-					float4 v_raw[4] = { pCellV[vlut.x], pCellV[vlut.y], pCellV[vlut.z], pCellV[vlut.w] }; // load raw data from 4 presynaptic neurons
-					float4 v = {_cell_spike( v_raw[0] ), _cell_spike( v_raw[1] ), _cell_spike( v_raw[2] ),  _cell_spike( v_raw[3] ) };
-					w_total += proc_synsum( v, w );
+			case LSNS_SIGMA_SYN:{
+					float v12 = 0, slope = 1;
+					for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
+						float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
+						int4 vlut = pCellLUT[j];// load look-up-table for 4 presynaptic units (drives/outputs/feedbacks etc)
+						float4 v_raw[4] = { pCellV[vlut.x], pCellV[vlut.y], pCellV[vlut.z], pCellV[vlut.w] }; // load raw data from 4 presynaptic units
+						float4 v = {lsns_msigm( _cell_v( v_raw[0] ), v12, slope ), lsns_msigm( _cell_v( v_raw[1] ), v12, slope ), lsns_msigm( _cell_v( v_raw[2] ), v12, slope ),  lsns_msigm( _cell_v( v_raw[3] ), v12, slope ) };
+						w_total += proc_synsum( v, w );
+					}
+				}
+				break;
+			case LSNS_PULSE_SYN:{
+					for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
+						float4 w = pWall[j];	// load synaptic weights for 4 presynaptic neurons
+						int4 vlut = pCellLUT[j];// load look-up-table for 4 presynaptic neurons
+						float4 v_raw[4] = { pCellV[vlut.x], pCellV[vlut.y], pCellV[vlut.z], pCellV[vlut.w] }; // load raw data from 4 presynaptic neurons
+						float4 v = {_cell_spike( v_raw[0] ), _cell_spike( v_raw[1] ), _cell_spike( v_raw[2] ),  _cell_spike( v_raw[3] ) };
+						w_total += proc_synsum( v, w );
+					}
 				}
 				break;
 			default:
@@ -121,6 +137,7 @@ void syn_kernel( int index, syndat *data )
 // such as pump current, concentration of ions inside the cell, etc.
 // Input parameters:
 // Output parameters:
+// !!!!!!!!!!!!!!!must be optimized
 void ions_kernel( int index, iondat *data )
 {
 	__lsns_assert( index >= 0 && index < MAX_IONS );	// DEBUG: check the range for 'index' variable
@@ -254,6 +271,19 @@ void cell_kernel( int index, celldat *data )
 	_cell_v( v ) = vm;
 	_cell_spike( v ) = spike;
 	pCellV[index] = v;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// control_kernel: 
+// Input parameters:
+// Output parameters:
+void nnunit_kernel( int index /*, ctrldat *data*/ )
+{
+	__lsns_assert( index >= 0 && index < MAX_NNUNITS );				// DEBUG: check the range for 'index' variable
+	float step = Step;
+	// load type of ion channel (generic, a-b, etc) and its parameters (half-voltage, slope, etc)
+//	int4 tp = pUnitType[index]; // #define pUnitType ( data->UnitType ) 1. type: drive/output/feedback; 2. parameters
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
