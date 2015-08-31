@@ -83,6 +83,7 @@
     <ClCompile Include="..\src\core\engine.cpp" />
     <ClCompile Include="..\src\core\gates.cpp" />
     <ClCompile Include="..\src\core\ions.cpp" />
+    <ClCompile Include="..\src\core\synapses.cpp" />
     <ClCompile Include="..\src\core\view.cpp" />
     <ClCompile Include="console.cpp" />
     <ClCompile Include="precompile.cpp" />

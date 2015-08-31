@@ -30,6 +30,9 @@
     <ClCompile Include="..\src\core\view.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\core\synapses.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\include\config.h">
