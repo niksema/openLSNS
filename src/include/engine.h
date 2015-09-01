@@ -174,6 +174,32 @@ typedef struct __lsns_align( 16 ) __cell_data{
 	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - time constant of ions dynamics, w - reserved.
 } celldat;
 
+//=================== unitdat macroses ========================================
+/*
+///////////////////////////////////////////////////////////////////////////////
+// parameters of cell (decodes CellV):
+//	x - membrane potential; 
+//	y - membrane capacitance;
+//	z - spike onset;
+//	w - injected current
+#define _cell_v( v ) ( v ).x
+#define _cell_c( v ) ( v ).y
+#define _cell_spike( v ) ( v ).z
+#define _cell_iadd( v ) ( v ).w
+*/
+///////////////////////////////////////////////////////////////////////////////
+// unitdat maps data which are related to networks' elements (drives, feedbacks, outpus) onto global memory
+typedef struct __lsns_align( 16 ) __unit_data{
+	// local variables (read-only)
+	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
+	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table of pump current: x - counter, the rest are actual indices of IonsI array;
+	// local variables (read-write)
+	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
+	// shared variables
+	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
+	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - time constant of ions dynamics, w - reserved.
+} unitdat;
+
 //=============================================================================
 ///////////////////////////////////////////////////////////////////////////////
 // iodat contains the pointers to both host and device memory which are related 

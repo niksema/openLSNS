@@ -377,7 +377,7 @@ bool lsns_free( netpar &par )
 	// reset the constant parameters of the network
 	Step = -1.f; Threshold = -10.f; StepCounter = 0;
 	MaxIons = MaxChan = MaxCells = MaxViewPars = MaxGlobalData = 0;
-	memset( Gates, 0, sizeof( netpar )*LSNS_MAX_GATEPARS );
+	memset( Gates, 0, sizeof( gatepar )*LSNS_MAX_GATEPARS );
 	memset( Ions, 0, sizeof( ionspar )*LSNS_MAX_IONPARS );
 	return true;
 }

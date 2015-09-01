@@ -32,6 +32,8 @@ create		<[pathway\]name> [-b, --subnet | -d, --drive | -f, --feedback | -o, --ou
 				-i ions dynamics.
 			The elements description can be taken from the template <tname> (optionally stored in the file <tfilename>).
 			The size of the population may be specified as parameter <N>.
+			
+!			SM comment - add compartment
 -------------
 copy		<[pathway\]oldname(including wildcard)> <newname(including wildcard)>
 			To copy the network element(s)
@@ -92,7 +94,8 @@ display		[[pathway\]name] [-1(default)|-2|...|-n|-a, --all]
 -------------
 help		[-?(default)|-c, --command | -p, --parameter <par>] [[pathway\]name]
 ========== network control ===========
-link		<[pathway1\]parname1> <[pathway2\]parname2>
+link		<[pathway1\]parname1> <[pathway2\]parname2> 						
+!			KH comment - provide the possibility to display linked parameters
 -------------
 unlink		<[pathway\]parname>
 ======================================
