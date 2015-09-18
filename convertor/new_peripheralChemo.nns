@@ -1,0 +1,12 @@
+Neural Network Simulator (NNS), 2015(C)
+
+<VERSION>
+NNS V1.0
+</VERSION>
+
+<CTR PARAM>
+Seed = -1432929639
+SimStep = 0.1
+SimDuration = 40000
+</CTR PARAM>
+

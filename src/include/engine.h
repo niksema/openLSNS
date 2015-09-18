@@ -67,6 +67,9 @@ typedef struct __lsns_align( 16 ) __synapses_data{
 //	y - concentration of ions inside the cell;
 //	z - concentration of ions outside the cell;
 //	w - RT/Fz constant for specific ions
+enum __float4_ione{
+//	....TODO
+};
 #define _ions_eds( e ) ( e ).x
 #define _ions_in( e ) ( e ).y
 #define _ions_out( e ) ( e ).z
@@ -77,6 +80,9 @@ typedef struct __lsns_align( 16 ) __synapses_data{
 //	y - channels current;
 //	z - reserved;
 //	w - reserved.
+enum __float4_ioni{
+//	....TODO
+};
 #define _ions_ipump( i ) ( i ).x
 #define _ions_ichan( i ) ( i ).y
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,7 +94,7 @@ typedef struct __lsns_align( 16 ) __ions_data{
 	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
 	// local variables (read/write)
 	float4 __lsns_align( 16 ) *IonsE;			// ions properties: x - reversal potential (Eds), y - concentration of ions inside the cell, z - concentration of ions outside the cell, w - RT/Fz constant for specific ions
-	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - time constant of ions dynamics, w - reserved.
+	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - reserved, w - reserved.
 	// shared variables
 	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
@@ -121,6 +127,9 @@ typedef struct __lsns_align( 16 ) __ions_data{
 //	y - inactivation;
 //	z - power of activation for channels;
 //	w - power of inactivation for channels
+enum __float4_chanmh{
+//	....TODO
+};
 #define _gate_m( mh ) ( mh ).x
 #define _gate_h( mh ) ( mh ).y
 #define _gate_powm( mh ) ( mh ).z
@@ -131,6 +140,9 @@ typedef struct __lsns_align( 16 ) __ions_data{
 //	y - conductance;
 //	z - current;
 //	w - G*Eds production
+enum __float4_chang{
+//	....TODO
+};
 #define _chan_gmax( g ) ( g ).x
 #define _chan_g( g ) ( g ).y
 #define _chan_ge( g ) ( g ).z
@@ -153,14 +165,21 @@ typedef struct __lsns_align( 16 ) __channel_data{
 //=================== celldat macroses ========================================
 ///////////////////////////////////////////////////////////////////////////////
 // parameters of cell (decodes CellV):
-//	x - membrane potential; 
-//	y - membrane capacitance;
-//	z - spike onset;
+//	x - membrane potential
+//	y - membrane capacitance
+//	z - spike onset
 //	w - injected current
+enum __float4_cellv{
+	_cell_pos_v	= 0x00, // membrane potential
+	_cell_pos_c	= 0x01, // membrane capacitance
+	_cell_pos_spike	= 0x02, // spike onset
+	_cell_pos_i	= 0x03, // injected current
+};
 #define _cell_v( v ) ( v ).x
 #define _cell_c( v ) ( v ).y
 #define _cell_spike( v ) ( v ).z
 #define _cell_iadd( v ) ( v ).w
+
 ///////////////////////////////////////////////////////////////////////////////
 // celldat maps data which are related to neurons onto global memory
 typedef struct __lsns_align( 16 ) __cell_data{
