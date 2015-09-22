@@ -38,23 +38,39 @@ class simdata{
 // class iondata
 class iondata{
 	public:
-		iondata( void ) : RTF( 26.54f ), Z( 1 ), In( .1f ), Out( .1f ), T( 1.f ), Eds( "auto" ), B( 0.03f ), K( 0.001f ){};
-		iondata( const iondata &ion ) : RTF( 26.54f ), Z( ion.Z ), In( ion.In ), Out( ion.Out ), T( ion.T ), Eds( ion.Eds ), B( ion.B ), K( ion.K ){};
+		iondata( void ) : RTF( 26.54f ), Z( 1 ), In( .1f ), In0( 0.f ), Out( .1f ), T( 1.f ), IType( 0 ), 
+			PType( 0 ), Eds( 0.f ), B( 0.03f ), K( 0.001f ), Rpmp( 1.f ), Rch( 1.f ), Kp( 15.f ){};
+		iondata( const iondata &ion ) : RTF( 26.54f ), Z( ion.Z ), In( ion.In ), In0( ion.In0 ), Out( ion.Out ), T( ion.T ), IType( ion.IType ),
+			PType( ion.PType ), Eds( ion.Eds ), B( ion.B ), K( ion.K ), Rpmp( ion.Rpmp ), Rch( ion.Rch ), Kp( ion.Kp ){};
 		~iondata( void ){};
+/*
+//				nns<<"Rpmp = "<<pops[i].paraset.ions.ion_para[j].Rpmp<<endl;
+//				nns<<"Rch = "<<pops[i].paraset.ions.ion_para[j].Rch<<endl;
+//				nns << "Kp = " << Network().Ions[j]().K << endl;
+
+*/
 	public:
 		iondata &operator = ( const iondata &ion );
 	public:
 		bool loadpar( istream &file, const string &parname );
 		bool validate( const string &type );
+		bool save( ostream &file );
 	public:
+		int IType;
+		int PType;
 		int Z;
 		float RTF;
-		float In;
-		float Out;
+		hhnpair<float> In;
+		hhnpair<float> In0;
+		hhnpair<float> Out;
+		hhnpair<float> Eds;
+
+		float Rpmp;
+		float Rch;
+		float Kp;
 		float T;
 		float B;		// Ca specific
 		float K;		// Ca specific
-		string Eds;
 };
 
 /////////////////////////////////////////////////////////////////////////////

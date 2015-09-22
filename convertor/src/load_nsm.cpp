@@ -84,11 +84,17 @@ bool simdata::validate( const string &type )
 iondata &iondata::operator = ( const iondata &ion )
 {
 	In = ion.In;
+	In0 = ion.In0;
 	Out = ion.Out;
 	T = ion.T;
 	Eds = ion.Eds;
+	Kp = ion.Kp;
+	Rpmp = ion.Rpmp;
+	Rch = ion.Rch;
 	B = ion.B;
 	K = ion.K;
+	IType = ion.IType;
+	PType = ion.PType;
 	return *this;
 };
 
@@ -97,6 +103,18 @@ bool iondata::loadpar( istream &file, const string &parname )
 	string str;
 	if( parname == "In"){
 		file >> str >> In;
+		return true;
+	}
+	else if( parname == "In0"){
+		file >> str >> In0;
+		return true;
+	}
+	else if( parname == "Rpmp"){
+		file >> str >> Rpmp;
+		return true;
+	}
+	else if( parname == "Rch"){
+		file >> str >> Rch;
 		return true;
 	}
 	else if( parname == "Out"){
@@ -124,20 +142,68 @@ bool iondata::loadpar( istream &file, const string &parname )
 
 bool iondata::validate( const string &type )
 {
-	if( type == "Na" || type == "K" ){
+	if( type == "Na" ){
+		IType = 1;
+		PType = 0;
+		Z = 1;
+	}
+	else if( type == "K" ){
+		IType = 2;
+		PType = 0;
 		Z = 1;
 	}
 	else if( type == "Ca" ){
+		IType = 3;
+		PType = 3;
 		Z = 2;
 	}
 	else if( type == "Cl" ){
+		IType = 4;
+		PType = 0;
 		Z = -1;
 	}
 	else{
+		IType = 0;
+		PType = 0;
 		Z = 1;
 		string mess = "unknown ions type:" + type;
 		message( mess.c_str(), "Warning" );
 		return false;
+	}
+	return true;
+}
+
+bool iondata::save( ostream &file )
+{
+	file << "IonType = " << IType << endl;
+	file << "PumpType = " << PType << endl;
+	if( IType == 0 ){ // non-spec Eds
+		file << "E = " << Eds << endl;
+	}
+	else{ // Na, K, Ca, Cl etc
+		float eds = ( RTF/Z )*log( Out.X/In.X );
+		file << "E = " << eds << endl;
+		file << "Z = " << Z << endl;
+		file << "Cin = " << In << endl;
+		file << "Cout = " << Out << endl;
+	}
+	if( PType != 0){ // ion pump
+		file << "T = " << T << endl;		 // time constant
+		file << "InEq = " << In0 << endl;
+		file << "Rpmp = " << Rpmp << endl;
+		file << "Rch = " << Rch << endl;
+		switch( PType ){
+			case 1: // Na pump
+				file << "Kp = " << Kp << endl;
+				break;
+			case 2: // Ca standard
+				break;
+			case 3: // Ca shell
+				file << "K = " << K << endl;
+				file << "B = " << B << endl;
+				break;
+			default:;
+		}
 	}
 	return true;
 }
@@ -850,46 +916,216 @@ bool nsm_model::save_model( const char *filename )
 		nns << "</CTR PARAM>" << endl;
 		nns << endl;
 		size_t npops = Network().Units().PData.size();
-		nns << "<POPULATIONS>" << endl;
+		nns << "<POPULATIONS>" << endl;					// Populations definition
 		nns << "N of Pops = " << npops << endl;
-		nns << "</POPULATIONS>" << endl;
-/*
-		for( size_t i = 0; i < Network().Units.size(); ++i ){
-
-		}
-*/
-/*
-		Network.save( nns );
-bool netdata::save( ostream &file )
-{
-	float Threshold;
-	vector<netunit<iondata >> Ions;
-	vector<netunit<syndata >> Syns;
-	vector<netunit<dsyndata >> DSyns;
-	vector<netunit<ssyndata >> SSyns;
-	vector<netunit<unitdata >> Units;
-	vector<netunit<condata >> Connections;
-	vector<netunit<ctrdata >> Controls;
-
-	for( size_t i = 0; i < Units.size(); ++i ){
-		Units[i].save( file );
-		bool unitdata::save( ostream &file )
-		{
-				vector<netunit<popdata >> PData;	// list of populations
-				vector<netunit<drivedata >> DData;	// list of drives
-				vector<netunit<outdata >> OData;	// list of outputs
-			file << "<POPULATIONS>" << endl;
-			file << "N of Pops = " << PData.size() << endl;
-
-			for( size_t i = 0; i < PData.size(); ++i ){
+		for( size_t i = 0; i < npops; ++i ){
+//			nichs = pops[i].neu_s.nICh;
+//			nions = pops[i].paraset.ions.nIons;
+			nns << "<POP "<< i << ">" << endl;
+			nns << "Name = " << Network().Units().PData[i].Name << endl;
+			nns << "ID = " << i << endl;
+			nns << "Size = " << Network().Units().PData[i]().Size << endl;
+			nns << "Threshold = " << Network().Threshold << endl;
+			nns << endl;
+			nns << "<NEURON PARAM>" << endl;
+			nns << "Cm = " << Network().Units().PData[i]().Hhn().C << endl; // Cm must be parameter of compartment
+			nns << "Vm = " << Network().Units().PData[i]().Hhn().Cmps[0]().V << endl;
+			nns << "Type = " << 1 << endl;					// ????
+			nns << "<ICHANNELS PARAM>" << endl;
+			size_t nICH = Network().Units().PData[i]().Hhn().Cmps[0]().Chans.size();
+			nns << "nICH = " << nICH << endl;
+			nns << "nICHTypeList = {";
+			for( size_t j = 0; j < nICH-1; ++j ){
+				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name << ", "; // must be type instead of name
 			}
-			file << "</POPULATIONS>" << endl;
-			return true;
-		}
-	}
-	return true;
-}
+			if( nICH > 0 ){
+				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[nICH-1].Name; // must be type instead of name
+			}
+			nns << "}" << endl;
+			nns << "nICHNameList = {";
+			for( size_t j = 0; j < nICH-1; ++j ){
+				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name << ", ";
+			}
+			if( nICH > 0 ){
+				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[nICH-1].Name;
+			}
+			nns << "}" << endl << endl;
+			for( size_t j = 0; j < nICH; ++j ){
+				nns << "<ICH " << j << ">" << endl;
+/*
+				switch (pops[i].neu_s.IChTypeList[j]){
+				case 1:
+					nns<<"Name = "<<pops[i].paraset.ichs.g_para.at(tc1).name<<endl;
+					nns<<"ID = "<<pops[i].paraset.ichs.g_para.at(tc1).ID<<endl;
+
+					nns<<"g = "<<pops[i].paraset.ichs.g_para.at(tc1).g.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).g.var<<")"<<endl;
+					nns<<"E = "<<pops[i].paraset.ichs.g_para.at(tc1).E.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).E.var<<")"<<endl;
+					nns<<"mpower = "<<pops[i].paraset.ichs.g_para.at(tc1).mpower<<endl;
+					nns<<"hpower = "<<pops[i].paraset.ichs.g_para.at(tc1).hpower<<endl;
+
+					nns<<"Vhfm = "<<pops[i].paraset.ichs.g_para.at(tc1).Vhfm.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).Vhfm.var<<")"<<endl;
+					nns<<"km = "<<pops[i].paraset.ichs.g_para.at(tc1).km.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).km.var<<")"<<endl;
+					nns<<"tm = "<<pops[i].paraset.ichs.g_para.at(tc1).tm.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).tm.var<<")"<<endl;
+					nns<<"ktm = "<<pops[i].paraset.ichs.g_para.at(tc1).ktm.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).ktm.var<<")"<<endl;
+
+					nns<<"Vhfh = "<<pops[i].paraset.ichs.g_para.at(tc1).Vhfh.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).Vhfh.var<<")"<<endl;
+					nns<<"kh = "<<pops[i].paraset.ichs.g_para.at(tc1).kh.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).kh.var<<")"<<endl;
+					nns<<"th = "<<pops[i].paraset.ichs.g_para.at(tc1).th.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).th.var<<")"<<endl;
+					nns<<"kth = "<<pops[i].paraset.ichs.g_para.at(tc1).kth.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).kth.var<<")"<<endl;
+
+					tc1++;
+					break;
+				case 2:
+					nns<<"Name = "<<pops[i].paraset.ichs.m_para.at(tc2).name<<endl;
+					nns<<"ID = "<<pops[i].paraset.ichs.m_para.at(tc2).ID<<endl;
+
+					nns<<"g = "<<pops[i].paraset.ichs.m_para.at(tc2).g.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).g.var<<")"<<endl;
+					nns<<"E = "<<pops[i].paraset.ichs.m_para.at(tc2).E.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).E.var<<")"<<endl;
+					nns<<"mpower = "<<pops[i].paraset.ichs.m_para.at(tc2).mpower<<endl;
+
+					nns<<"Vhfm = "<<pops[i].paraset.ichs.m_para.at(tc2).Vhfm.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).Vhfm.var<<")"<<endl;
+					nns<<"km = "<<pops[i].paraset.ichs.m_para.at(tc2).km.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).km.var<<")"<<endl;
+					nns<<"tm = "<<pops[i].paraset.ichs.m_para.at(tc2).tm.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).tm.var<<")"<<endl;
+					nns<<"ktm = "<<pops[i].paraset.ichs.m_para.at(tc2).ktm.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).ktm.var<<")"<<endl;
+
+					tc2++;
+					break;
+				case 3:
+					nns<<"Name = "<<pops[i].paraset.ichs.h_para.at(tc3).name<<endl;
+					nns<<"ID = "<<pops[i].paraset.ichs.h_para.at(tc3).ID<<endl;
+
+					nns<<"g = "<<pops[i].paraset.ichs.h_para.at(tc3).g.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).g.var<<")"<<endl;
+					nns<<"E = "<<pops[i].paraset.ichs.h_para.at(tc3).E.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).E.var<<")"<<endl;
+					nns<<"hpower = "<<pops[i].paraset.ichs.h_para.at(tc3).hpower<<endl;
+
+					nns<<"Vhfh = "<<pops[i].paraset.ichs.h_para.at(tc3).Vhfh.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).Vhfh.var<<")"<<endl;
+					nns<<"kh = "<<pops[i].paraset.ichs.h_para.at(tc3).kh.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).kh.var<<")"<<endl;
+					nns<<"th = "<<pops[i].paraset.ichs.h_para.at(tc3).th.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).th.var<<")"<<endl;
+					nns<<"kth = "<<pops[i].paraset.ichs.h_para.at(tc3).kth.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).kth.var<<")"<<endl;
+
+					tc3++;
+					break;
+				case 4:
+					nns<<"Name = "<<pops[i].paraset.ichs.ng_para.at(tc4).name<<endl;
+					nns<<"ID = "<<pops[i].paraset.ichs.ng_para.at(tc4).ID<<endl;
+
+					nns<<"g = "<<pops[i].paraset.ichs.ng_para.at(tc4).g.val<<" ("<<pops[i].paraset.ichs.ng_para.at(tc4).g.var<<")"<<endl;
+					nns<<"E = "<<pops[i].paraset.ichs.ng_para.at(tc4).E.val<<" ("<<pops[i].paraset.ichs.ng_para.at(tc4).E.var<<")"<<endl;
+
+					tc4++;
+					break;
+				
+				};
 */
+				nns << "</ICH " << j << ">" << endl;
+				nns << endl;
+			}
+			nns << "</ICHANNELS PARAM>" << endl;
+			nns << "</NEURON PARAM>" << endl;
+			nns << endl;
+			nns << "<IONS PARAM>" << endl;
+			size_t nIONS = Network().Ions.size();
+			nns << "nIONS = " << nIONS << endl;
+			for( size_t j = 0; j < nIONS; ++j ){
+				nns << "<ION " << j << ">" << endl;
+				nns << "Name = " << Network().Ions[j].Name << endl;
+				nns << "ID = " << j << endl;
+				Network().Ions[j]().save( nns );
+				nns << "</ION " << j << ">" << endl;
+				nns << endl;
+			};
+			nns << "</IONS PARAM>" << endl;
+			nns << endl;
+			nns << "</POP "<< i << ">" << endl;
+			nns<<endl;
+		}
+		nns << "</POPULATIONS>" << endl;
+		nns << "<NETWORKS>" << endl;						// All Networks definition
+/*
+		nns<<endl;
+		nns<<"N of Nets = "<<nnets<<endl;
+		nns<<"N of MNets = "<<nmnets<<endl;
+		nns<<endl;
+
+		for (int i=0;i<nnets;i++) {
+
+			nns<<"<NET "<<i<<">"<<endl;
+			nns<<"Name = "<<nets[i].name<<endl;
+			nns<<"OnOff = "<<nets[i].OnOff<<endl;
+			nns<<"nList = "<<nets[i].nList<<endl;
+
+			nns<<"pnameList = {";
+			for (int j=0;j<nets[i].nList;j++) {
+				if (j != nets[i].nList-1)
+					nns<<nets[i].pnameList[j]<<", ";
+				else
+					nns<<nets[i].pnameList[j]<<"}"<<endl;
+			};
+
+			nns<<"pidList = {";
+			for (int j=0;j<nets[i].nList;j++) {
+				if (j != nets[i].nList-1)
+					nns<<nets[i].pidList[j]<<", ";
+				else
+					nns<<nets[i].pidList[j]<<"}"<<endl;
+			};
+
+			for (int j=0;j<nets[i].pconn.size();j++) {
+				nns<<"<PCONN "<<j<<">"<<endl;
+				nns<<"Source Pop = "<<nets[i].pconn[j].spop<<endl;
+				nns<<"Source Prob = "<<nets[i].pconn[j].sprob.val<<" ("<<nets[i].pconn[j].sprob.var<<")"<<endl;
+				nns<<"Target Pop = "<<nets[i].pconn[j].tpop<<endl;
+				nns<<"Target Prob = "<<nets[i].pconn[j].tprob.val<<" ("<<nets[i].pconn[j].tprob.var<<")"<<endl;
+				nns<<"Weight = "<<nets[i].pconn[j].w.val<<" ("<<nets[i].pconn[j].w.var<<")"<<endl;
+				nns<<"</PCONN "<<j<<">"<<endl;
+			};
+			nns<<"</NET "<<i<<">"<<endl;
+			nns<<endl;
+		};
+
+		for (int i=0;i<nmnets;i++) {
+			
+			nns<<"<MNET "<<i<<">"<<endl;
+			nns<<"Name = "<<mnets[i].name<<endl;
+			nns<<"OnOff = "<<mnets[i].OnOff<<endl;
+			nns<<"nList = "<<mnets[i].nList<<endl;
+
+			nns<<"nnameList = {";
+			for (int j=0;j<mnets[i].nList;j++) {
+				if (j != mnets[i].nList-1)
+					nns<<mnets[i].nnameList[j]<<", ";
+				else
+					nns<<mnets[i].nnameList[j]<<"}"<<endl;
+			};
+
+			nns<<"nidList = {";
+			for (int j=0;j<mnets[i].nList;j++) {
+				if (j != mnets[i].nList-1)
+					nns<<mnets[i].nidList[j]<<", ";
+				else
+					nns<<mnets[i].nidList[j]<<"}"<<endl;
+			};
+			
+			for (int j=0;j<mnets[i].nconn.size();j++) {
+				nns<<"<NCONN "<<j<<">"<<endl;
+				nns<<"Source Net = "<<mnets[i].nconn[j].snet<<endl;
+				nns<<"Source Pop = "<<mnets[i].nconn[j].spop<<endl;
+				nns<<"Source Prob = "<<mnets[i].nconn[j].sprob.val<<" ("<<mnets[i].nconn[j].sprob.var<<")"<<endl;
+				nns<<"Target Net = "<<mnets[i].nconn[j].tnet<<endl;
+				nns<<"Target Pop = "<<mnets[i].nconn[j].tpop<<endl;
+				nns<<"Target Prob = "<<mnets[i].nconn[j].tprob.val<<" ("<<mnets[i].nconn[j].tprob.var<<")"<<endl;
+				nns<<"Weight = "<<mnets[i].nconn[j].w.val<<" ("<<mnets[i].nconn[j].w.var<<")"<<endl;
+				nns<<"</NCONN "<<j<<">"<<endl;
+			};
+
+			nns<<"</MNET "<<i<<">"<<endl;
+			nns<<endl;
+
+		};
+		
+*/
+		nns << "</NETWORKS>" << endl;
+
 		nns.close();
 	}
 	return false;

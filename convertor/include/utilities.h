@@ -24,7 +24,8 @@ using std::ws;
 template<class T>
 class hhnpair{
 	public:
-		hhnpair( void ) : X(), Y(){};
+		hhnpair( void ) : X( 0 ), Y( 0 ){};
+		hhnpair( const T &x ) : X( x ), Y( 0 ){};
 		hhnpair( const T &x, const T &y ) : X( x ), Y( y ){};
 		hhnpair( const hhnpair &xy )  : X( xy.X ), Y( xy.Y ){};
 		~hhnpair( void ){};
@@ -42,7 +43,10 @@ class hhnpair{
 template<class T>
 ostream &operator << ( ostream &s, const hhnpair<T> &xy )
 {
-	return s << xy.X << "(" << xy.Y << ")";
+	s << xy.X;
+	if( xy.Y != T( 0 ))
+		s << "(" << xy.Y << ")";
+	return  s;
 };
 
 template<class T>
@@ -51,13 +55,17 @@ istream &operator >> ( istream &s, hhnpair<T> &xy )
 	char ch = 0;
 	bool OK = true;
 
-	T x, y;
+	T x, y = T( 0 );
 	s >> ws >> x >> ws;
 	s.get( ch );
 	if( ch == '(' ){
 		s >> y >> ws;
 		s.get( ch );
 		OK = ( ch == ')' );
+	}
+	else if( ch == '\n' ){
+		y = T( 0 );
+		OK = true;
 	}
 	else{
 		s.putback( ch );
