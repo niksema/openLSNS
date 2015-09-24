@@ -321,6 +321,16 @@ bool ssyndata::validate( const string &type )
 /////////////////////////////////////////////////////////////////////////////
 // class chandata
 //--- constructors/destructor
+static const char *ChannelNames[] = {
+	"Na fast",
+	"NaP channel (generic)",
+	"K",
+	"KCa",
+	"CaL",
+	"Leak",
+};
+
+
 //--- public methods
 chandata &chandata::operator = ( const chandata &chdat )
 {
@@ -431,6 +441,43 @@ bool chandata::loadpar( istream &file, const string &parname )
 bool chandata::validate( const string &type )
 {
 	return true;
+}
+
+bool chandata::save( ostream &file, const string &name )
+{
+	/*
+	"Na fast"
+	"NaP channel (generic)"
+	"K"
+	"KCa"
+	"CaL"
+	"Leak"
+	*/
+	return false;
+}
+
+int chandata::type( const string &name )
+{
+	int nChan = sizeof( ChannelNames )/sizeof( char * );
+	for( int i = 0; i < nChan; ++i ){
+		if( name == ChannelNames[i] ){
+			switch( i ){
+				case 0: // Na fast
+					return 1; // m & h
+				case 1: // NaP channel (generic)
+					return 1; // m & h
+				case 2: // K 
+					return 2; // m only
+				case 3: // KCa
+					return 2; // m only
+				case 4: // CaL
+					return 2; // m only
+				case 5: // Leak
+					return 4; // no m/h
+			}
+		}
+	}
+	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -919,8 +966,8 @@ bool nsm_model::save_model( const char *filename )
 		nns << "<POPULATIONS>" << endl;					// Populations definition
 		nns << "N of Pops = " << npops << endl;
 		for( size_t i = 0; i < npops; ++i ){
-//			nichs = pops[i].neu_s.nICh;
-//			nions = pops[i].paraset.ions.nIons;
+			size_t nICH = Network().Units().PData[i]().Hhn().Cmps[0]().Chans.size();
+			size_t nIONS = Network().Ions.size();
 			nns << "<POP "<< i << ">" << endl;
 			nns << "Name = " << Network().Units().PData[i].Name << endl;
 			nns << "ID = " << i << endl;
@@ -932,14 +979,15 @@ bool nsm_model::save_model( const char *filename )
 			nns << "Vm = " << Network().Units().PData[i]().Hhn().Cmps[0]().V << endl;
 			nns << "Type = " << 1 << endl;					// ????
 			nns << "<ICHANNELS PARAM>" << endl;
-			size_t nICH = Network().Units().PData[i]().Hhn().Cmps[0]().Chans.size();
 			nns << "nICH = " << nICH << endl;
 			nns << "nICHTypeList = {";
 			for( size_t j = 0; j < nICH-1; ++j ){
-				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name << ", "; // must be type instead of name
+				string name = Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name;
+				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j]().type( name ) << ", "; // must be type instead of name
 			}
 			if( nICH > 0 ){
-				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[nICH-1].Name; // must be type instead of name
+				string name = Network().Units().PData[i]().Hhn().Cmps[0]().Chans[nICH-1].Name;
+				nns << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[nICH-1]().type( name ); // must be type instead of name
 			}
 			nns << "}" << endl;
 			nns << "nICHNameList = {";
@@ -952,6 +1000,10 @@ bool nsm_model::save_model( const char *filename )
 			nns << "}" << endl << endl;
 			for( size_t j = 0; j < nICH; ++j ){
 				nns << "<ICH " << j << ">" << endl;
+				nns << "Name = " << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name << endl;
+				nns << "ID = " << j << endl;
+//				Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j]().save( nns );
+
 /*
 				switch (pops[i].neu_s.IChTypeList[j]){
 				case 1:
@@ -1024,7 +1076,6 @@ bool nsm_model::save_model( const char *filename )
 			nns << "</NEURON PARAM>" << endl;
 			nns << endl;
 			nns << "<IONS PARAM>" << endl;
-			size_t nIONS = Network().Ions.size();
 			nns << "nIONS = " << nIONS << endl;
 			for( size_t j = 0; j < nIONS; ++j ){
 				nns << "<ION " << j << ">" << endl;

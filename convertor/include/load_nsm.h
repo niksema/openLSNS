@@ -140,6 +140,8 @@ class chandata{
 	public:
 		bool loadpar( istream &file, const string &parname );
 		bool validate( const string &type );
+		int type( const string &name );
+		bool save( ostream &file, const string &name );
 	public:
 		hhnpair<float> M;
 		hhnpair<float> H;

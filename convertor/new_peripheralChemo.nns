@@ -10,3 +10,17 @@ SimStep = 0.1
 SimDuration = 40000
 </CTR PARAM>
 
+<POPULATIONS>
+N of Pops = 15
+<POP 0>
+Name = ramp-I (rVRG)
+ID = 0
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
