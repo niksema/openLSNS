@@ -16,9 +16,9 @@
 // time constant for modified generic gate variable: t0+2*t/( exp(-( v-v12 )/slp )+exp(( v-v12_2 )/slp2 ))
 #define lsns_ggate_tmod( t0, t, v, v12, slp, v12_2, slp_2 ) \
 	( t0 )+lsns_div( 2*( t ), lsns_exp( -lsns_div(( v )-( v12 ), slp ))+lsns_exp( lsns_div(( v )-( v12_2 ), slp_2 )))
-// alha/beta gate variable: a*( b*v-v12 )/( c+exp(-( v-v12 )/slp ))
+// alha/beta gate variable: a*( b*v-v12 )/( exp(( v-v12 )/slp )-c )
 #define lsns_abgate( v, v12, slp, a, b, c ) \
-	( a )*lsns_div(( b )*( v )-( v12 ), ( c )+lsns_exp( -lsns_div(( v )-( v12 ), slp )))
+	( a )*lsns_div(( b )*( v )-( v12 ), lsns_exp( lsns_div(( v )-( v12 ), slp ))-( c ))
 ///////////////////////////////////////////////////////////////////////////////
 // +implementation of the gate variables of all types
 //=============================================================================

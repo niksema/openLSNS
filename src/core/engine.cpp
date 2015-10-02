@@ -234,6 +234,7 @@ void chan_kernel( int index, chandat *data )
 //todo: } possible CUDA optimization
 	// perform calculations
 	float mp, hp;
+//todo: keep time constants instead power in 'mh' variable.  powers for activation and inactivateion should be stored in Gates structure
 	proc_gate( _gate_typem( tp ), Gates[_gate_parm( tp )], step, vm, _chan_lutm( lut ), pIonsE, pWsyn, _gate_powm( mh ), _gate_m( mh ), mp );
 	proc_gate( _gate_typeh( tp ), Gates[_gate_parh( tp )], step, vm, _chan_luth( lut ), pIonsE, pWsyn, _gate_powh( mh ), _gate_h( mh ), hp );
 	_chan_g( g ) = _chan_gmax( g )*mp*hp;						// g

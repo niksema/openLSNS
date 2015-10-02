@@ -133,7 +133,7 @@ class chandata{
 		chandata( void ) : M( 1.f, 0.f ), H( 1.f, 0.f ), Gmax( 1.f, 0.f ), Eds( -1.f, -1.f ), Pcl( 0.45f, 0.f ), Pna( 0.05f, 0.f ), Vg( "false" ){}; //(auto) Eds( -1.f, -1.f ) specific reversal potential, related to ion dynamics 
 		chandata( const chandata &chdat ) : M( chdat.M ), H( chdat.H ), Gmax( chdat.Gmax ), Eds( chdat.Eds ), Pcl( chdat.Pcl ), Pna( chdat.Pna ), Tm( chdat.Tm ), Th( chdat.Th ), 
 			PowM( chdat.PowM ), PowH( chdat.PowH ), V12m( chdat.V12m ), V12h( chdat.V12h ), Slpm( chdat.Slpm ), Slph( chdat.Slph ),	V12tm( chdat.V12tm ), V12th( chdat.V12th ), 
-			Slptm( chdat.Slptm ), Slpth( chdat.Slpth ), Vg( chdat.Vg ){};
+			Slptm( chdat.Slptm ), Slpth( chdat.Slpth ), Vg( chdat.Vg ), Family( chdat.Family ){};
 		~chandata( void ){};
 	public:
 		chandata &operator = ( const chandata &chdat );
@@ -141,8 +141,9 @@ class chandata{
 		bool loadpar( istream &file, const string &parname );
 		bool validate( const string &type );
 		int type( const string &name );
-		bool save( ostream &file, const string &name );
+		bool save( ostream &file, const string &name, int id );
 	public:
+		string Family;
 		hhnpair<float> M;
 		hhnpair<float> H;
 		hhnpair<float> Tm;

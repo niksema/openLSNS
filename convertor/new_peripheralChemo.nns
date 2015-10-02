@@ -24,3 +24,1907 @@ Vm = -60
 Type = 1
 <ICHANNELS PARAM>
 nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 0>
+
+<POP 1>
+Name = early-I (2) (rVRG)
+ID = 1
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 5
+nICHTypeList = {1, 2, 4, 2, 1}
+nICHNameList = {Na fast, K, Leak, KCa, CaL}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+<ICH 3>
+Name = KCa
+ID = 3
+g = 6
+E = -1(-1)
+mpower = 2
+A = 50000000
+B = 1
+Lymbda = 2
+Gamma = 1
+tm = 700000
+</ICH 3>
+
+<ICH 4>
+Name = CaL
+ID = 4
+g = 0.05
+E = -1(-1)
+mpower = 1
+hpower = 1
+Vhfm = 27.4
+km = 5.7
+tm0 = 0.5
+Vhfh = 52.4
+kh = 5.2
+th0 = 18
+</ICH 4>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 1>
+
+<POP 2>
+Name = pre-I (pre-BotC)
+ID = 2
+Size = 50
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 4
+nICHTypeList = {1, 2, 4, 1}
+nICHNameList = {Na fast, K, Leak, NaP channel (generic)}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 170
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 180
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 2.8
+E = -68(0.01)
+</ICH 2>
+
+<ICH 3>
+Name = NaP channel (generic)
+ID = 3
+g = 4(0.1)
+E = -1(-1)
+mpower = 1
+hpower = 1
+Vhfm = -47.1
+km = -3.1
+tm0 = 1
+Vhfh = -60
+kh = 9
+th = 4000
+kth = 9
+</ICH 3>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 2>
+
+<POP 3>
+Name = late-E (pFRG)
+ID = 3
+Size = 50
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 4
+nICHTypeList = {1, 2, 4, 1}
+nICHNameList = {Na fast, K, Leak, NaP channel (generic)}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 170
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 180
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 2.5
+E = -68(0.01)
+</ICH 2>
+
+<ICH 3>
+Name = NaP channel (generic)
+ID = 3
+g = 4(0.1)
+E = -1(-1)
+mpower = 1
+hpower = 1
+Vhfm = -47.1
+km = -3.1
+tm0 = 1
+Vhfh = -60
+kh = 9
+th = 4000
+kth = 9
+</ICH 3>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 3>
+
+<POP 4>
+Name = early-I (1) (pre-BotC)
+ID = 4
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 5
+nICHTypeList = {1, 2, 4, 2, 1}
+nICHNameList = {Na fast, K, Leak, KCa, CaL}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+<ICH 3>
+Name = KCa
+ID = 3
+g = 6
+E = -1(-1)
+mpower = 2
+A = 50000000
+B = 1
+Lymbda = 2
+Gamma = 1
+tm = 1e+006
+</ICH 3>
+
+<ICH 4>
+Name = CaL
+ID = 4
+g = 0.05
+E = -1(-1)
+mpower = 1
+hpower = 1
+Vhfm = 27.4
+km = 5.7
+tm0 = 0.5
+Vhfh = 52.4
+kh = 5.2
+th0 = 18
+</ICH 4>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 4>
+
+<POP 5>
+Name = post-I (BotC)
+ID = 5
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 5
+nICHTypeList = {1, 2, 4, 1, 2}
+nICHNameList = {Na fast, K, Leak, CaL, KCa}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+<ICH 3>
+Name = CaL
+ID = 3
+g = 0.05
+E = -1(-1)
+mpower = 1
+hpower = 1
+Vhfm = 27.4
+km = 5.7
+tm0 = 0.5
+Vhfh = 52.4
+kh = 5.2
+th0 = 18
+</ICH 3>
+
+<ICH 4>
+Name = KCa
+ID = 4
+g = 6
+E = -1(-1)
+mpower = 2
+A = 50000000
+B = 1
+Lymbda = 2
+Gamma = 1
+tm = 1.2e+007
+</ICH 4>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 5>
+
+<POP 6>
+Name = IE (pons)
+ID = 6
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 6>
+
+<POP 7>
+Name = RVLM
+ID = 7
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 7>
+
+<POP 8>
+Name = CVLM
+ID = 8
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 8>
+
+<POP 9>
+Name = pNTS
+ID = 9
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 9>
+
+<POP 10>
+Name = bNTS
+ID = 10
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 10>
+
+<POP 11>
+Name = aug-E (BotC)
+ID = 11
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 5
+nICHTypeList = {1, 2, 4, 1, 2}
+nICHNameList = {Na fast, K, Leak, CaL, KCa}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+<ICH 3>
+Name = CaL
+ID = 3
+g = 0.05
+E = -1(-1)
+mpower = 1
+hpower = 1
+Vhfm = 27.4
+km = 5.7
+tm0 = 0.5
+Vhfh = 52.4
+kh = 5.2
+th0 = 18
+</ICH 3>
+
+<ICH 4>
+Name = KCa
+ID = 4
+g = 6
+E = -1(-1)
+mpower = 2
+A = 50000000
+B = 1
+Lymbda = 2
+Gamma = 1
+tm = 1.2e+007
+</ICH 4>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 11>
+
+<POP 12>
+Name = post-I (e) (BotC)
+ID = 12
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 5
+nICHTypeList = {1, 2, 4, 1, 2}
+nICHNameList = {Na fast, K, Leak, CaL, KCa}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -63(0.01)
+</ICH 2>
+
+<ICH 3>
+Name = CaL
+ID = 3
+g = 0.05
+E = -1(-1)
+mpower = 1
+hpower = 1
+Vhfm = 27.4
+km = 5.7
+tm0 = 0.5
+Vhfh = 52.4
+kh = 5.2
+th0 = 18
+</ICH 3>
+
+<ICH 4>
+Name = KCa
+ID = 4
+g = 1.5
+E = -1(-1)
+mpower = 2
+A = 50000000
+B = 1
+Lymbda = 2
+Gamma = 1
+tm = 3e+006
+</ICH 4>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 12>
+
+<POP 13>
+Name = pc Tonic (NTS)
+ID = 13
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 350
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 13>
+
+<POP 14>
+Name = post-I (cVRG)
+ID = 14
+Size = 20
+Threshold = -35
+
+<NEURON PARAM>
+Cm = 36
+Vm = -60
+Type = 1
+<ICHANNELS PARAM>
+nICH = 3
+nICHTypeList = {1, 2, 4}
+nICHNameList = {Na fast, K, Leak}
+
+<ICH 0>
+Name = Na fast
+ID = 0
+g = 400
+E = -1(-1)
+mpower = 3
+hpower = 1
+Vhfm = 43.8
+km = 6
+tm = 0.252
+ktm = 14
+Vhfh = 67.5
+kh = 10.8
+th = 8.456
+kth = 12.8
+</ICH 0>
+
+<ICH 1>
+Name = K
+ID = 1
+g = 250
+E = -1(-1)
+mpower = 4
+AmA = -0.01
+BmA = 1
+CmA = 1
+VhfmA = -44
+kmA = -5
+AmB = 0.00346939
+BmB = 0
+CmB = 0
+VhfmB = -49
+kmB = 40
+</ICH 1>
+
+<ICH 2>
+Name = Leak
+ID = 2
+g = 6
+E = -60(0.01)
+</ICH 2>
+
+</ICHANNELS PARAM>
+</NEURON PARAM>
+
+<IONS PARAM>
+nIONS = 4
+<ION 0>
+Name = Na
+ID = 0
+IonType = 1
+PumpType = 0
+E = 55.1884
+Z = 1
+Cin = 15
+Cout = 120
+</ION 0>
+
+<ION 1>
+Name = K
+ID = 1
+IonType = 2
+PumpType = 0
+E = -94.3589
+Z = 1
+Cin = 140
+Cout = 4
+</ION 1>
+
+<ION 2>
+Name = Ca
+ID = 2
+IonType = 3
+PumpType = 3
+E = 149.815
+Z = 2
+Cin = 5e-005
+Cout = 4
+T = 500
+InEq = 0
+Rpmp = 1
+Rch = 1
+K = 0.001
+B = 0.03
+</ION 2>
+
+<ION 3>
+Name = Cl
+ID = 3
+IonType = 4
+PumpType = 0
+E = -75.9628
+Z = -1
+Cin = 4
+Cout = 70
+</ION 3>
+
+</IONS PARAM>
+
+</POP 14>
+
+</POPULATIONS>
+<NETWORKS>
+
+</NETWORKS>

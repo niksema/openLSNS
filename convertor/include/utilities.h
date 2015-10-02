@@ -30,6 +30,11 @@ class hhnpair{
 		hhnpair( const hhnpair &xy )  : X( xy.X ), Y( xy.Y ){};
 		~hhnpair( void ){};
 	public:
+		hhnpair &operator() ( const T &x, const T &y ){
+			X = x;
+			Y = y;
+			return *this;
+		};
 		hhnpair &operator = ( const hhnpair &xy ){
 			X = xy.X;
 			Y = xy.Y;

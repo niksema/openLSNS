@@ -330,7 +330,6 @@ static const char *ChannelNames[] = {
 	"Leak",
 };
 
-
 //--- public methods
 chandata &chandata::operator = ( const chandata &chdat )
 {
@@ -353,6 +352,7 @@ chandata &chandata::operator = ( const chandata &chdat )
 	PowM = chdat.PowM;
 	PowH = chdat.PowH;
 	Vg = chdat.Vg;
+	Family = chdat.Family;
 	return *this;
 }
 
@@ -408,11 +408,11 @@ bool chandata::loadpar( istream &file, const string &parname )
 		return true;
 	}
 	else if( parname == "Slptm" || parname ==  "Ktm" ){
-		file >> str >> Slpm;
+		file >> str >> Slptm;
 		return true;
 	}
 	else if( parname == "Slpth" || parname ==  "Kth" ){
-		file >> str >> Slph;
+		file >> str >> Slpth;
 		return true;
 	}
 	else if( parname == "PowM" || parname ==  "M_power" ){
@@ -440,44 +440,163 @@ bool chandata::loadpar( istream &file, const string &parname )
 
 bool chandata::validate( const string &type )
 {
+	if( Eds.X == -1. && Eds.Y == -1. ){
+
+	}
 	return true;
 }
 
-bool chandata::save( ostream &file, const string &name )
+bool chandata::save( ostream &file, const string &name, int id )
 {
-	/*
-	"Na fast"
-	"NaP channel (generic)"
-	"K"
-	"KCa"
-	"CaL"
-	"Leak"
-	*/
-	return false;
+	file << "Name = " << name << endl;
+	file << "ID = " << id << endl;
+	file << "g = " << Gmax << endl;
+	file << "E = " << Eds << endl;
+	if( Family == "generic" ){
+		switch( type( name ) ){
+			case 1:
+				file << "mpower = "<< PowM.X << endl;
+				file << "hpower = "<< PowH.X << endl;
+				file << "Vhfm = "<< V12m << endl;
+				file << "km = "<< Slpm <<endl;
+				if( Slptm.X > 0.f ){
+					file << "tm = "<< Tm << endl;
+					file << "ktm = "<< Slptm << endl;
+				}
+				else{
+					file << "tm0 = "<< Tm << endl;
+				}
+				file << "Vhfh = "<< V12h << endl;
+				file << "kh = "<< Slph <<endl;
+				if( Slpth.X > 0.f ){
+					file << "th = "<< Th << endl;
+					file << "kth = "<< Slpth << endl;
+				}
+				else{
+					file << "th0 = "<< Th << endl;
+				}
+				break;
+			case 2:
+				file << "mpower = "<< PowM.X << endl;
+				file << "Vhfm = "<< V12m << endl;
+				file << "km = "<< Slpm <<endl;
+				if( Slptm.X > 0.f ){
+					file << "tm = "<< Tm << endl;
+					file << "ktm = "<< Slptm << endl;
+				}
+				else{
+					file << "tm0 = "<< Tm << endl;
+				}
+				break;
+			case 3:
+				file << "hpower = "<< PowH.X << endl;
+				file << "Vhfh = "<< V12h << endl;
+				file << "kh = "<< Slph <<endl;
+				if( Slpth.X > 0.f ){
+					file << "th = "<< Th << endl;
+					file << "kth = "<< Slpth << endl;
+				}
+				else{
+					file << "th0 = "<< Th << endl;
+				}
+				break;
+			case 4:
+				break;
+			default:
+				file << "unknown type of the channel" << endl;
+		}
+	}
+	else if( Family == "ab-type" ){
+		switch( type( name )){
+			case 2:
+				file << "mpower = " << PowM.X << endl;
+				file << "AmA = " << -0.01 << endl;
+				file << "BmA = " << 1 << endl;
+				file << "CmA = " << 1 << endl;
+				file << "VhfmA = " << -44 << endl;
+				file << "kmA = " << -5 << endl;
+
+				file << "AmB = " << 0.17/49.f << endl;
+				file << "BmB = " << 0 << endl;
+				file << "CmB = " << 0 << endl;
+				file << "VhfmB = " << -49 << endl;
+				file << "kmB = " << 40 << endl;
+				break;
+			default:
+				file << "unknown type of the channel" << endl;
+		}
+	}
+	else if( Family == "KCA" ){
+		switch( type( name ) ){
+			case 2:
+				file << "mpower = "<< PowM.X << endl;
+				file << "A = "<< 50000000 << endl;
+				file << "B = "<< 1.f << endl;
+				file << "Lymbda = "<< 2.f << endl;
+				file << "Gamma = "<< 1.f << endl;
+				file << "tm = "<< Tm << endl;
+				break;
+			default:
+				file << "unknown type of the channel" << endl;
+		}
+	}
+	else{
+		return false;
+	}
+	return true;
 }
 
 int chandata::type( const string &name )
 {
+	Family = "";
 	int nChan = sizeof( ChannelNames )/sizeof( char * );
 	for( int i = 0; i < nChan; ++i ){
 		if( name == ChannelNames[i] ){
 			switch( i ){
 				case 0: // Na fast
+					Family = "generic";
+					PowM( 3, 0 );
+					PowH( 1, 0 );
+					V12m( 43.8f, 0 );
+					Slpm( 6.f, 0 );
+					V12h( 67.5f, 0 );
+					Slph( 10.8f, 0 );
+					Tm( 0.252f, 0 );
+					Th( 8.456f, 0);
+					Slptm( 14.f, 0 );
+					Slpth( 12.8f, 0 );
 					return 1; // m & h
 				case 1: // NaP channel (generic)
+					Family = "generic";
 					return 1; // m & h
 				case 2: // K 
+					Family = "ab-type";
+					PowM( 4, 0 );
+					Tm( 7.f, 0 );
 					return 2; // m only
 				case 3: // KCa
+					Family = "KCA";
+					PowM( 2, 0 );
+					Tm.X *= 1000.f;
 					return 2; // m only
 				case 4: // CaL
-					return 2; // m only
+					Family = "generic";
+					PowM( 1, 0 );
+					PowH( 1, 0 );
+					V12m( 27.4f, 0 );
+					Slpm( 5.7f, 0 );
+					V12h( 52.4f, 0 );
+					Slph( 5.2f, 0 );
+					Tm( 0.5f, 0 ); // t0
+					Th( 18.f, 0);  // t0
+					return 1; // m only
 				case 5: // Leak
 					return 4; // no m/h
+					Family = "leak";
 			}
 		}
 	}
-	return 0;
+	return -1;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -999,76 +1118,9 @@ bool nsm_model::save_model( const char *filename )
 			}
 			nns << "}" << endl << endl;
 			for( size_t j = 0; j < nICH; ++j ){
+				string name = Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name;
 				nns << "<ICH " << j << ">" << endl;
-				nns << "Name = " << Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name << endl;
-				nns << "ID = " << j << endl;
-//				Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j]().save( nns );
-
-/*
-				switch (pops[i].neu_s.IChTypeList[j]){
-				case 1:
-					nns<<"Name = "<<pops[i].paraset.ichs.g_para.at(tc1).name<<endl;
-					nns<<"ID = "<<pops[i].paraset.ichs.g_para.at(tc1).ID<<endl;
-
-					nns<<"g = "<<pops[i].paraset.ichs.g_para.at(tc1).g.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).g.var<<")"<<endl;
-					nns<<"E = "<<pops[i].paraset.ichs.g_para.at(tc1).E.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).E.var<<")"<<endl;
-					nns<<"mpower = "<<pops[i].paraset.ichs.g_para.at(tc1).mpower<<endl;
-					nns<<"hpower = "<<pops[i].paraset.ichs.g_para.at(tc1).hpower<<endl;
-
-					nns<<"Vhfm = "<<pops[i].paraset.ichs.g_para.at(tc1).Vhfm.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).Vhfm.var<<")"<<endl;
-					nns<<"km = "<<pops[i].paraset.ichs.g_para.at(tc1).km.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).km.var<<")"<<endl;
-					nns<<"tm = "<<pops[i].paraset.ichs.g_para.at(tc1).tm.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).tm.var<<")"<<endl;
-					nns<<"ktm = "<<pops[i].paraset.ichs.g_para.at(tc1).ktm.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).ktm.var<<")"<<endl;
-
-					nns<<"Vhfh = "<<pops[i].paraset.ichs.g_para.at(tc1).Vhfh.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).Vhfh.var<<")"<<endl;
-					nns<<"kh = "<<pops[i].paraset.ichs.g_para.at(tc1).kh.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).kh.var<<")"<<endl;
-					nns<<"th = "<<pops[i].paraset.ichs.g_para.at(tc1).th.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).th.var<<")"<<endl;
-					nns<<"kth = "<<pops[i].paraset.ichs.g_para.at(tc1).kth.val<<" ("<<pops[i].paraset.ichs.g_para.at(tc1).kth.var<<")"<<endl;
-
-					tc1++;
-					break;
-				case 2:
-					nns<<"Name = "<<pops[i].paraset.ichs.m_para.at(tc2).name<<endl;
-					nns<<"ID = "<<pops[i].paraset.ichs.m_para.at(tc2).ID<<endl;
-
-					nns<<"g = "<<pops[i].paraset.ichs.m_para.at(tc2).g.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).g.var<<")"<<endl;
-					nns<<"E = "<<pops[i].paraset.ichs.m_para.at(tc2).E.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).E.var<<")"<<endl;
-					nns<<"mpower = "<<pops[i].paraset.ichs.m_para.at(tc2).mpower<<endl;
-
-					nns<<"Vhfm = "<<pops[i].paraset.ichs.m_para.at(tc2).Vhfm.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).Vhfm.var<<")"<<endl;
-					nns<<"km = "<<pops[i].paraset.ichs.m_para.at(tc2).km.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).km.var<<")"<<endl;
-					nns<<"tm = "<<pops[i].paraset.ichs.m_para.at(tc2).tm.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).tm.var<<")"<<endl;
-					nns<<"ktm = "<<pops[i].paraset.ichs.m_para.at(tc2).ktm.val<<" ("<<pops[i].paraset.ichs.m_para.at(tc2).ktm.var<<")"<<endl;
-
-					tc2++;
-					break;
-				case 3:
-					nns<<"Name = "<<pops[i].paraset.ichs.h_para.at(tc3).name<<endl;
-					nns<<"ID = "<<pops[i].paraset.ichs.h_para.at(tc3).ID<<endl;
-
-					nns<<"g = "<<pops[i].paraset.ichs.h_para.at(tc3).g.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).g.var<<")"<<endl;
-					nns<<"E = "<<pops[i].paraset.ichs.h_para.at(tc3).E.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).E.var<<")"<<endl;
-					nns<<"hpower = "<<pops[i].paraset.ichs.h_para.at(tc3).hpower<<endl;
-
-					nns<<"Vhfh = "<<pops[i].paraset.ichs.h_para.at(tc3).Vhfh.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).Vhfh.var<<")"<<endl;
-					nns<<"kh = "<<pops[i].paraset.ichs.h_para.at(tc3).kh.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).kh.var<<")"<<endl;
-					nns<<"th = "<<pops[i].paraset.ichs.h_para.at(tc3).th.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).th.var<<")"<<endl;
-					nns<<"kth = "<<pops[i].paraset.ichs.h_para.at(tc3).kth.val<<" ("<<pops[i].paraset.ichs.h_para.at(tc3).kth.var<<")"<<endl;
-
-					tc3++;
-					break;
-				case 4:
-					nns<<"Name = "<<pops[i].paraset.ichs.ng_para.at(tc4).name<<endl;
-					nns<<"ID = "<<pops[i].paraset.ichs.ng_para.at(tc4).ID<<endl;
-
-					nns<<"g = "<<pops[i].paraset.ichs.ng_para.at(tc4).g.val<<" ("<<pops[i].paraset.ichs.ng_para.at(tc4).g.var<<")"<<endl;
-					nns<<"E = "<<pops[i].paraset.ichs.ng_para.at(tc4).E.val<<" ("<<pops[i].paraset.ichs.ng_para.at(tc4).E.var<<")"<<endl;
-
-					tc4++;
-					break;
-				
-				};
-*/
+				Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j]().save( nns, name, j );
 				nns << "</ICH " << j << ">" << endl;
 				nns << endl;
 			}
@@ -1092,8 +1144,8 @@ bool nsm_model::save_model( const char *filename )
 		}
 		nns << "</POPULATIONS>" << endl;
 		nns << "<NETWORKS>" << endl;						// All Networks definition
-/*
 		nns<<endl;
+/*
 		nns<<"N of Nets = "<<nnets<<endl;
 		nns<<"N of MNets = "<<nmnets<<endl;
 		nns<<endl;
