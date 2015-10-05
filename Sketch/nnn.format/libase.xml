@@ -1,0 +1,150 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <description>
+	The library of basic network units which supported by LSNS 1.0 engine
+</description>
+<include lib="default"/> <!-- import all modules from default library -->
+<template>
+	<random>
+		<rnd name="grnd"> <!-- specify the name of the method that generated this description -->
+			<description>
+				Pseudorandom number generator.
+				Generate pseudo-random numbers that are normally distributed around mean (m) with chosen variance (v).
+			</description>
+			<parameters>
+				<m name="Mean">0</m>
+				<v name="Variance">0</v>
+			</parameters>
+		</rnd>
+		<rnd name="urnd">
+			<description>
+				Pseudorandom number generator.
+				Generate pseudo-random numbers that are uniformly distributed around mean (m) with chosen variance (v).
+			</description>
+			<parameters>
+				<m name="Mean">0</m>
+				<v name="Variance">0</v>
+			</parameters>
+		</rnd>
+	</random>
+	<gates>
+		<gate name="generic instant">
+			<description>
+				The generic description of a gate variable (M|H) (activation or inactivation).
+				T*d[M/H]/dt = [M/H]inf-[M/H]
+				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
+				T = 0
+			</description>
+			<parameters>
+				<pow name="Power">0</pow>
+				<v12 name="Half-voltage">0</v12>
+				<slp name="Slope">1<slp>
+			</parameters>
+		</gate>
+		<gate name="generic">
+			<description>
+				The generic description of a gate variable (M|H) (activation or inactivation).
+				T*d[M/H]/dt = [M/H]inf-[M/H]
+				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
+				T = T0+Tmax/cosh((v-v12T)/slpT)
+			</description>
+			<parameters>
+				<init name="Initial value" xpath="/template/random/rnd" default="grnd">(0,0)</init>
+				<pow name="Power">0</pow>
+				<v12 name="Half-voltage">0</v12>
+				<slp name="Slope">1<slp>
+				<T0 name="Bias of time constant">0</T0>
+				<Tmax name="Maximal time constant">0.1</Tmax>
+				<v12T name="Half-voltage for time constant">0</v12T>
+				<slpT name="Slope for time constant">1</slpT>
+			</parameters>
+		</gate>
+		<gate name="generic modified">
+			<description>
+				The generic description of a gate variable (M|H) (activation or inactivation).
+				T*d[M/H]/dt = [M/H]inf-[M/H]
+				[M|H]inf = 1/( 1+exp(-(v-v12 )/slp )
+				T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
+			</description>
+			<parameters>
+				<init name="Initial value" xpath="/template/random/rnd" default="grnd">(0,0)</init>
+				<pow name="Power">0</pow>
+				<v12 name="Half-voltage">0</v12>
+				<slp name="Slope">1<slp>
+				<T0 name="Bias of time constant">0</T0>
+				<Tmax name="Maximal time constant">0.1</Tmax>
+				<v12T name="Half-voltage for time constant1">0</v12T>
+				<v12T2 name="Half-voltage for time constant2">0</v12T2>
+				<slpT name="Slope for time constant1">1</slpT>
+				<slpT2 name="Slope for time constant2">1</slpT2>
+			</parameters>
+		</gate>
+		<gate name="generic A-gate">
+			<description>
+				The generic description of a gate variable (M|H) (activation or inactivation).
+				T*d[M/H]/dt = [M/H]inf-[M/H]
+				[M|H]inf = 1/( 1+exp(-(v-v12 )/slp )
+				T = Tup;
+				if V less than Vup
+					T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
+			</description>
+			<parameters>
+				<init name="Initial value" xpath="/template/random/rnd" default="grnd">(0,0)</init>
+				<pow name="Power">0</pow>
+				<v12 name="Half-voltage">0</v12>
+				<slp name="Slope">1<slp>
+				<T0 name="Bias of time constant">0</T0>
+				<Tmax name="Maximal time constant">0.1</Tmax>
+				<v12T name="Half-voltage for time constant1">0</v12T>
+				<v12T2 name="Half-voltage for time constant2">0</v12T2>
+				<slpT name="Slope for time constant1">1</slpT>
+				<slpT2 name="Slope for time constant2">1</slpT2>
+				<Vup name="Voltage threshold">-100</Vup>
+				<Tup name="Time constant if V less Vup">0.1</Tup>
+			</parameters>
+		</gate>
+		<gate name="a-b instant">
+			<description>
+			</description>
+			<!-- etc --> 
+		</gate>
+		<gate name="a-b">
+			<description>
+			</description>
+			<!-- etc --> 
+		</gate>
+		<!-- etc --> 
+	</gates>
+	<ions>
+		<ion name="non-specific">
+			<description>
+				Non-specific reversal potential
+			</description>
+			<parameters>
+				<eds name="Reversal potential" xpath="/template/random/rnd" default="grnd">(0,0)</eds>
+			</parameters>
+		</ion>
+		<ion name="specific">
+			<description>
+				Specific reversal potential
+				E = (R*T)/(z*F)*ln([Out]/[In])
+				where R,T,F are constants
+			</description>
+			<parameters>
+				<in name="Concentration of ions inside the cell" xpath="/template/random/rnd" default="grnd">(0,0)</in>
+				<out name="Concentration of ions outside the cell" xpath="/template/random/rnd" default="grnd">(0,0)</out>
+				<Z name="Ionic charge">0</Z>
+				<eds name="Reversal potential">auto</eds>
+			</parameters>
+		<!-- etc --> 
+		</ion>
+		<dynamics>
+			<ion name="Na-ions">
+			</ion>
+			<ion name="Ca-ions">
+			</ion>
+			<ion name="Ca-ions +buffering">
+			</ion>
+		<!-- etc --> 
+		</dynamics>
+	</ions>
+</template>

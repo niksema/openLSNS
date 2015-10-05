@@ -1,0 +1,74 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <description>
+	The library of ion channels
+</description>
+<!-- <include lib="libase.xml"/> import all modules from library "libase.xml" --> 
+<include lib="libase.xml">
+	<import name="grnd" xpath="/template/random/rnd[@name='grnd']"/>
+	<import name="urnd" xpath="/template/random/rnd[@name='urnd']"/>
+	<import name="generic" xpath="/template/gates/gate[@name='generic']"/>
+	<import name="generic instant" xpath="/template/gates/gate[@name='generic instant']"/>
+	<import name="generic modified" xpath="/template/gates/gate[@name='generic modified']"/>
+	<import name="generic A-gate" xpath="/template/gates/gate[@name='generic A-gate']"/>
+	<import name="a-b" xpath="/template/gates/gate[@name='a-b']"/>
+	<import name="a-b instant" xpath="/template/gates/gate[@name='a-b instant']"/>
+	<import name="non-specific" xpath="/template/ions/ion[@name='non-specific']"/>
+	<import name="specific" xpath="/template/ions/ion[@name='specific']"/>
+	<!-- etc --> 
+</include>
+<template>
+	<channels>
+		<channel name="Na fast">
+			<description>
+				I = G*(V-Ena)
+				G = Gmax*M^pm*H^ph
+				where M - activation, pm - power of activation
+					  H - inactivation, pm - power of inactivation
+				Description of gate variables both activation and inactivation is taken from
+				[#ref]
+			</description>
+			<parameters>
+				<gmax name="Maximal conductance" xpath="/template/random/rnd" default="grnd">(0,0)</gmax>
+				<eds ref="../ions[@name='Na']"/>
+				<activation name="Activation" xpath="/template/gates/gate[@name='generic']">
+					<parameters v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3">
+						<tag name="init">(0,0)</tag>
+					</parameters>
+				</activation>
+				<inactivation name="Inactivation" xpath="/template/gates/gate[@name='generic']">
+					<parameters v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1">
+						<tag name="init">(0,0)</tag>
+					</parameters>
+				</inactivation>
+			</parameters>
+		</channel>
+		<channel name="Kdr">
+			<description>
+				I = G*(V-Ek)
+				G = Gmax*M^pm
+				where M - activation, pm - power of activation
+				Description of activation is taken from
+				[#ref]
+			</description>
+			<parameters>
+				<gmax name="Maximal conductance" xpath="/template/random/rnd" default="grnd">(0,0)</gmax>
+				<eds ref="../ions[@name='K']"/>
+				<activation name="Activation" xpath="/template/gates/gate[@name='a-b']">
+					<parameters "...">
+						<tag name="init">(0,0)</tag>
+					</parameters>
+				</activation>
+			</parameters>
+		</channel>
+		<channel name="Leak current">
+			<description>
+				I = Gmax*(V-Eleak)
+			</description>
+			<parameters>
+				<gmax name="Maximal conductance" xpath="/template/random/rnd" default="grnd">(0,0)</gmax>
+				<eds ref="../ions[@name='Leak']"/>
+			</parameters>
+		</channel>
+		<!-- etc --> 
+	</channels>
+</template>

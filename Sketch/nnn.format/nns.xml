@@ -2,217 +2,99 @@
  <description>
 	This is an example of the network description in new format
 </description>
-<common>
-	<!-- common parameters of the network --> 
-	<step name="Integration step" value="0.1"/>
-	<time name="Simulation time" value="0.1"/>
-</common>
+<include lib="libase.xml">
+	<import name="grnd" xpath="/template/random/rnd[@name='grnd']"/>
+	<import name="urnd" xpath="/template/random/rnd[@name='urnd']"/>
+	<import name="generic" xpath="/template/gates/gate[@name='generic']"/>
+	<import name="generic instant" xpath="/template/gates/gate[@name='generic instant']"/>
+	<import name="generic modified" xpath="/template/gates/gate[@name='generic modified']"/>
+	<import name="generic A-gate" xpath="/template/gates/gate[@name='generic A-gate']"/>
+	<import name="a-b" xpath="/template/gates/gate[@name='a-b']"/>
+	<import name="a-b instant" xpath="/template/gates/gate[@name='a-b instant']"/>
+	<import name="non-specific" xpath="/template/ions/ion[@name='non-specific']"/>
+	<import name="specific" xpath="/template/ions/ion[@name='specific']"/>
+	<!-- etc --> 
+</include>
+<include lib="channels.xml">
+	<import name="Na fast" xpath="/template/channels/channel[@name='Na fast']"/>
+	<import name="Kdr" xpath="/template/channels/channel[@name='Kdr']"/>
+	<import name="Leak current" xpath="/template/channels/channel[@name='Leak current']"/>
+	<!-- etc --> 
+</include>
 <template>
-	<!-- reusable parameters of the network --> 
-	<random>
-		<rnd name="grnd" default="true" lib="specify the name of the method that generated this description">
-			<description>
-				Pseudorandom number generator.
-				Generating pseudo-random numbers that are normally distributed around mean (m) with chosen variance (v).
-			</description>
-			<parameters>
-				<m name="Mean">0</m>
-				<v name="Variance">0</v>
-			</parameters>
-		</rnd>
-		<rnd name="urnd" lib="???">
-			<description>
-				Pseudorandom number generator.
-				Generating pseudo-random numbers that are uniformly distributed around mean (m) with chosen variance (v).
-			</description>
-			<parameters>
-				<m name="Mean">0</m>
-				<v name="Variance">0</v>
-			</parameters>
-		</rnd>
-	</random>
-	<gates>
-		<gate name="generic instant" default="true" lib="???">
-			<description>
-				The generic description of a gate variable (M|H) (activation or inactivation).
-				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
-				T = 0
-			</description>
-			<parameters>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-			</parameters>
-		</gate>
-		<gate name="generic" lib="???">
-			<description>
-				The generic description of a gate variable (M|H) (activation or inactivation).
-				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
-				T = T0+Tmax/cosh((v-v12T)/slpT)
-			</description>
-			<parameters>
-				<init name="Initial value" type="/template/random/rnd">grnd(0,0)</init>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-				<T0 name="Bias of time constant">0</T0>
-				<Tmax name="Maximal time constant">0.1</Tmax>
-				<v12T name="Half-voltage for time constant">0</v12T>
-				<slpT name="Slope for time constant">1</slpT>
-			</parameters>
-		</gate>
-		<gate name="generic modified" lib="???">
-			<description>
-				The generic description of a gate variable (M|H) (activation or inactivation).
-				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/( 1+exp(-(v-v12 )/slp )
-				T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
-			</description>
-			<parameters>
-				<init name="Initial value" type="/template/random/rnd">grnd(0,0)</init>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-				<T0 name="Bias of time constant">0</T0>
-				<Tmax name="Maximal time constant">0.1</Tmax>
-				<v12T name="Half-voltage for time constant1">0</v12T>
-				<v12T2 name="Half-voltage for time constant2">0</v12T2>
-				<slpT name="Slope for time constant1">1</slpT>
-				<slpT2 name="Slope for time constant2">1</slpT2>
-			</parameters>
-		</gate>
-		<gate name="generic A-gate" lib="???">
-			<description>
-				The generic description of a gate variable (M|H) (activation or inactivation).
-				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/( 1+exp(-(v-v12 )/slp )
-				T = Tup;
-				if V less than Vup
-					T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
-			</description>
-			<parameters>
-				<init name="Initial value" type="/template/random/rnd">grnd(0,0)</init>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-				<T0 name="Bias of time constant">0</T0>
-				<Tmax name="Maximal time constant">0.1</Tmax>
-				<v12T name="Half-voltage for time constant1">0</v12T>
-				<v12T2 name="Half-voltage for time constant2">0</v12T2>
-				<slpT name="Slope for time constant1">1</slpT>
-				<slpT2 name="Slope for time constant2">1</slpT2>
-				<Vup name="Voltage threshold">-100</Vup>
-				<Tup name="Time constant if V less Vup">0.1</Tup>
-			</parameters>
-		</gate>
-		<gate name="a-b instant" lib="???">
-			<description>
-			</description>
-			<!-- etc --> 
-		</gate>
-		<gate name="a-b" lib="???">
-			<description>
-			</description>
-			<!-- etc --> 
-		</gate>
-		<!-- etc --> 
-	</gates>
-	<ions>
-		<ion name="Non-specific" default="true" lib="???">
-			<description>
-				Non-specific reversal potential
-			</description>
-			<parameters>
-				<eds name="Reversal potential" type="/template/random/rnd">grnd(0,0)</eds>
-			</parameters>
-		</ion>
-		<ion name="Specific" lib="???">
-			<description>
-				Specific reversal potential
-				E = (R*T)/(z*F)*ln([Out]/[In])
-				where R,T,F are constants
-			</description>
-			<parameters>
-				<in name="Concentration of ions inside the cell" type="/template/random/rnd">grnd(0,0)</in>
-				<out name="Concentration of ions outside the cell" type="/template/random/rnd">grnd(0,0)</out>
-				<Z name="Ionic charge">0</Z>
-				<eds name="Reversal potential">auto</eds>
-			</parameters>
-		</ion>
-		<dynamics>
-			<ion name="Na-ions" default="true" lib="ionproc.h">
-			</ion>
-			<ion name="Ca-ions" lib="ionproc.h">
-			</ion>
-			<ion name="Ca-ions +buffering" lib="ionproc.h">
-			</ion>
-		</dynamics>
-	</ions>
-	<channels>
-		<channel name="Na fast" default="true">
-			<description>
-				I = G*(V-Ena)
-				G = Gmax*M^pm*H^ph
-				where M - activation, pm - power of activation
-					  H - inactivation, pm - power of inactivation
-				Description of gate variables both activation and inactivation is taken from
-				[#ref]
-			</description>
-			<parameters>
-				<gmax name="Maximal conductance" type="/template/random/rnd">grnd(0,0)</gmax>
-				<eds reference="../ions/Na"/>
-				<activation name="Activation" type="/template/gates/gate[@name='generic']">
-					<parameters tag="init">grnd(0,0)</parameters>
-					<parameters v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3"/>
-				</activation>
-				<inactivation name="Inactivation" type="/template/gates/gate[@name='generic']">
-					<parameters tag="init">grnd(0,0)</parameters>
-					<parameters v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1"/>
-				</inactivation>
-			</parameters>
-		</channel>
-		<channel name="Kdr">
-			<description>
-				I = G*(V-Ek)
-				G = Gmax*M^pm
-				where M - activation, pm - power of activation
-				Description of activation is taken from
-				[#ref]
-			</description>
-			<parameters>
-				<gmax name="Maximal conductance" type="/template/random/rnd">grnd(0,0)</gmax>
-				<eds reference="../ions/K"/>
-				<activation name="Activation" type="/template/gates/gate[@name='a-b']">
-					<parameters tag="init">grnd(0,0)</parameters>
-					<parameters "..." />
-				</activation>
-			</parameters>
-		</channel>
-		<channel name="Leak current">
-			<description>
-				I = Gmax*(V-Eleak)
-			</description>
-			<parameters>
-				<gmax name="Maximal conductance" type="/template/random/rnd">grnd(0,0)</gmax>
-				<eds reference="../ions/Leak"/>
-			</parameters>
-			<!-- etc --> 
-		</channel>
-		<!-- etc --> 
-	</channels>
-	<neurons>
-	</neurons>
+	<cells>
+		<cell name="Hhn-base">
+			<description>Simple model of Hodgkin-Haxley neuron</description>
+			<c name="Total capacitance">1</c>
+			<v name="Membrane potential" xpath="/template/random/rnd" default="grnd">(-60,0)</v>
+			<ions name="Na" xpath="/template/ions/ion[@name='non-specific']">
+				<description>Reversal potential for Na ions</description>
+				<parameters>
+					<tag name="eds">(55,0)</tag>
+				</parameters>
+			</ions>
+			<ions name="K" xpath="/template/ions/ion[@name='non-specific']">
+				<description>Reversal potential for K ions</description>
+				<parameters>
+					<tag name="eds">(-90,0)</tag>
+				</parameters>
+			</ions>
+			<ions name="Leak" xpath="/template/ions/ion[@name='non-specific']">
+				<description>Reversal potential for leak current</description>
+				<parameters>
+					<tag name="eds">(-60,0)</tag>
+				</parameters>
+			</ions>
+			<channels name="Na fast" xpath="/template/channels/channel[@name='Na fast']">
+				<parameters>
+					<tag name="gmax">(100,0)</tag>
+					<tag name="activation/init">(0.6,0)</tag>
+					<tag name="inactivation/init">(0.1,0)</tag>
+				</parameters>
+			</channels>
+			<channels name="Krd" xpath="/template/channels/channel[@name='Kdr']">
+				<parameters>
+					<tag name="gmax">(80,0)</tag>
+					<tag name="activation/init">(0.3,0)</tag>
+				</parameters>
+			</channels>
+			<channels name="Leak" xpath="/template/channels/channel[@name='Leak current']">
+				<parameters>
+					<tag name="gmax">(1,0.1)</tag>
+				</parameters>
+			</channels>
+		</cell>
+	<!-- etc --> 
+	</cells>
 </template>
-
 <network>
+	<!-- common parameters of the network --> 
+	<common>
+		<step name="Integration step">0.1</step>
+		<time name="Simulation time">1000</time>
+		<!-- etc --> 
+	</common>
+	<!-- network elements --> 
+	<subnet name="test subnet1">
+		<population>
+			<size name="N">1</size>
+			<cells name="Neuron" xpath="/template/cells/cell[@name='Hhn-base']">
+				<parameters>
+					<tag name="v">(-62,0.1)</tag>
+					<tag name="channels[@name='Na fast']/activation/init">(0.8,0.1)</tag>
+					<tag name="channels[@name='Leak']/gmax">(1,0.2)</tag>
+				</parameters>
+			</cells>
+		</population>
+	</subnet>
+	<subnet name="test subnet2">
+		<population>
+			<size name="N">1</size>
+			<cells name="Neuron" xpath="/template/cells/cell[@name='Hhn-base']">
+				<parameters>
+					<tag name="channels[@name='Leak']/gmax">(0.8,0.1)</tag>
+				</parameters>
+			</cells>
+		</population>
+	</subnet>
 </network>
-
-<!-- 
-	&lt; 	<
-	&gt; 	>
-	&amp; 	&
-	&apos; 	'
-	&quot; 	"
- --> 
