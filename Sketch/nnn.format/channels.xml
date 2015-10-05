@@ -31,14 +31,12 @@
 				<gmax name="Maximal conductance" xpath="/template/random/rnd" default="grnd">(0,0)</gmax>
 				<eds ref="../ions[@name='Na']"/>
 				<activation name="Activation" xpath="/template/gates/gate[@name='generic']">
-					<parameters v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3">
-						<tag name="init">(0,0)</tag>
-					</parameters>
+					<parameters v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3"/>
+					<parameters tag="init">(0,0)</parameters>
 				</activation>
 				<inactivation name="Inactivation" xpath="/template/gates/gate[@name='generic']">
-					<parameters v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1">
-						<tag name="init">(0,0)</tag>
-					</parameters>
+					<parameters v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1"/>
+					<parameters tag="init">(0,0)</parameters>
 				</inactivation>
 			</parameters>
 		</channel>
@@ -54,9 +52,8 @@
 				<gmax name="Maximal conductance" xpath="/template/random/rnd" default="grnd">(0,0)</gmax>
 				<eds ref="../ions[@name='K']"/>
 				<activation name="Activation" xpath="/template/gates/gate[@name='a-b']">
-					<parameters "...">
-						<tag name="init">(0,0)</tag>
-					</parameters>
+					<parameters "..."/>
+					<parameters tag="init">(0,0)</parameters>
 				</activation>
 			</parameters>
 		</channel>

@@ -29,39 +29,27 @@
 			<v name="Membrane potential" xpath="/template/random/rnd" default="grnd">(-60,0)</v>
 			<ions name="Na" xpath="/template/ions/ion[@name='non-specific']">
 				<description>Reversal potential for Na ions</description>
-				<parameters>
-					<tag name="eds">(55,0)</tag>
-				</parameters>
+				<parameters tag="eds">(55,0)</parameters>
 			</ions>
 			<ions name="K" xpath="/template/ions/ion[@name='non-specific']">
 				<description>Reversal potential for K ions</description>
-				<parameters>
-					<tag name="eds">(-90,0)</tag>
-				</parameters>
+				<parameters tag="eds">(-90,0)</parameters>
 			</ions>
 			<ions name="Leak" xpath="/template/ions/ion[@name='non-specific']">
 				<description>Reversal potential for leak current</description>
-				<parameters>
-					<tag name="eds">(-60,0)</tag>
-				</parameters>
+				<parameters tag="eds">(-60,0)</parameters>
 			</ions>
 			<channels name="Na fast" xpath="/template/channels/channel[@name='Na fast']">
-				<parameters>
-					<tag name="gmax">(100,0)</tag>
-					<tag name="activation/init">(0.6,0)</tag>
-					<tag name="inactivation/init">(0.1,0)</tag>
-				</parameters>
+				<parameters tag="gmax">(100,0)</parameters>
+				<parameters tag="activation/init">(0.6,0)</parameters>
+				<parameters tag="inactivation/init">(0.1,0)</parameters>
 			</channels>
 			<channels name="Krd" xpath="/template/channels/channel[@name='Kdr']">
-				<parameters>
-					<tag name="gmax">(80,0)</tag>
-					<tag name="activation/init">(0.3,0)</tag>
-				</parameters>
+				<parameters tag="gmax">(80,0)</parameters>
+				<parameters tag="activation/init">(0.3,0)</parameters>
 			</channels>
 			<channels name="Leak" xpath="/template/channels/channel[@name='Leak current']">
-				<parameters>
-					<tag name="gmax">(1,0.1)</tag>
-				</parameters>
+				<parameters tag="gmax">(1,0.1)</parameters>
 			</channels>
 		</cell>
 	<!-- etc --> 
