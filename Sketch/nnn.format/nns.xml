@@ -2,41 +2,40 @@
  <description>
 	This is an example of the network description in new format
 </description>
-<include lib="tlsns.1.0"/> <!-- include modules from binary library -->
 <include lib="libase.xml"/>
 <include lib="channels.xml/">
 <template>
 	<cells>
-		<cell name="Hhn-base" module="...">
+		<cell name="Hhn-basic" import="/template/cells/cell[@name='generic']">
 			<description>Simple model of Hodgkin-Haxley neuron</description>
 			<parameters>
-				<c name="Total capacitance">1</c>
-				<v name="Membrane potential" import="/template/random/rnd" default="grnd">(-60,0)</v>
+				<parameter xpath="c">1</c>
+				<parameter xpath="v">(-60,0)</c>
 				<ion name="Na ions" import="/template/ions/ion[@name='non-specific']">
 					<description>Reversal potential for Na ions</description>
-					<parameters xpath="eds">(55,0)</parameters>
+					<parameter xpath="eds">(55,0)</parameter>
 				</ion>
 				<ion name="K ions" import="/template/ions/ion[@name='non-specific']">
 					<description>Reversal potential for K ions</description>
-					<parameters xpath="eds">(-90,0)</parameters>
+					<parameter xpath="eds">(-90,0)</parameter>
 				</ion>
 				<ion name="Leak" import="/template/ions/ion[@name='non-specific']">
 					<description>Reversal potential for leak current</description>
-					<parameters xpath="eds">(-60,0)</parameters>
+					<parameter xpath="eds">(-60,0)</parameter>
 				</ion>
 				<channel name="Na fast" import="/template/channels/channel[@name='Na fast']">
-					<parameters xpath="gmax">(100,0)</parameters>
-					<parameters xpath="gate[@name='Activation']/init">(0.6,0)</parameters>
-					<parameters xpath="gate[@name='Inactivation']/init">(0.1,0)</parameters>
+					<parameter xpath="gmax">(100,0)</parameter>
+					<parameter xpath="gate[@name='Activation']/init">(0.6,0)</parameter>
+					<parameter xpath="gate[@name='Inactivation']/init">(0.1,0)</parameter>
 				</channel>
 				<channel name="Krd" import="/template/channels/channel[@name='Kdr']">
-					<parameters xpath="gmax">(80,0)</parameters>
-					<parameters xpath="gate[@name='Activation']/init">(0.3,0)</parameters>
+					<parameter xpath="gmax">(80,0)</parameter>
+					<parameter xpath="gate[@name='Activation']/init">(0.3,0)</parameter>
 				</channel>
 				<channel name="Leak current" import="/template/channels/channel[@name='Leak current']">
-					<parameters xpath="gmax">(1,0.1)</parameters>
+					<parameter xpath="gmax">(1,0.1)</parameter>
 				</channel>
-			<parameters>
+			</parameters>
 		</cell>
 	<!-- etc --> 
 	</cells>
@@ -50,21 +49,25 @@
 	</common>
 	<!-- network elements --> 
 	<subnet name="test subnet1">
-		<population>
-			<size name="N">1</size>
-			<cell name="Neuron" import="/template/cells/cell[@name='Hhn-base']">
-				<parameters xpath="v">(-62,0.1)</parameters>
-				<parameters xpath="channels[@name='Na fast']/activation/init">(0.8,0.1)</parameters>
-				<parameters xpath="channels[@name='Leak']/gmax">(1,0.2)</parameters>
-			</cell>
+		<population name="P1" import="/template/units/unit[@name='generic']">
+			<parameters>
+				<parameter xpath="n">1</parameter>
+				<cell name="Neuron" import="/template/cells/cell[@name='Hhn-basic']">
+					<parameter xpath="v">(-62,0.1)</parameter>
+					<parameter xpath="channels[@name='Na fast']/activation/init">(0.8,0.1)</parameter>
+					<parameter xpath="channels[@name='Leak']/gmax">(1,0.2)</parameter>
+				</cell>
+			</parameters>
 		</population>
 	</subnet>
 	<subnet name="test subnet2">
-		<population>
-			<size name="N">10</size>
-			<cell name="Neuron" import="/template/cells/cell[@name='Hhn-base']">
-				<parameters xpath="channels[@name='Leak']/gmax">(0.8,0.1)</parameters>
-			</cell>
+		<population name="P2" import="/template/units/unit[@name='generic']">
+			<parameters>
+				<parameter xpath="n">100</parameter>
+				<cell name="Neuron" import="/template/cells/cell[@name='Hhn-basic']">
+					<parameter xpath="channels[@name='Leak']/gmax">(0.8,0.1)</parameter>
+				</cell>
+			</parameters>
 		</population>
 	</subnet>
 </network>

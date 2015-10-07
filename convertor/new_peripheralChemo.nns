@@ -31,7 +31,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -48,7 +48,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -74,28 +74,6 @@ E = -60(0.01)
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -112,17 +90,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -147,7 +114,7 @@ nICHNameList = {Na fast, K, Leak, KCa, CaL}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -164,7 +131,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -189,7 +156,7 @@ E = -60(0.01)
 Name = KCa
 ID = 3
 g = 6
-E = -1(-1)
+E = -94.3589
 mpower = 2
 A = 50000000
 B = 1
@@ -202,7 +169,7 @@ tm = 700000
 Name = CaL
 ID = 4
 g = 0.05
-E = -1(-1)
+E = 149.815
 mpower = 1
 hpower = 1
 Vhfm = 27.4
@@ -218,28 +185,6 @@ th0 = 18
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -256,17 +201,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -291,7 +225,7 @@ nICHNameList = {Na fast, K, Leak, NaP channel (generic)}
 Name = Na fast
 ID = 0
 g = 170
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -308,7 +242,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 180
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -333,7 +267,7 @@ E = -68(0.01)
 Name = NaP channel (generic)
 ID = 3
 g = 4(0.1)
-E = -1(-1)
+E = 55.1884
 mpower = 1
 hpower = 1
 Vhfm = -47.1
@@ -350,28 +284,6 @@ kth = 9
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -388,17 +300,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -423,7 +324,7 @@ nICHNameList = {Na fast, K, Leak, NaP channel (generic)}
 Name = Na fast
 ID = 0
 g = 170
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -440,7 +341,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 180
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -465,7 +366,7 @@ E = -68(0.01)
 Name = NaP channel (generic)
 ID = 3
 g = 4(0.1)
-E = -1(-1)
+E = 55.1884
 mpower = 1
 hpower = 1
 Vhfm = -47.1
@@ -482,28 +383,6 @@ kth = 9
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -520,17 +399,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -555,7 +423,7 @@ nICHNameList = {Na fast, K, Leak, KCa, CaL}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -572,7 +440,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -597,7 +465,7 @@ E = -60(0.01)
 Name = KCa
 ID = 3
 g = 6
-E = -1(-1)
+E = -94.3589
 mpower = 2
 A = 50000000
 B = 1
@@ -610,7 +478,7 @@ tm = 1e+006
 Name = CaL
 ID = 4
 g = 0.05
-E = -1(-1)
+E = 149.815
 mpower = 1
 hpower = 1
 Vhfm = 27.4
@@ -626,28 +494,6 @@ th0 = 18
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -664,17 +510,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -699,7 +534,7 @@ nICHNameList = {Na fast, K, Leak, CaL, KCa}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -716,7 +551,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -741,7 +576,7 @@ E = -60(0.01)
 Name = CaL
 ID = 3
 g = 0.05
-E = -1(-1)
+E = 149.815
 mpower = 1
 hpower = 1
 Vhfm = 27.4
@@ -756,7 +591,7 @@ th0 = 18
 Name = KCa
 ID = 4
 g = 6
-E = -1(-1)
+E = -94.3589
 mpower = 2
 A = 50000000
 B = 1
@@ -770,28 +605,6 @@ tm = 1.2e+007
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -808,17 +621,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -843,7 +645,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -860,7 +662,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -886,28 +688,6 @@ E = -60(0.01)
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -924,17 +704,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -959,7 +728,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -976,7 +745,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1002,28 +771,6 @@ E = -60(0.01)
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1040,17 +787,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -1075,7 +811,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -1092,7 +828,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1118,28 +854,6 @@ E = -60(0.01)
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1156,17 +870,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -1191,7 +894,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -1208,7 +911,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1234,28 +937,6 @@ E = -60(0.01)
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1272,17 +953,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -1307,7 +977,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -1324,7 +994,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1350,28 +1020,6 @@ E = -60(0.01)
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1388,17 +1036,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -1423,7 +1060,7 @@ nICHNameList = {Na fast, K, Leak, CaL, KCa}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -1440,7 +1077,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1465,7 +1102,7 @@ E = -60(0.01)
 Name = CaL
 ID = 3
 g = 0.05
-E = -1(-1)
+E = 149.815
 mpower = 1
 hpower = 1
 Vhfm = 27.4
@@ -1480,7 +1117,7 @@ th0 = 18
 Name = KCa
 ID = 4
 g = 6
-E = -1(-1)
+E = -94.3589
 mpower = 2
 A = 50000000
 B = 1
@@ -1494,28 +1131,6 @@ tm = 1.2e+007
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1532,17 +1147,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -1567,7 +1171,7 @@ nICHNameList = {Na fast, K, Leak, CaL, KCa}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -1584,7 +1188,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1609,7 +1213,7 @@ E = -63(0.01)
 Name = CaL
 ID = 3
 g = 0.05
-E = -1(-1)
+E = 149.815
 mpower = 1
 hpower = 1
 Vhfm = 27.4
@@ -1624,7 +1228,7 @@ th0 = 18
 Name = KCa
 ID = 4
 g = 1.5
-E = -1(-1)
+E = -94.3589
 mpower = 2
 A = 50000000
 B = 1
@@ -1638,28 +1242,6 @@ tm = 3e+006
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1676,17 +1258,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -1711,7 +1282,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -1728,7 +1299,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 350
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1754,28 +1325,6 @@ E = -60
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1792,17 +1341,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 
@@ -1827,7 +1365,7 @@ nICHNameList = {Na fast, K, Leak}
 Name = Na fast
 ID = 0
 g = 400
-E = -1(-1)
+E = 55.1884
 mpower = 3
 hpower = 1
 Vhfm = 43.8
@@ -1844,7 +1382,7 @@ kth = 12.8
 Name = K
 ID = 1
 g = 250
-E = -1(-1)
+E = -94.3589
 mpower = 4
 AmA = -0.01
 BmA = 1
@@ -1870,28 +1408,6 @@ E = -60(0.01)
 
 <IONS PARAM>
 nIONS = 4
-<ION 0>
-Name = Na
-ID = 0
-IonType = 1
-PumpType = 0
-E = 55.1884
-Z = 1
-Cin = 15
-Cout = 120
-</ION 0>
-
-<ION 1>
-Name = K
-ID = 1
-IonType = 2
-PumpType = 0
-E = -94.3589
-Z = 1
-Cin = 140
-Cout = 4
-</ION 1>
-
 <ION 2>
 Name = Ca
 ID = 2
@@ -1908,17 +1424,6 @@ Rch = 1
 K = 0.001
 B = 0.03
 </ION 2>
-
-<ION 3>
-Name = Cl
-ID = 3
-IonType = 4
-PumpType = 0
-E = -75.9628
-Z = -1
-Cin = 4
-Cout = 70
-</ION 3>
 
 </IONS PARAM>
 

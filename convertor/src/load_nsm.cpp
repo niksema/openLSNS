@@ -2,6 +2,45 @@
 
 #include "load_nsm.h"
 
+float eds( float rtfz, float out, float in )
+{
+	return rtfz*log( out/in );
+}
+
+hhnpair<float> hack1( hhnpair<float>& e, const string &name, vector<netunit<iondata >> &ions )
+{
+	if( name[0] == 'N' && name[1] == 'a' ){
+		for( size_t i = 0; i < ions.size(); ++i ){
+			if( ions[i].Name == "Na" ){
+				e = ions[i]().Eds;
+			}
+		}
+	}
+	if( name[0] == 'K' ){
+		for( size_t i = 0; i < ions.size(); ++i ){
+			if( ions[i].Name == "K" ){
+				e = ions[i]().Eds;
+			}
+		}
+	}
+	if( name[0] == 'C' && name[1] == 'a' ){
+		for( size_t i = 0; i < ions.size(); ++i ){
+			if( ions[i].Name == "Ca" ){
+				e = ions[i]().Eds;
+			}
+		}
+	}
+	return e;
+}
+
+bool hack2( const string &name, vector<netunit<chandata >> &chans )
+{
+	if( name[0] == 'C' && name[1] == 'a' ){
+		return true;
+	}
+	return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // class simdata
 //--- constructors/destructor
@@ -146,21 +185,25 @@ bool iondata::validate( const string &type )
 		IType = 1;
 		PType = 0;
 		Z = 1;
+		Eds.X = eds( RTF/Z, Out.X, In.X );
 	}
 	else if( type == "K" ){
 		IType = 2;
 		PType = 0;
 		Z = 1;
+		Eds.X = eds( RTF/Z, Out.X, In.X );
 	}
 	else if( type == "Ca" ){
 		IType = 3;
 		PType = 3;
 		Z = 2;
+		Eds.X = eds( RTF/Z, Out.X, In.X );
 	}
 	else if( type == "Cl" ){
 		IType = 4;
 		PType = 0;
 		Z = -1;
+		Eds.X = eds( RTF/Z, Out.X, In.X );
 	}
 	else{
 		IType = 0;
@@ -181,8 +224,7 @@ bool iondata::save( ostream &file )
 		file << "E = " << Eds << endl;
 	}
 	else{ // Na, K, Ca, Cl etc
-		float eds = ( RTF/Z )*log( Out.X/In.X );
-		file << "E = " << eds << endl;
+		file << "E = " << Eds << endl;
 		file << "Z = " << Z << endl;
 		file << "Cin = " << In << endl;
 		file << "Cout = " << Out << endl;
@@ -440,9 +482,6 @@ bool chandata::loadpar( istream &file, const string &parname )
 
 bool chandata::validate( const string &type )
 {
-	if( Eds.X == -1. && Eds.Y == -1. ){
-
-	}
 	return true;
 }
 
@@ -1119,6 +1158,9 @@ bool nsm_model::save_model( const char *filename )
 			nns << "}" << endl << endl;
 			for( size_t j = 0; j < nICH; ++j ){
 				string name = Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j].Name;
+				hhnpair<float> eds = Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j]().Eds;
+				eds = hack1( eds, name, Network().Ions );
+				Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j]().Eds = eds;
 				nns << "<ICH " << j << ">" << endl;
 				Network().Units().PData[i]().Hhn().Cmps[0]().Chans[j]().save( nns, name, j );
 				nns << "</ICH " << j << ">" << endl;
@@ -1130,12 +1172,15 @@ bool nsm_model::save_model( const char *filename )
 			nns << "<IONS PARAM>" << endl;
 			nns << "nIONS = " << nIONS << endl;
 			for( size_t j = 0; j < nIONS; ++j ){
-				nns << "<ION " << j << ">" << endl;
-				nns << "Name = " << Network().Ions[j].Name << endl;
-				nns << "ID = " << j << endl;
-				Network().Ions[j]().save( nns );
-				nns << "</ION " << j << ">" << endl;
-				nns << endl;
+				if( hack2( Network().Ions[j].Name, Network().Units().PData[i]().Hhn().Cmps[0]().Chans )){
+					/*check if Ca channels are present then print it*/
+					nns << "<ION " << j << ">" << endl;
+					nns << "Name = " << Network().Ions[j].Name << endl;
+					nns << "ID = " << j << endl;
+					Network().Ions[j]().save( nns );
+					nns << "</ION " << j << ">" << endl;
+					nns << endl;
+				}
 			};
 			nns << "</IONS PARAM>" << endl;
 			nns << endl;

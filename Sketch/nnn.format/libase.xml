@@ -2,10 +2,10 @@
  <description>
 	The library of basic network units which supported by LSNS 1.0 engine
 </description>
-<include lib="tlsns.1.0"/> <!-- include modules from binary library -->
+<include lib="liblsns.1.0"/> <!-- include modules from binary library -->
 <template>
 	<random>
-		<rnd name="grnd" module="???"> <!-- specify the name of the method that generated this description -->
+		<rnd name="grnd" module="???"> <!-- specify the name of the method that uses this description to allocate and initialize memory for -->
 			<description>
 				Pseudorandom number generator.
 				Generate pseudo-random numbers that are normally distributed around mean (m) with chosen variance (v).
@@ -147,4 +147,36 @@
 		<!-- etc --> 
 		</dynamics>
 	</ions>
+	<channels>
+		<channel name="generic" module="???">
+			<parameters>
+				<gmax name="Maximal conductance" import="/template/random/rnd" default="grnd">(0,0)</gmax>
+				<eds name="Reversal potential">null</eds>
+			</parameters>
+		</channel>
+	</channels>
+	<cells>
+		<cell name="generic" module="...">
+			<parameters>
+				<c name="Total capacitance">1</c>
+				<v name="Membrane potential" import="/template/random/rnd" default="grnd">(-60,0)</v>
+				<ion name="Leak" import="/template/ions/ion[@name='non-specific']">
+					<description>Reversal potential for leak current</description>
+					<parameter xpath="eds">(-60,0)</parameter>
+				</ion>
+				<channel name="Leak current" import="/template/channels/channel[@name='generic']">
+					<parameter xpath="gmax">(1,0)</parameter>
+					<parameter xpath="eds">../ion[@name='Leak']</parameter>
+				</channel>
+			<parameters>
+		</cell>
+	<!-- etc --> 
+	</cells>
+	<units>
+		<unit name="generic" module="...">
+			<n name="Size">1</n>
+		</unit>
+	</units>
+
+	
 </template>

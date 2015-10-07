@@ -2,11 +2,10 @@
  <description>
 	The library of ion channels
 </description>
-<!-- <include lib="libase.xml"/> import all modules from library "libase.xml" --> 
 <include lib="libase.xml"/>
 <template>
 	<channels>
-		<channel name="Na fast">
+		<channel name="Na fast" import="/template/channels/channel[@name='generic']">
 			<description>
 				I = G*(V-Ena)
 				G = Gmax*M^pm*H^ph
@@ -16,19 +15,19 @@
 				[#ref]
 			</description>
 			<parameters>
-				<gmax name="Maximal conductance" import="/template/random/rnd" default="grnd">(0,0)</gmax>
-				<eds ref="../ion[@name='Na ions']"/>
+				<parameter xpath="gmax">(0,0)</parameter>
+				<parameter xpath="eds">../ion[@name='Na ions']</parameter>
 				<gate name="Activation" import="/template/gates/gate[@name='generic']">
-					<parameters v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3"/>
-					<parameters xpath="init">(0,0)</parameters>
+					<parameter v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3"/>
+					<parameter xpath="init">(0,0)</parameter>
 				</gate>
 				<gate name="Inactivation" import="/template/gates/gate[@name='generic']">
-					<parameters v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1"/>
-					<parameters xpath="init">(0,0)</parameters>
+					<parameter v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1"/>
+					<parameter xpath="init">(0,0)</parameter>
 				</gate>
 			</parameters>
 		</channel>
-		<channel name="Kdr">
+		<channel name="Kdr" import="/template/channels/channel[@name='generic']">
 			<description>
 				I = G*(V-Ek)
 				G = Gmax*M^pm
@@ -37,22 +36,20 @@
 				[#ref]
 			</description>
 			<parameters>
-				<gmax name="Maximal conductance" import="/template/random/rnd" default="grnd">(0,0)</gmax>
-				<eds ref="../ion[@name='K ions']"/>
+				<parameter xpath="gmax">(0,0)</parameter>
+				<parameter xpath="eds">../ion[@name='K ions']</parameter>
 				<gate name="Activation" import="/template/gates/gate[@name='a-b']">
-					<parameters "..."/>
-					<parameters xpath="init">(0,0)</parameters>
+					<parameter "..."/>
+					<parameter xpath="init">(0,0)</parameter>
 				</gate>
 			</parameters>
 		</channel>
-		<channel name="Leak current">
+		<channel name="Leak current" import="/template/channels/channel[@name='generic']">
 			<description>
 				I = Gmax*(V-Eleak)
 			</description>
-			<parameters>
-				<gmax name="Maximal conductance" import="/template/random/rnd" default="grnd">(0,0)</gmax>
-				<eds ref="../ion[@name='Leak']"/>
-			</parameters>
+			<parameter xpath="gmax">(0,0)</parameter>
+			<parameter xpath="eds">../ion[@name='Leak']</parameter>
 		</channel>
 		<!-- etc --> 
 	</channels>
