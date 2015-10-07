@@ -2,55 +2,41 @@
  <description>
 	This is an example of the network description in new format
 </description>
-<include lib="libase.xml">
-	<import name="grnd" xpath="/template/random/rnd[@name='grnd']"/>
-	<import name="urnd" xpath="/template/random/rnd[@name='urnd']"/>
-	<import name="generic" xpath="/template/gates/gate[@name='generic']"/>
-	<import name="generic instant" xpath="/template/gates/gate[@name='generic instant']"/>
-	<import name="generic modified" xpath="/template/gates/gate[@name='generic modified']"/>
-	<import name="generic A-gate" xpath="/template/gates/gate[@name='generic A-gate']"/>
-	<import name="a-b" xpath="/template/gates/gate[@name='a-b']"/>
-	<import name="a-b instant" xpath="/template/gates/gate[@name='a-b instant']"/>
-	<import name="non-specific" xpath="/template/ions/ion[@name='non-specific']"/>
-	<import name="specific" xpath="/template/ions/ion[@name='specific']"/>
-	<!-- etc --> 
-</include>
-<include lib="channels.xml">
-	<import name="Na fast" xpath="/template/channels/channel[@name='Na fast']"/>
-	<import name="Kdr" xpath="/template/channels/channel[@name='Kdr']"/>
-	<import name="Leak current" xpath="/template/channels/channel[@name='Leak current']"/>
-	<!-- etc --> 
-</include>
+<include lib="tlsns.1.0"/> <!-- include modules from binary library -->
+<include lib="libase.xml"/>
+<include lib="channels.xml/">
 <template>
 	<cells>
-		<cell name="Hhn-base">
+		<cell name="Hhn-base" module="...">
 			<description>Simple model of Hodgkin-Haxley neuron</description>
-			<c name="Total capacitance">1</c>
-			<v name="Membrane potential" xpath="/template/random/rnd" default="grnd">(-60,0)</v>
-			<ions name="Na" xpath="/template/ions/ion[@name='non-specific']">
-				<description>Reversal potential for Na ions</description>
-				<parameters tag="eds">(55,0)</parameters>
-			</ions>
-			<ions name="K" xpath="/template/ions/ion[@name='non-specific']">
-				<description>Reversal potential for K ions</description>
-				<parameters tag="eds">(-90,0)</parameters>
-			</ions>
-			<ions name="Leak" xpath="/template/ions/ion[@name='non-specific']">
-				<description>Reversal potential for leak current</description>
-				<parameters tag="eds">(-60,0)</parameters>
-			</ions>
-			<channels name="Na fast" xpath="/template/channels/channel[@name='Na fast']">
-				<parameters tag="gmax">(100,0)</parameters>
-				<parameters tag="activation/init">(0.6,0)</parameters>
-				<parameters tag="inactivation/init">(0.1,0)</parameters>
-			</channels>
-			<channels name="Krd" xpath="/template/channels/channel[@name='Kdr']">
-				<parameters tag="gmax">(80,0)</parameters>
-				<parameters tag="activation/init">(0.3,0)</parameters>
-			</channels>
-			<channels name="Leak" xpath="/template/channels/channel[@name='Leak current']">
-				<parameters tag="gmax">(1,0.1)</parameters>
-			</channels>
+			<parameters>
+				<c name="Total capacitance">1</c>
+				<v name="Membrane potential" import="/template/random/rnd" default="grnd">(-60,0)</v>
+				<ion name="Na ions" import="/template/ions/ion[@name='non-specific']">
+					<description>Reversal potential for Na ions</description>
+					<parameters xpath="eds">(55,0)</parameters>
+				</ion>
+				<ion name="K ions" import="/template/ions/ion[@name='non-specific']">
+					<description>Reversal potential for K ions</description>
+					<parameters xpath="eds">(-90,0)</parameters>
+				</ion>
+				<ion name="Leak" import="/template/ions/ion[@name='non-specific']">
+					<description>Reversal potential for leak current</description>
+					<parameters xpath="eds">(-60,0)</parameters>
+				</ion>
+				<channel name="Na fast" import="/template/channels/channel[@name='Na fast']">
+					<parameters xpath="gmax">(100,0)</parameters>
+					<parameters xpath="gate[@name='Activation']/init">(0.6,0)</parameters>
+					<parameters xpath="gate[@name='Inactivation']/init">(0.1,0)</parameters>
+				</channel>
+				<channel name="Krd" import="/template/channels/channel[@name='Kdr']">
+					<parameters xpath="gmax">(80,0)</parameters>
+					<parameters xpath="gate[@name='Activation']/init">(0.3,0)</parameters>
+				</channel>
+				<channel name="Leak current" import="/template/channels/channel[@name='Leak current']">
+					<parameters xpath="gmax">(1,0.1)</parameters>
+				</channel>
+			<parameters>
 		</cell>
 	<!-- etc --> 
 	</cells>
@@ -66,23 +52,19 @@
 	<subnet name="test subnet1">
 		<population>
 			<size name="N">1</size>
-			<cells name="Neuron" xpath="/template/cells/cell[@name='Hhn-base']">
-				<parameters>
-					<tag name="v">(-62,0.1)</tag>
-					<tag name="channels[@name='Na fast']/activation/init">(0.8,0.1)</tag>
-					<tag name="channels[@name='Leak']/gmax">(1,0.2)</tag>
-				</parameters>
-			</cells>
+			<cell name="Neuron" import="/template/cells/cell[@name='Hhn-base']">
+				<parameters xpath="v">(-62,0.1)</parameters>
+				<parameters xpath="channels[@name='Na fast']/activation/init">(0.8,0.1)</parameters>
+				<parameters xpath="channels[@name='Leak']/gmax">(1,0.2)</parameters>
+			</cell>
 		</population>
 	</subnet>
 	<subnet name="test subnet2">
 		<population>
-			<size name="N">1</size>
-			<cells name="Neuron" xpath="/template/cells/cell[@name='Hhn-base']">
-				<parameters>
-					<tag name="channels[@name='Leak']/gmax">(0.8,0.1)</tag>
-				</parameters>
-			</cells>
+			<size name="N">10</size>
+			<cell name="Neuron" import="/template/cells/cell[@name='Hhn-base']">
+				<parameters xpath="channels[@name='Leak']/gmax">(0.8,0.1)</parameters>
+			</cell>
 		</population>
 	</subnet>
 </network>
