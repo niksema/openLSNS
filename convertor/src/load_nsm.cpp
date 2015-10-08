@@ -1174,7 +1174,13 @@ bool nsm_model::save_model( const char *filename )
 			nns << "</NEURON PARAM>" << endl;
 			nns << endl;
 			nns << "<IONS PARAM>" << endl;
-			nns << "nIONS = " << nIONS << endl;
+			size_t n_ions = 0;
+			for( size_t j = 0; j < nIONS; ++j ){
+				if( hack2( Network().Ions[j].Name, Network().Units().PData[i]().Hhn().Cmps[0]().Chans )){
+					n_ions=1;
+				}
+			}
+			nns << "nIONS = " << n_ions << endl;
 			for( size_t j = 0; j < nIONS; ++j ){
 				if( hack2( Network().Ions[j].Name, Network().Units().PData[i]().Hhn().Cmps[0]().Chans )){
 					/*check if Ca channels are present then print it*/

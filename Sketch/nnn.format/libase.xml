@@ -177,7 +177,7 @@
 			<description>
 				Basic model of a cell/compartment. 
 			</description>
-			<c name="Total capacitance">1</c>
+			<c name="Capacitance">1</c>
 			<v name="Membrane potential" import="/template/random/rnd" default="grnd">(-60,0)</v>
 			<ion name="Leak" import="/template/ions/ion[@name='Leak']">
 				<parameter xpath="eds">(-60,0)</parameter>
@@ -193,6 +193,4 @@
 			<n name="Size">1</n>
 		</unit>
 	</units>
-
-	
 </template>

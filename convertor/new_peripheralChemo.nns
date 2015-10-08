@@ -73,24 +73,7 @@ E = -60(0.01)
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 0>
@@ -184,7 +167,7 @@ th0 = 18
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
+nIONS = 1
 <ION 2>
 Name = Ca
 ID = 2
@@ -283,24 +266,7 @@ kth = 9
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 2>
@@ -382,24 +348,7 @@ kth = 9
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 3>
@@ -493,7 +442,7 @@ th0 = 18
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
+nIONS = 1
 <ION 2>
 Name = Ca
 ID = 2
@@ -604,7 +553,7 @@ tm = 1.2e+007
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
+nIONS = 1
 <ION 2>
 Name = Ca
 ID = 2
@@ -687,24 +636,7 @@ E = -60(0.01)
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 6>
@@ -770,24 +702,7 @@ E = -60(0.01)
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 7>
@@ -853,24 +768,7 @@ E = -60(0.01)
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 8>
@@ -936,24 +834,7 @@ E = -60(0.01)
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 9>
@@ -1019,24 +900,7 @@ E = -60(0.01)
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 10>
@@ -1130,7 +994,7 @@ tm = 1.2e+007
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
+nIONS = 1
 <ION 2>
 Name = Ca
 ID = 2
@@ -1241,7 +1105,7 @@ tm = 3e+006
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
+nIONS = 1
 <ION 2>
 Name = Ca
 ID = 2
@@ -1324,24 +1188,7 @@ E = -60
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 13>
@@ -1407,24 +1254,7 @@ E = -60(0.01)
 </NEURON PARAM>
 
 <IONS PARAM>
-nIONS = 4
-<ION 2>
-Name = Ca
-ID = 2
-IonType = 3
-PumpType = 3
-E = 149.815
-Z = 2
-Cin = 5e-005
-Cout = 4
-T = 500
-InEq = 0
-Rpmp = 1
-Rch = 1
-K = 0.001
-B = 0.03
-</ION 2>
-
+nIONS = 0
 </IONS PARAM>
 
 </POP 14>
