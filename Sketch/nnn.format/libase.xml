@@ -170,7 +170,6 @@
 				I = Gmax*(V-E)
 			</description>
 			<parameter xpath="eds" link="../ion[@name='Leak']/eds"/>
-			<parameter xpath="gmax">(1,0)</parameter>
 		</channel>
 	</channels>
 	<cells>
