@@ -36,7 +36,11 @@ hhnpair<float> hack1( hhnpair<float>& e, const string &name, vector<netunit<iond
 bool hack2( const string &name, vector<netunit<chandata >> &chans )
 {
 	if( name[0] == 'C' && name[1] == 'a' ){
-		return true;
+		for( size_t i = 0; i < chans.size(); ++i ){
+			if( chans[i].Name.find( "Ca" ) != string::npos ){
+				return true;
+			}
+		}
 	}
 	return false;
 }
