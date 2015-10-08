@@ -5,7 +5,7 @@
 <include lib="libase.xml"/>
 <template>
 	<channels>
-		<channel name="Na fast" import="/template/channels/channel[@name='generic']">
+		<channel name="Na fast" import="/template/channels/channel[@name='basic']">
 			<description>
 				I = G*(V-Ena)
 				G = Gmax*M^pm*H^ph
@@ -14,20 +14,18 @@
 				Description of gate variables both activation and inactivation is taken from
 				[#ref]
 			</description>
-			<parameters>
-				<parameter xpath="gmax">(0,0)</parameter>
-				<parameter xpath="eds">../ion[@name='Na ions']</parameter>
-				<gate name="Activation" import="/template/gates/gate[@name='generic']">
-					<parameter v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3"/>
-					<parameter xpath="init">(0,0)</parameter>
-				</gate>
-				<gate name="Inactivation" import="/template/gates/gate[@name='generic']">
-					<parameter v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1"/>
-					<parameter xpath="init">(0,0)</parameter>
-				</gate>
-			</parameters>
+			<parameter xpath="eds" link="../ion[@name='Na ions']/eds"/>
+			<parameter xpath="gmax">(0,0)</parameter>
+			<parameter xpath="gate/Activation" import="/template/gates/gate[@name='generic']">
+				<parameter v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3"/>
+				<parameter xpath="init">(0,0)</parameter>
+			</parameter>
+			<parameter xpath="gate/Inactivation" import="/template/gates/gate[@name='generic']">
+				<parameter v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1"/>
+				<parameter xpath="init">(0,0)</parameter>
+			</parameter>
 		</channel>
-		<channel name="Kdr" import="/template/channels/channel[@name='generic']">
+		<channel name="Kdr" import="/template/channels/channel[@name='basic']">
 			<description>
 				I = G*(V-Ek)
 				G = Gmax*M^pm
@@ -44,7 +42,7 @@
 				</gate>
 			</parameters>
 		</channel>
-		<channel name="Leak current" import="/template/channels/channel[@name='generic']">
+		<channel name="Leak current" import="/template/channels/channel[@name='basic']">
 			<description>
 				I = Gmax*(V-Eleak)
 			</description>

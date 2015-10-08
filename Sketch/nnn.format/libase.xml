@@ -2,31 +2,35 @@
  <description>
 	The library of basic network units which supported by LSNS 1.0 engine
 </description>
-<include lib="liblsns.1.0"/> <!-- include modules from binary library -->
+<include lib="rwlsns.1.0"/> <!-- include modules from binary library -->
 <template>
 	<random>
-		<rnd name="grnd" module="???"> <!-- specify the name of the method that uses this description to allocate and initialize memory for -->
+		<rnd name="grnd" module="???"> <!-- specify the name of the method that uses this description to allocate and initialize memory -->
 			<description>
 				Pseudorandom number generator.
 				Generate pseudo-random numbers that are normally distributed around mean (m) with chosen variance (v).
 			</description>
-			<parameters>
-				<m name="Mean">0</m>
-				<v name="Variance">0</v>
-			</parameters>
+			<m name="Mean">0</m>
+			<v name="Variance">0</v>
 		</rnd>
 		<rnd name="urnd" module="???">
 			<description>
 				Pseudorandom number generator.
 				Generate pseudo-random numbers that are uniformly distributed around mean (m) with chosen variance (v).
 			</description>
-			<parameters>
-				<m name="Mean">0</m>
-				<v name="Variance">0</v>
-			</parameters>
+			<m name="Mean">0</m>
+			<v name="Variance">0</v>
 		</rnd>
 	</random>
 	<gates>
+		<gate name="nogate" module="???">
+			<description>The gate variable is always 1</description>
+			<init name="Initial value">1</init>
+		</gate>
+		<gate name="bypass gate" module="???">
+			<description>The gate variable will be modified elsewhere</description>
+			<init name="Initial value" link="null"/>
+		</gate>
 		<gate name="generic instant" module="???">
 			<description>
 				The generic description of a gate variable (M|H) (activation or inactivation).
@@ -34,11 +38,10 @@
 				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
 				T = 0
 			</description>
-			<parameters>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-			</parameters>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<pow name="Power">0</pow>
+			<v12 name="Half-voltage">0</v12>
+			<slp name="Slope">1<slp>
 		</gate>
 		<gate name="generic" module="???">
 			<description>
@@ -47,16 +50,15 @@
 				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
 				T = T0+Tmax/cosh((v-v12T)/slpT)
 			</description>
-			<parameters>
-				<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-				<T0 name="Bias of time constant">0</T0>
-				<Tmax name="Maximal time constant">0.1</Tmax>
-				<v12T name="Half-voltage for time constant">0</v12T>
-				<slpT name="Slope for time constant">1</slpT>
-			</parameters>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
+			<pow name="Power">0</pow>
+			<v12 name="Half-voltage">0</v12>
+			<slp name="Slope">1<slp>
+			<T0 name="Bias of time constant">0</T0>
+			<Tmax name="Maximal time constant">0.1</Tmax>
+			<v12T name="Half-voltage for time constant">0</v12T>
+			<slpT name="Slope for time constant">1</slpT>
 		</gate>
 		<gate name="generic modified" module="???">
 			<description>
@@ -65,18 +67,17 @@
 				[M|H]inf = 1/( 1+exp(-(v-v12 )/slp )
 				T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
 			</description>
-			<parameters>
-				<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-				<T0 name="Bias of time constant">0</T0>
-				<Tmax name="Maximal time constant">0.1</Tmax>
-				<v12T name="Half-voltage for time constant1">0</v12T>
-				<v12T2 name="Half-voltage for time constant2">0</v12T2>
-				<slpT name="Slope for time constant1">1</slpT>
-				<slpT2 name="Slope for time constant2">1</slpT2>
-			</parameters>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
+			<pow name="Power">0</pow>
+			<v12 name="Half-voltage">0</v12>
+			<slp name="Slope">1<slp>
+			<T0 name="Bias of time constant">0</T0>
+			<Tmax name="Maximal time constant">0.1</Tmax>
+			<v12T name="Half-voltage for time constant1">0</v12T>
+			<v12T2 name="Half-voltage for time constant2">0</v12T2>
+			<slpT name="Slope for time constant1">1</slpT>
+			<slpT2 name="Slope for time constant2">1</slpT2>
 		</gate>
 		<gate name="generic A-gate" module="???">
 			<description>
@@ -87,29 +88,30 @@
 				if V less than Vup
 					T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
 			</description>
-			<parameters>
-				<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
-				<pow name="Power">0</pow>
-				<v12 name="Half-voltage">0</v12>
-				<slp name="Slope">1<slp>
-				<T0 name="Bias of time constant">0</T0>
-				<Tmax name="Maximal time constant">0.1</Tmax>
-				<v12T name="Half-voltage for time constant1">0</v12T>
-				<v12T2 name="Half-voltage for time constant2">0</v12T2>
-				<slpT name="Slope for time constant1">1</slpT>
-				<slpT2 name="Slope for time constant2">1</slpT2>
-				<Vup name="Voltage threshold">-100</Vup>
-				<Tup name="Time constant if V less Vup">0.1</Tup>
-			</parameters>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
+			<pow name="Power">0</pow>
+			<v12 name="Half-voltage">0</v12>
+			<slp name="Slope">1<slp>
+			<T0 name="Bias of time constant">0</T0>
+			<Tmax name="Maximal time constant">0.1</Tmax>
+			<v12T name="Half-voltage for time constant1">0</v12T>
+			<v12T2 name="Half-voltage for time constant2">0</v12T2>
+			<slpT name="Slope for time constant1">1</slpT>
+			<slpT2 name="Slope for time constant2">1</slpT2>
+			<Vup name="Voltage threshold">-100</Vup>
+			<Tup name="Time constant if V less Vup">0.1</Tup>
 		</gate>
 		<gate name="a-b instant" module="???">
 			<description>
 			</description>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
 			<!-- etc --> 
 		</gate>
 		<gate name="a-b" module="???">
 			<description>
 			</description>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
 			<!-- etc --> 
 		</gate>
 		<!-- etc --> 
@@ -119,9 +121,7 @@
 			<description>
 				Non-specific reversal potential
 			</description>
-			<parameters>
-				<eds name="Reversal potential" import="/template/random/rnd" default="grnd">(0,0)</eds>
-			</parameters>
+			<eds name="Reversal potential" import="/template/random/rnd" default="grnd">(0,0)</eds>
 		</ion>
 		<ion name="specific" module="???">
 			<description>
@@ -129,46 +129,63 @@
 				E = (R*T)/(z*F)*ln([Out]/[In])
 				where R,T,F are constants
 			</description>
-			<parameters>
-				<in name="Concentration of ions inside the cell" import="/template/random/rnd" default="grnd">(0,0)</in>
-				<out name="Concentration of ions outside the cell" import="/template/random/rnd" default="grnd">(0,0)</out>
-				<Z name="Ionic charge">1</Z>
-				<eds name="Reversal potential">auto</eds>
-			</parameters>
-		<!-- etc --> 
+			<eds name="Reversal potential">auto</eds>
+			<in name="Concentration of ions inside the cell" import="/template/random/rnd" default="grnd">(0,0)</in>
+			<out name="Concentration of ions outside the cell" import="/template/random/rnd" default="grnd">(0,0)</out>
+			<Z name="Ionic charge">1</Z>
+		</ion>
+		<ion name="Leak" import="/template/ions/ion[@name='non-specific']">
+			<description>Reversal potential for basic leak current</description>
+			<parameter xpath="eds">(-60,0)</parameter>
 		</ion>
 		<dynamics>
 			<ion name="Na-ions" module="???">
+				<description>
+				</description>
 			</ion>
 			<ion name="Ca-ions" module="???">
+				<description>
+				</description>
 			</ion>
 			<ion name="Ca-ions +buffering" module="???">
+				<description>
+				</description>
 			</ion>
-		<!-- etc --> 
 		</dynamics>
 	</ions>
 	<channels>
-		<channel name="generic" module="???">
-			<parameters>
-				<gmax name="Maximal conductance" import="/template/random/rnd" default="grnd">(0,0)</gmax>
-				<eds name="Reversal potential">null</eds>
-			</parameters>
+		<channel name="basic" module="???">
+			<description>
+				Basic model of ion channel. 
+			</description>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<eds link="null"/>
+			<gmax name="Maximal conductance" import="/template/random/rnd" default="grnd">(0,0)</gmax>
+			<gate name="Activation" import="/template/gates/gate[@name='nogate']"/>
+			<gate name="Inactivation" import="/template/gates/gate[@name='nogate']"/>
+		</channel>
+		<channel name="Leak" import="/template/channels/channel[@name='basic']">
+			<description>
+				Basic model of Leak current. 
+				I = Gmax*(V-E)
+			</description>
+			<parameter xpath="eds" link="../ion[@name='Leak']/eds"/>
+			<parameter xpath="gmax">(1,0)</parameter>
 		</channel>
 	</channels>
 	<cells>
-		<cell name="generic" module="...">
-			<parameters>
-				<c name="Total capacitance">1</c>
-				<v name="Membrane potential" import="/template/random/rnd" default="grnd">(-60,0)</v>
-				<ion name="Leak" import="/template/ions/ion[@name='non-specific']">
-					<description>Reversal potential for leak current</description>
-					<parameter xpath="eds">(-60,0)</parameter>
-				</ion>
-				<channel name="Leak current" import="/template/channels/channel[@name='generic']">
-					<parameter xpath="gmax">(1,0)</parameter>
-					<parameter xpath="eds">../ion[@name='Leak']</parameter>
-				</channel>
-			<parameters>
+		<cell name="basic" module="...">
+			<description>
+				Basic model of a cell/compartment. 
+			</description>
+			<c name="Total capacitance">1</c>
+			<v name="Membrane potential" import="/template/random/rnd" default="grnd">(-60,0)</v>
+			<ion name="Leak" import="/template/ions/ion[@name='Leak']">
+				<parameter xpath="eds">(-60,0)</parameter>
+			</ion>
+			<channel name="Leak current" import="/template/channels/channel[@name='Leak']">
+				<parameter xpath="gmax">(1,0)</parameter>
+			</channel>
 		</cell>
 	<!-- etc --> 
 	</cells>
