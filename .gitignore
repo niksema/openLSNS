@@ -25,3 +25,5 @@ convertor/new_peripheralChemo.nns
 convertor/new_peripheralChemo.nns
 convertor/new_peripheralChemo.nns
 *.nns
+pugixml-1.6/docs/images/*
+pugixml-1.6/docs/*.html
