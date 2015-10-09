@@ -16,15 +16,15 @@
 			</description>
 			<parameter xpath="eds" link="../ion[@name='Na ions']/eds"/>
 			<gate name="Activation" import="/template/gates/gate[@name='generic']"> <!-- override activation --> 
-				<parameter v12="43.8" slp="6." Tmax="0.252" slpT="10.8" pow="3"/>
+				<parameter pow="3" Tmax="0.252" v12="43.8" slp="6." slpT="10.8"/>
 				<parameter xpath="init">(0,0)</parameter>
 			</gate>
 			<gate name="Inactivation" import="/template/gates/gate[@name='generic']"> <!-- override inactivation -->
-				<parameter v12="67.5" slp="10.8" Tmax="8.456" slpT="12.8" pow="1"/>
+				<parameter pow="1" Tmax="8.456" v12="67.5" slp="10.8" slpT="12.8"/>
 				<parameter xpath="init">(0,0)</parameter>
 			</gate>
 		</channel>
-		<channel name="Kdr" import="/template/channels/channel[@name='basic']">
+		<channel name="Kdr (a-b)" import="/template/channels/channel[@name='basic']">
 			<description>
 				I = G*(V-Ek)
 				G = Gmax*M^pm
@@ -34,7 +34,7 @@
 			</description>
 			<parameter xpath="eds" link="../ion[@name='K ions']/eds"/>
 			<gate name="Activation" import="/template/gates/gate[@name='a-b']"> <!-- override activation -->
-				<parameter "..."/>
+				<parameter pow="4" Tmax="???" v12a="???" slpa="???" Aa="" Ba="" Ca="" Da="" v12b="???" slpb="???" Ab="" Bb="" Cb="" Db=""/>
 				<parameter xpath="init">(0,0)</parameter>
 			</gate>
 		</channel>

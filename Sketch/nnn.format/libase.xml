@@ -35,7 +35,7 @@
 			<description>
 				The generic description of a gate variable (M|H) (activation or inactivation).
 				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
+				[M|H]inf = 1/(1+exp((v-v12)/slp)
 				T = 0
 			</description>
 			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
@@ -47,7 +47,7 @@
 			<description>
 				The generic description of a gate variable (M|H) (activation or inactivation).
 				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/(1+exp(-(v-v12)/slp)
+				[M|H]inf = 1/(1+exp((v-v12)/slp)
 				T = T0+Tmax/cosh((v-v12T)/slpT)
 			</description>
 			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
@@ -64,7 +64,7 @@
 			<description>
 				The generic description of a gate variable (M|H) (activation or inactivation).
 				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/( 1+exp(-(v-v12 )/slp )
+				[M|H]inf = 1/( 1+exp((v-v12 )/slp )
 				T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
 			</description>
 			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
@@ -83,7 +83,7 @@
 			<description>
 				The generic description of a gate variable (M|H) (activation or inactivation).
 				T*d[M/H]/dt = [M/H]inf-[M/H]
-				[M|H]inf = 1/( 1+exp(-(v-v12 )/slp )
+				[M|H]inf = 1/( 1+exp((v-v12 )/slp )
 				T = Tup;
 				if V less than Vup
 					T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
@@ -104,15 +104,50 @@
 		</gate>
 		<gate name="a-b instant" module="???">
 			<description>
+				The Alpha/Beta description of a gate variable (M|H) (activation or inactivation).
+				T*d[M/H]/dt = [M/H]inf-[M/H]
+				[M|H]inf = Alpha/(Alpha+Beta)
+				T = 0;
+				where:
+				Alpha/Beta = (A*v+B)/( exp(( v+V12 )/Slp )+C)
 			</description>
 			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
-			<!-- etc --> 
+			<pow name="Power">0</pow>
+			<v12a name="Alpha: Half-voltage">0</v12a>
+			<slpa name="Alpha: Slope">1<slpa>
+			<Aa name="Alpha: A">0</Aa>
+			<Ba name="Alpha: B">0</Ba>
+			<Ca name="Alpha: C">0</Ca>
+			<v12b name="Beta: Half-voltage">0</v12b>
+			<slpb name="Beta: Slope">-1<slpb>
+			<Ab name="Beta: A">1</Ab>
+			<Bb name="Beta: B">0</Bb>
+			<Cb name="Beta: C">-1</Cb>
 		</gate>
 		<gate name="a-b" module="???">
 			<description>
+				The Alpha/Beta description of a gate variable (M|H) (activation or inactivation).
+				T*d[M/H]/dt = [M/H]inf-[M/H]
+				[M|H]inf = Alpha/(Alpha+Beta)
+				T = T0+Tmax/(Alpha+Beta);
+				where:
+				Alpha/Beta = (A*v+B)/( exp(( v+V12 )/Slp )+C)
 			</description>
 			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
-			<!-- etc --> 
+			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
+			<pow name="Power">0</pow>
+			<T0 name="Bias of time constant">0</T0>
+			<Tmax name="Maximal time constant">0.1</Tmax>
+			<v12a name="Alpha: Half-voltage">0</v12a>
+			<slpa name="Alpha: Slope">1<slpa>
+			<Aa name="Alpha: A">0</Aa>
+			<Ba name="Alpha: B">0</Ba>
+			<Ca name="Alpha: C">0</Ca>
+			<v12b name="Beta: Half-voltage">0</v12b>
+			<slpb name="Beta: Slope">-1<slpb>
+			<Ab name="Beta: A">1</Ab>
+			<Bb name="Beta: B">0</Bb>
+			<Cb name="Beta: C">-1</Cb>
 		</gate>
 		<!-- etc --> 
 	</gates>

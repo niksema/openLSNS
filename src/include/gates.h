@@ -70,10 +70,14 @@ extern const char *lsns_gate_types[LSNS_MAX_GATES];
 #define _abgateCa( par ) ( par ).Par3.x
 // get parameter C for beta component of gate variable 
 #define _abgateCb( par ) ( par ).Par3.y
+// get parameter D for alpha component of gate variable 
+#define _abgateDa( par ) ( par ).Par3.z
+// get parameter D for beta component of gate variable 
+#define _abgateDb( par ) ( par ).Par3.w
 // get parameter T0 for alpha component of gate variable 
-#define _abgatet0( par ) ( par ).Par3.z
+#define _abgatet0( par ) ( par ).Par4.x
 // get parameter Tmax for beta component of gate variable 
-#define _abgatetmax( par ) ( par ).Par3.w
+#define _abgatetmax( par ) ( par ).Par4.y
 ///////////////////////////////////////////////////////////////////////////////
 // +extract parameters for all z-descriptions from the structure 'gatepar'
 //=============================================================================
@@ -100,6 +104,7 @@ typedef struct __lsns_align( 16 ) __gate_par{
 	float4 Par1;
 	float4 Par2;
 	float4 Par3;
+	float4 Par4;
 } gatepar;
 
 #endif /*__GATES_H*/

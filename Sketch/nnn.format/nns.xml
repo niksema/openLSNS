@@ -28,7 +28,7 @@
 					<parameter xpath="gate[@name='Activation']/init">(0.6,0)</parameter>
 					<parameter xpath="gate[@name='Inactivation']/init">(0.1,0)</parameter>
 				</channel>
-				<channel name="Krd" import="/template/channels/channel[@name='Kdr']">
+				<channel name="Krd (a-b)" import="/template/channels/channel[@name='Kdr']">
 					<parameter xpath="gmax">(80,0)</parameter>
 					<parameter xpath="gate[@name='Activation']/init">(0.3,0)</parameter>
 				</channel>
