@@ -109,20 +109,20 @@
 				[M|H]inf = Alpha/(Alpha+Beta)
 				T = 0;
 				where:
-				Alpha/Beta = (A*v+B)/( exp(( v+V12 )/Slp )+C)
+				Alpha/Beta = (A*v+B)/( exp(( v+C )/D )+E)
 			</description>
 			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
 			<pow name="Power">0</pow>
-			<v12a name="Alpha: Half-voltage">0</v12a>
-			<slpa name="Alpha: Slope">1<slpa>
 			<Aa name="Alpha: A">0</Aa>
 			<Ba name="Alpha: B">0</Ba>
 			<Ca name="Alpha: C">0</Ca>
-			<v12b name="Beta: Half-voltage">0</v12b>
-			<slpb name="Beta: Slope">-1<slpb>
-			<Ab name="Beta: A">1</Ab>
-			<Bb name="Beta: B">0</Bb>
-			<Cb name="Beta: C">-1</Cb>
+			<slpa name="Alpha: D">1<slpa>
+			<v12a name="Alpha: E">0</v12a>
+			<Ab name="Beta: A">0</Ab>
+			<Bb name="Beta: B">1</Bb>
+			<v12b name="Beta: C">0</v12b>
+			<slpb name="Beta: D">-1<slpb>
+			<Cb name="Beta: E">0</Cb>
 		</gate>
 		<gate name="a-b" module="???">
 			<description>
@@ -131,23 +131,23 @@
 				[M|H]inf = Alpha/(Alpha+Beta)
 				T = T0+Tmax/(Alpha+Beta);
 				where:
-				Alpha/Beta = (A*v+B)/( exp(( v+V12 )/Slp )+C)
+				Alpha/Beta = (A*v+B)/( exp(( v+C )/D )+E)
 			</description>
 			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
 			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
 			<pow name="Power">0</pow>
 			<T0 name="Bias of time constant">0</T0>
 			<Tmax name="Maximal time constant">0.1</Tmax>
-			<v12a name="Alpha: Half-voltage">0</v12a>
-			<slpa name="Alpha: Slope">1<slpa>
 			<Aa name="Alpha: A">0</Aa>
 			<Ba name="Alpha: B">0</Ba>
 			<Ca name="Alpha: C">0</Ca>
-			<v12b name="Beta: Half-voltage">0</v12b>
-			<slpb name="Beta: Slope">-1<slpb>
-			<Ab name="Beta: A">1</Ab>
-			<Bb name="Beta: B">0</Bb>
-			<Cb name="Beta: C">-1</Cb>
+			<slpa name="Alpha: D">1<slpa>
+			<v12a name="Alpha: E">0</v12a>
+			<Ab name="Beta: A">0</Ab>
+			<Bb name="Beta: B">1</Bb>
+			<v12b name="Beta: C">0</v12b>
+			<slpb name="Beta: D">-1<slpb>
+			<Cb name="Beta: E">0</Cb>
 		</gate>
 		<!-- etc --> 
 	</gates>

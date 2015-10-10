@@ -32,23 +32,42 @@
 #else
 	#define __lsns_inline inline
 	#if defined( __GNUC__ ) // GCC
+		#include <stdint.h>
 		#define __lsns_align( n ) __attribute__(( aligned( n )))
+		typedef int32_t __lsns_int32;
+		typedef uint32_t __lsns_uint32; 
 	#elif defined(_MSC_VER ) // MSVC
 		#define __lsns_align( n ) __declspec( align( n ))
+		typedef __int32 __lsns_int32;
+		typedef unsigned __int32 __lsns_uint32; 
 	#else
+		#define __lsns_align( n )
+		typedef int __lsns_int32;
+		typedef unsigned int __lsns_uint32; 
 		#error "Please provide a definition for __lsns_align macro for your host compiler!"
+		#error "Please provide a definition for __lsns_int32 macro for your host compiler!"
+		#error "Please provide a definition for __lsns_uint32 macro for your host compiler!"
 	#endif
-
 	typedef struct __int2{
-		int x;
-		int y;
+		__lsns_int32 x;
+		__lsns_int32 y;
 	} int2;
+	typedef struct __uint2{
+		__lsns_uint32 x;
+		__lsns_uint32 y;
+	} uint2;
 	typedef struct __int4{
-		int x;
-		int y;
-		int z;
-		int w;
+		__lsns_int32 x;
+		__lsns_int32 y;
+		__lsns_int32 z;
+		__lsns_int32 w;
 	} int4;
+	typedef struct __uint4{
+		__lsns_uint32 x;
+		__lsns_uint32 y;
+		__lsns_uint32 z;
+		__lsns_uint32 w;
+	} uint4;
 	typedef struct __float2{
 		float x;
 		float y;

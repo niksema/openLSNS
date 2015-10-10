@@ -50,34 +50,31 @@ extern const char *lsns_gate_types[LSNS_MAX_GATES];
 ///////////////////////////////////////////////////////////////////////////////
 // +extract parameters for alpha/beta descriptions from the structure 'gatepar'
 //=============================================================================
-// get half-voltage for alpha component of gate variable 
-#define _abgatev12a( par ) ( par ).Par1.x
-// get half-voltage for beta component of gate variable 
-#define _abgatev12b( par ) ( par ).Par2.x
-// get slope for alpha component of gate variable 
-#define _abgateslpa( par ) ( par ).Par1.y
-// get slope for beta component of gate variable 
-#define _abgateslpb( par ) ( par ).Par2.y
-// get parameter A for alpha component of gate variable 
-#define _abgateAa( par ) ( par ).Par1.z
-// get parameter A for beta component of gate variable 
-#define _abgateAb( par ) ( par ).Par2.z
-// get parameter B for alpha component of gate variable 
-#define _abgateBa( par ) ( par ).Par1.w
-// get parameter B for beta component of gate variable 
-#define _abgateBb( par ) ( par ).Par2.w
-// get parameter C for alpha component of gate variable 
-#define _abgateCa( par ) ( par ).Par3.x
-// get parameter C for beta component of gate variable 
-#define _abgateCb( par ) ( par ).Par3.y
-// get parameter D for alpha component of gate variable 
-#define _abgateDa( par ) ( par ).Par3.z
-// get parameter D for beta component of gate variable 
-#define _abgateDb( par ) ( par ).Par3.w
+//	Alpha/Beta = (A*v+B)/( exp(( v+C )/D )+E)
 // get parameter T0 for alpha component of gate variable 
-#define _abgatet0( par ) ( par ).Par4.x
+#define _abgatet0( par ) ( par ).Par1.x
 // get parameter Tmax for beta component of gate variable 
-#define _abgatetmax( par ) ( par ).Par4.y
+#define _abgatetmax( par ) ( par ).Par1.y
+// get A for alpha component of gate variable 
+#define _abgateAa( par ) ( par ).Par1.z
+// get B for alpha component of gate variable 
+#define _abgateBa( par ) ( par ).Par1.w
+// get C for alpha component of gate variable 
+#define _abgateCa( par ) ( par ).Par2.x
+// get D for alpha component of gate variable 
+#define _abgateDa( par ) ( par ).Par2.y
+// get E for alpha component of gate variable 
+#define _abgateEa( par ) ( par ).Par2.z
+// get A for beta component of gate variable 
+#define _abgateAb( par ) ( par ).Par2.w
+// get B for beta component of gate variable 
+#define _abgateBb( par ) ( par ).Par3.x
+// get C for beta component of gate variable 
+#define _abgateCb( par ) ( par ).Par3.y
+// get D for beta component of gate variable 
+#define _abgateDb( par ) ( par ).Par3.z
+// get E for beta component of gate variable 
+#define _abgateEb( par ) ( par ).Par3.w
 ///////////////////////////////////////////////////////////////////////////////
 // +extract parameters for all z-descriptions from the structure 'gatepar'
 //=============================================================================
@@ -104,7 +101,6 @@ typedef struct __lsns_align( 16 ) __gate_par{
 	float4 Par1;
 	float4 Par2;
 	float4 Par3;
-	float4 Par4;
 } gatepar;
 
 #endif /*__GATES_H*/

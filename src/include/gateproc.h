@@ -16,9 +16,9 @@
 // time constant for modified generic gate variable: t0+2*t/( exp(( v-v12 )/slp )+exp(-( v-v12_2 )/slp2 ))
 #define lsns_ggate_tmod( t0, t, v, v12, slp, v12_2, slp_2 ) \
 	( t0 )+lsns_div( 2*( t ), lsns_exp( lsns_div(( v )-( v12 ), slp ))+lsns_exp( -lsns_div(( v )-( v12_2 ), slp_2 )))
-// alha/beta gate variable: ( a*v+b )/( exp(( v+v12 )/slp )+c )
-#define lsns_abgate( v, v12, slp, a, b, c, d ) \
-	lsns_div(( a )*( v )+( b ), lsns_exp( lsns_div(( v )+( v12 ), slp ))+( d ))
+// alha/beta gate variable: (a*v+b )/( exp(( v+c )/d )+e )
+#define lsns_abgate( v, a, b, c, d, e ) \
+	lsns_div(( a )*( v )+( b ), lsns_exp( lsns_div(( v )+( c ), d ))+( e ))
 ///////////////////////////////////////////////////////////////////////////////
 // +implementation of the gate variables of all types
 //=============================================================================
@@ -97,19 +97,19 @@ __lsns_inline float proc_ggate4( gatepar &par, float v, float step, float gate )
 //		[M/H]inf = Alpha/(Alpha+Beta);
 //		T*d[M/H]/dt = [M/H]inf-[M/H];
 //-----------------------------------------------------------------------------
-//	Alpha/Beta = A*( B*v-C )/(exp(( v-V12 )/Slp )-D);
+//	Alpha/Beta = (A*v+B)/( exp(( v+C )/D )+E)
 //=========================== abgate1 =========================================
 __lsns_inline float proc_abgate1( gatepar &par, float v, float step, float gate )
 {
-	float alpha = lsns_abgate( v, _abgatev12a( par ), _abgateslpa( par ), _abgateAa( par ), _abgateBa( par ), _abgateCa( par ), _abgateDa( par ));
-	float beta = lsns_abgate( v, _abgatev12b( par ), _abgateslpb( par ), _abgateAb( par ), _abgateBb( par ), _abgateCb( par ), _abgateDb( par ));
+	float alpha = lsns_abgate( v, _abgateAa( par ), _abgateBa( par ), _abgateCa( par ), _abgateDa( par ), _abgateEa( par ));
+	float beta = lsns_abgate( v, _abgateAb( par ), _abgateBb( par ), _abgateCb( par ), _abgateDb( par ), _abgateEb( par ));
 	return lsns_div( alpha, alpha+beta );
 }
 //=========================== abgate2 =========================================
 __lsns_inline float proc_abgate2( gatepar &par, float v, float step, float gate )
 {
-	float alpha = lsns_abgate( v, _abgatev12a( par ), _abgateslpa( par ), _abgateAa( par ), _abgateBa( par ), _abgateCa( par ), _abgateDa( par ));
-	float beta = lsns_abgate( v, _abgatev12b( par ), _abgateslpb( par ), _abgateAb( par ), _abgateBb( par ), _abgateCb( par ), _abgateDb( par ));
+	float alpha = lsns_abgate( v, _abgateAa( par ), _abgateBa( par ), _abgateCa( par ), _abgateDa( par ), _abgateEa( par ));
+	float beta = lsns_abgate( v, _abgateAb( par ), _abgateBb( par ), _abgateCb( par ), _abgateDb( par ), _abgateEb( par ));
 	float time = lsns_div( 1.f, alpha+beta );
 	float gate_inf = alpha*time;
 	time = _abgatet0( par )+_abgatetmax( par )*time;

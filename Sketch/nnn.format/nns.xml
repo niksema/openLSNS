@@ -45,6 +45,7 @@
 	<common>
 		<step name="Integration step">0.1</step>
 		<time name="Simulation time">1000</time>
+		<threads name="Number of threads">auto</threads> <!-- multi-threading support (non-cuda version only)-->
 		<!-- etc --> 
 	</common>
 	<!-- network elements --> 
