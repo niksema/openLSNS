@@ -83,11 +83,12 @@ void syn_kernel( int index, syndat *data )
 	// process the synaptic summation if needed (size > 0)
 	if( _syn_size( tp ) > 0 ){
 		// load parameters for simulation
-		float step = Step;
+//		float step = Step;
 	 	synpar par = Synapses[_syn_par( tp )];
 		// load parameters synaptic weight
 		float4 wsyn = pWsyn[index];
-		float w_total = 0.f, ah = _wsyn_ah( wsyn ), edt = _synEdt( par ), dt = _synDt( par );	// results of synaptic summation to be stored
+		float w_total = 0.f;							// results of synaptic summation to be stored
+		float ah = _wsyn_ah( wsyn ), edt = _synEdt( par ), dt = _synDt( par );	// parameters of synaptic summation
 		switch( _syn_type( tp )){
 			case LSNS_WSUM_SYN:{
 					for( int i = 0, j = _syn_lut( tp ); i < _syn_size( tp ); ++j, i += 4 ){
@@ -141,13 +142,13 @@ void syn_kernel( int index, syndat *data )
 void ions_kernel( int index, iondat *data )
 {
 	__lsns_assert( index >= 0 && index < MAX_IONS );	// DEBUG: check the range for 'index' variable
-	// load parameters for simulation
-	float step = Step;
 	// load type of ions (Na, K, Ca etc, and type of ion dynamics)
 	int4 tp = pIonsType[index];
 	int type_dyn = _ions_typepump( tp );
 	int type_eds = _ions_typeeds( tp );
 	if( type_dyn != LSNS_NO_DYN ){
+		// load parameters for simulation
+		float step = Step;
 		// load ions parameters, resting potential, ions concentrations if needed
 		ionspar par = Ions[_ions_parpump( tp )];	// load pump properties
 		int4 lut = pIonsLUT[index];			// load references to external parameters (channel conductances etc)
@@ -228,6 +229,7 @@ void chan_kernel( int index, chandat *data )
 	// load properties of gate variables (activation, inactivation, etc) if needed
 	float4 mh = ( _gate_typem( tp )+_gate_typeh( tp ) != LSNS_NOGATE)? pChanMH[index]: float4();
 //todo: { possible CUDA optimization (try to use shared variables)
+	//TODO: use __lsns_cached for pIonsE, pCellV
 	// load shared variables (resting potential, membrane potential, etc) to shared memory
 	float eds = _ions_eds( pIonsE[_chan_lute( lut )] );				// extract resting potential from 'IonsE'
 	float vm = _cell_v( pCellV[_chan_lutv( lut )] );				// extract membrane potential from 'CellV'
@@ -434,7 +436,7 @@ bool lsns_run( netpar &par, int max_step )
 		for( int view = 0; view < par.MaxViewPars/4+1; ++view ){
 			store2dev_kernel( view, &( par.Data->DevMap->IOData ), step%MAX_STORED_STEPS );
 		}
-		if( step > 0 && step%MAX_STORED_STEPS == 0 ){
+		if(( step+1 )%MAX_STORED_STEPS == 0 ){
 			for( int view = 0; view < ( par.MaxViewPars/4+1 )*MAX_STORED_STEPS; ++view ){
 				store2host_kernel( view, &( par.Data->DevMap->IOData ));
 			}

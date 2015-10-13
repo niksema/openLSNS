@@ -39,10 +39,10 @@ typedef struct __lsns_align( 16 ) __synapses_data{
 	int4 __lsns_align( 16 ) *SynType;			//  x - type of synapse, y - parameters, z - size, w - initial index in Wall&CellLUT arrays
 	int4 __lsns_align( 16 ) *CellLUT;			// look-up-table for all neurons which are converged onto particular synapse
 	float4 __lsns_align( 16 ) *Wall;			// all weights for particular synapse
-	// local variables (read/write)
-	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - [rate of transmitter release]*[plasticity] (a*h), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
-	// shared variables
+	// shared variables (read-only)
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
+	// shared variables (read/write)
+	float4 __lsns_align( 16 ) *Wsyn;			// x - total sum, y - [rate of transmitter release]*[plasticity] (a*h), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
 } syndat;
 //=================== iondat macroses =========================================
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,12 +92,12 @@ typedef struct __lsns_align( 16 ) __ions_data{
 	int4 __lsns_align( 16 ) *IonsType;			// type of ions: x - pump type, y - eds type, z - pump parameters, w - reserved
 	int4 __lsns_align( 16 ) *IonsLUT;			// indices of shared variables: x - cell properties, y, z, w - reserved
 	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
-	// local variables (read/write)
-	float4 __lsns_align( 16 ) *IonsE;			// ions properties: x - reversal potential (Eds), y - concentration of ions inside the cell, z - concentration of ions outside the cell, w - RT/Fz constant for specific ions
-	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - reserved, w - reserved.
-	// shared variables
+	// shared variables (read-only)
 	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
+	// shared variables (read/write)
+	float4 __lsns_align( 16 ) *IonsE;			// ions properties: x - reversal potential (Eds), y - concentration of ions inside the cell, z - concentration of ions outside the cell, w - RT/Fz constant for specific ions
+	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - reserved, w - reserved.
 } iondat;
 
 //=================== chandat macroses ========================================
@@ -153,13 +153,13 @@ typedef struct __lsns_align( 16 ) __channel_data{
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *ChanType;			// type of channel: x - type of activation, y - parameters of activation, z - type of inactivation, w - parameters of inactivation.
 	int4 __lsns_align( 16 ) *ChanLUT;			// indices of shared variables: x - CellV, y - IonsE/eds, z - IonsE/in for M (z-channel)/or W total for synapse, w - IonsE/in for H (z-channel)/or W total for synapse
-	// local variables (read-write)
-	float4 __lsns_align( 16 ) *ChanMH;			// gate variables: x - activation, y - inactivation, z - power of activation, w - power of inactivation
-	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
-	// shared variables
+	// shared variables (read-only)
 	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 	float4 __lsns_align( 16 ) *IonsE;			// ions properties: x - reversal potential (Eds), y - concentration of ions inside the cell, z - concentration of ions outside the cell, w - RT/Fz constant for specific ions
 	float4 __lsns_align( 16 ) *Wsyn;			// synaptic weights: x - total sum, y - ( rate of transmitter release )*( plasticity ), z - 1 for pulse model or step/T other models, w - exp( step/T ) for pulse model or 1-step/T for othe models
+	// shared variables (read-write)
+	float4 __lsns_align( 16 ) *ChanMH;			// gate variables: x - activation, y - inactivation, z - power of activation, w - power of inactivation
+	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
 } chandat;
 
 //=================== celldat macroses ========================================
@@ -186,11 +186,11 @@ typedef struct __lsns_align( 16 ) __cell_data{
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
 	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table of pump current: x - counter, the rest are actual indices of IonsI array;
-	// local variables (read-write)
-	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
-	// shared variables
+	// shared variables (read-only)
 	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
 	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - time constant of ions dynamics, w - reserved.
+	// shared variables (read-write)
+	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 } celldat;
 
 //=================== unitdat macroses ========================================
@@ -212,11 +212,11 @@ typedef struct __lsns_align( 16 ) __unit_data{
 	// local variables (read-only)
 	int4 __lsns_align( 16 ) *ChanGLUT;			// look-up-table of channel current: x - counter, the rest are actual indices of ChanG array
 	int4 __lsns_align( 16 ) *IonsILUT;			// look-up-table of pump current: x - counter, the rest are actual indices of IonsI array;
-	// local variables (read-write)
-	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 	// shared variables
 	float4 __lsns_align( 16 ) *ChanG;			// channel current: x - maximal conductance, y - conductance, z - current, w - G*Eds production
 	float4 __lsns_align( 16 ) *IonsI;			// ion currents: x - pump current, y - channels current, z - time constant of ions dynamics, w - reserved.
+	// shared variables (read-write)
+	float4 __lsns_align( 16 ) *CellV;			// cell properties: x - membrane potential, y - membrane capacitance, z - spike onset, w - injected current
 } unitdat;
 
 //=============================================================================
@@ -228,11 +228,11 @@ typedef struct __lsns_align( 16 ) __iobuf{
 	// LUT format: bits 31..30 are coding the offset in each float4 variable (00 - x, 01 - y, 10 - z, 11 - w); 
 	// bits 29..0 are coding the offset in the global array 'GlobalData'
 	int4 __lsns_align( 16 ) *ViewLUT;			// look-up-table for data needed to be stored (located both in device and host memory)
-	// local variables (read-write)
+	// shared variables (read only)
+	float4 __lsns_align( 16 ) *GlobalData;			// array of global data (located in device memory)
+	// shared variables (read-write)
 	float4 __lsns_align( 16 ) *ViewData[MAX_STORED_STEPS];	// data to display (located in device memory)
 	float4 __lsns_align( 16 ) *GlobalViewData;		// data to display (pinned memory located in host memory)
-	// shared variables
-	float4 __lsns_align( 16 ) *GlobalData;			// array of global data (located in device memory)
 } iodat;
 
 //=============================================================================

@@ -26,10 +26,12 @@
 		<gate name="nogate" module="???">
 			<description>The gate variable is always 1</description>
 			<init name="Initial value">1</init>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 		</gate>
 		<gate name="bypass gate" module="???">
 			<description>The gate variable will be modified elsewhere</description>
 			<init name="Initial value" link="null"/>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 		</gate>
 		<gate name="generic instant" module="???">
 			<description>
@@ -38,7 +40,7 @@
 				[M|H]inf = 1/(1+exp((v-v12)/slp)
 				T = 0
 			</description>
-			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 			<pow name="Power">0</pow>
 			<v12 name="Half-voltage">0</v12>
 			<slp name="Slope">1<slp>
@@ -50,7 +52,7 @@
 				[M|H]inf = 1/(1+exp((v-v12)/slp)
 				T = T0+Tmax/cosh((v-v12T)/slpT)
 			</description>
-			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
 			<pow name="Power">0</pow>
 			<v12 name="Half-voltage">0</v12>
@@ -67,7 +69,7 @@
 				[M|H]inf = 1/( 1+exp((v-v12 )/slp )
 				T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
 			</description>
-			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
 			<pow name="Power">0</pow>
 			<v12 name="Half-voltage">0</v12>
@@ -88,7 +90,7 @@
 				if V less than Vup
 					T = T0+2*Tmax/(exp((v-v12T)/slpT)+exp(-(v-v12T2)/slpT2))
 			</description>
-			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
 			<pow name="Power">0</pow>
 			<v12 name="Half-voltage">0</v12>
@@ -111,18 +113,18 @@
 				where:
 				Alpha/Beta = (A*v+B)/( exp(( v+C )/D )+E)
 			</description>
-			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 			<pow name="Power">0</pow>
 			<Aa name="Alpha: A">0</Aa>
 			<Ba name="Alpha: B">0</Ba>
 			<Ca name="Alpha: C">0</Ca>
-			<slpa name="Alpha: D">1<slpa>
-			<v12a name="Alpha: E">0</v12a>
+			<Da name="Alpha: D">1<Da>
+			<Ea name="Alpha: E">0</Ea>
 			<Ab name="Beta: A">0</Ab>
 			<Bb name="Beta: B">1</Bb>
-			<v12b name="Beta: C">0</v12b>
-			<slpb name="Beta: D">-1<slpb>
-			<Cb name="Beta: E">0</Cb>
+			<Cb name="Beta: C">0</Cb>
+			<Db name="Beta: D">-1<Db>
+			<Eb name="Beta: E">0</Eb>
 		</gate>
 		<gate name="a-b" module="???">
 			<description>
@@ -133,7 +135,7 @@
 				where:
 				Alpha/Beta = (A*v+B)/( exp(( v+C )/D )+E)
 			</description>
-			<v name="Membrane potential" link="../v[@name='Membrane potential']"/>
+			<v name="Membrane potential" link="../v[@name='Membrane potential']" hide="on"/>
 			<init name="Initial value" import="/template/random/rnd" default="grnd">(0,0)</init>
 			<pow name="Power">0</pow>
 			<T0 name="Bias of time constant">0</T0>
@@ -141,13 +143,13 @@
 			<Aa name="Alpha: A">0</Aa>
 			<Ba name="Alpha: B">0</Ba>
 			<Ca name="Alpha: C">0</Ca>
-			<slpa name="Alpha: D">1<slpa>
-			<v12a name="Alpha: E">0</v12a>
+			<Da name="Alpha: D">1<Da>
+			<Ea name="Alpha: E">0</Ea>
 			<Ab name="Beta: A">0</Ab>
 			<Bb name="Beta: B">1</Bb>
-			<v12b name="Beta: C">0</v12b>
-			<slpb name="Beta: D">-1<slpb>
-			<Cb name="Beta: E">0</Cb>
+			<Cb name="Beta: C">0</Cb>
+			<Db name="Beta: D">-1<Db>
+			<Eb name="Beta: E">0</Eb>
 		</gate>
 		<!-- etc --> 
 	</gates>

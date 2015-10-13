@@ -29,13 +29,15 @@
 #if defined( __CUDACC__ ) // NVCC
 	#define __lsns_inline __forceinline__ __device__
 	#define __lsns_align( n ) __align__( n )
+	#define __lsns_cached( p ) __ldg( p )
 #else
 	#define __lsns_inline inline
+	#define __lsns_cached( p ) p
 	#if defined( __GNUC__ ) // GCC
 		#include <stdint.h>
 		#define __lsns_align( n ) __attribute__(( aligned( n )))
 		typedef int32_t __lsns_int32;
-		typedef uint32_t __lsns_uint32; 
+		typedef uint32_t __lsns_uint32;
 	#elif defined(_MSC_VER ) // MSVC
 		#define __lsns_align( n ) __declspec( align( n ))
 		typedef __int32 __lsns_int32;
