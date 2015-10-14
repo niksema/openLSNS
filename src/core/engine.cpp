@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "debug.h"
 
+#include "kernels.h"
 #if !defined ( __CUDA__ )
 
 #include <stdlib.h>

@@ -12,7 +12,7 @@ __lsns_inline float proc_synsum( float4 &v, float4 &w  )
 ///////////////////////////////////////////////////////////////////////////////
 // 'lsns_sig_syn' calculates the neurotransmitter release for model of sigma 
 // synapse. Parameters v12 and slope are hidden
-#define lsns_sig_syn( v )
+#define lsns_sig_syn( v ) \
 	lsns_msigm( v, v12, slope )
 ///////////////////////////////////////////////////////////////////////////////
 // 'lsns_synsum4' calculates the total sum of weighted inputs from 4 presynaptic

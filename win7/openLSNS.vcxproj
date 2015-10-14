@@ -96,6 +96,7 @@
     <ClInclude Include="..\src\include\gates.h" />
     <ClInclude Include="..\src\include\ionproc.h" />
     <ClInclude Include="..\src\include\ions.h" />
+    <ClInclude Include="..\src\include\kernels.h" />
     <ClInclude Include="..\src\include\lsnsmath.h" />
     <ClInclude Include="..\src\include\synapses.h" />
     <ClInclude Include="..\src\include\synproc.h" />
